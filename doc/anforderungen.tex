@@ -1,0 +1,143 @@
+\documentclass[a4paper]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{arrows, shapes, automata}
+\usepackage{pgf-umlsd}
+\usepackage[simplified]{pgf-umlcd}
+
+\title{Anforderungskatalog pyPsy}
+\author{Alexandra Weiss und Franz Gregor}
+\date{\today}
+
+\begin{document}
+\maketitle
+\pagebreak
+\section{Einleitung}
+
+\section{Anforderungen}
+  \subsection{Dateninput}
+    \subsubsection{Pflicht}
+      \begin{description}
+	\item[Video laden (IP01)] Das Programm muss ein vom Nutzer angegebenes Video, das von einer Eyelink II Ausrüstung aufgenommen wurde und von der Eyelink Software ohne Binärzeitbalken und ohne Blickcursor exportiert wurde, laden können.
+	\item[Augenbewegungsdaten laden (IP02)] Das Programm muss eine vom Nutzer angegebene Augenbewegungsdatendatei, die von der Eyelink Software im ASCII-Format exportiert wurde, laden können.
+	\item[Programmstatus laden (IP03)] Das Programm muss ein zuvor gespeicherten Programmstatus wiederherstellen können.
+      \end{description}
+    \subsubsection{Optional}
+      \begin{description}
+	\item[Videos mit anderen Codecs laden (IO01)] Das Programm sollte auch Videos mit anderen Codecs laden. Bspw. XviD.
+	\item[Rohvideos laden (IO02)] Das Programm sollte Videos mit Eyelink Binärzeitbalken laden.
+	\item[Rohaugenbewegungsdaten laden (IO03)] Das Programm sollte auch Augenbewegungsdaten, die im Eyelink Binärformat gespeicht sind, laden.
+      \end{description}
+  \subsection{Datenoutput}
+    \subsubsection{Pflicht}
+      \begin{description}
+	\item[Video mit Blickcursor exportieren (OP01)] Das Programm muss dem Nutzer die Möglichkeit bieten das geladene Video mit den geladenen Augenbewegungsdaten, die mit Hilfe eines Blickcursors im jeweiligem Bild angezeigt werden, zu exportieren.
+	\item[Kategorisierungen exportieren (OP02)] Das Programm muss dem Nutzer die Möglichkeit bieten die von ihm vorgenommenen Kategorisierungen in Form einer CSV-Datei zu exportieren.
+	\item[Programmstatus speichern (OP03)] Das Programm muss dem Nutzer die Möglichkeit bieten den aktuellen Programmstatus zum späteren wiederherstellen zu speichern.
+      \end{description}
+    \subsubsection{Optional}
+      \begin{description}
+	\item[Videokomprimierung (OO01)] Das Programm sollte das exportierte Video komprimieren.
+      \end{description}
+  \subsection{Wiedergabe}
+    \subsubsection{Pflicht}
+      \begin{description}
+	\item[Frame mit Blickcursor anzeigen (WP01)] Das Programm zeigt dem Nutzer ein Frame des geladenen Videos, zu einem bestimmten Zeitpunkt, mit einem oder zwei Blickcursor, dessen/derren Position aus den geladenen Augenbewegungsdaten gewonnen werden.
+	\item[Video abspielen (WP02)] Das Programm bietet dem Nutzer die Möglichkeit, in regelmäßigen vom Nutzer wählbaren Abständen, das gezeigte Frame durch das im Video darauffolgende zu ersetzen. Der Nutzer kann dieses Verhalten mit den Buttons Play/Pause, Schneller, Langsamer, dem Hotkey Leertaste Play/Pause steuern.
+	\item[Nachfolger/Vorgänger anzeigen (WP03)] Das Programm zeigt auf Anweisung des Nutzers hin das vorhergehende oder nachfolgende Frame an. Der Nutzer kann dieses Verhalten mit den Hotkeys Pfeil Hoch/Pfeil Runter und dem Mausrad steuern.
+	\item[Eventbasiertes springen (WP04)] Das Programm bietet dem Nutzer die Möglichkeit vom aktuell gezeigten Frame zu einem Frame des Videos, während der nächsten oder vorhergehende Fixation, zu springen. Der Nutzer kann dieses Verhalten mit den Hotkeys Pfeil Rechts/Pfeil Links steuern.
+	\item[Zeitbasiertes springen (WP05)] Der Nutzer kann das Programm mit einem Slider anweißen das Frame des Videos zu einem bestimmten Zeitpunkt anzuzeigen.
+      \end{description}
+    \subsubsection{Optional}
+      \begin{description}
+	\item[Anpassbare Blickcursor (WO01)] Der Nutzer sollte das Aussehen der Blickcursor anpassen.
+	\item[Deinterlacing (WO02)] Das Programm sollte die angezeigten Frames mit einem Deinterlacing Filter verbessern.
+	\item[Eventbasierte Blickcursorfarbe (WO03] Das Programm sollte den Blickcursor in unterschiedlichen Farben in Abhängigkeit vom aktuellem Event zeichnen.
+	\item[Korrektur des Blickcursors (WO04)] Das Programm bietet dem Nutzer die Möglichkeit die Position des Blickcursors zeit- oder positionsabhängig zu korrigieren.
+      \end{description}
+  \subsection{Kategorisierung}
+    \subsubsection{Pflicht}
+      \begin{description}
+	\item[Kategorien festlegen (KP01)] Das Programm bietet dem Nutzer eine Oberfläche um Kategorien anzulegen. Eine Kategorie besteht aus einem Namen und einem Tastenkürzel.
+	\item[Fixation kategorisieren (KP02)] Der Nutzer kann die zum gerade angezeigten Frame gehörende Fixation durch Drücken des zuvor festgelegten Tastenkürzel zu einer Kategorie zuordnen.
+	\item[Automatische Kategorisierung (KP03)] Wird nach einer Kategorisierung durch den Nutzer ein Frame der darauffolgenden Fixation gezeigt übernimmt das Programm die vorhergehende Kategorisierung auf die nachfolgende Fixation.
+	\item[Statusfenster Kategorisierung (KP04)] Das Programm informiert den Nutzer über den Status der Kategorisierung mit einer Tabelle am rechtem Rand der Oberfläche. In dieser werden alle Fixation mit Nummern und zugehöriger Kategorie angezeigt.
+      \end{description}
+\section{Weitere Leistungen}
+  \begin{description}
+    \item[Entwicklerhandbuch (WL01)] Das Entwicklerhandbuch enthält die zur Umsetzung des Programms genutzten Architekturen und Konzepte.
+    \item[Quellcodedokumentation (WL02)] Der Quellcode wird mit Docstrings kommentiert um zukünftigen Entwicklern das Einarbeiten zu erleichtern.
+  \end{description}
+  
+\section{Programmablauf}
+  Das folgende Flowchart auf Seite \pageref{flowchart} zeigt den groben Programmablauf.
+  
+  Das Programm wird vom Nutzer gestartet. Abhängig davon ob der Nutzer beim Programmaufruf bereits den Pfad zu einem gespeichertem Programmstatus angibt oder nicht wird dem Nutzer ein Dialog gezeigt. In diesem muss er entweder die Pfade zu der Video- und der Augenbewegungsdatendatei angeben oder den Pfad eines gespeicherten Programmstatus. Das Programm nutzt diese Angaben um den internen Datenstrukturen anzulegen.
+  
+  Anschließend ist das Programm bereit und alle weiteren Funktionen können über Tastenkürzel und das Menü genutzt werden.
+  
+  \begin{figure}[!ht]
+    \tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+      text width=5em, text badly centered, node distance=3cm, inner sep=0pt]
+    \tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+      text width=5.5em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+      minimum height=2em]
+    \begin{tikzpicture}[node distance=3cm, auto]
+      \node[cloud] (init) {Start};
+      \node[decision, right of=init] (open_saved) {Programm-status gegeben};
+      \node[block, below of=open_saved] (load_saved) {Daten laden};
+      \node[block, right of=open_saved] (query_data) {Datei(en) zum laden angeben};
+      \node[block, below of=load_saved] (ready) {Bereit};
+      \node[block, left of=ready] (play) {Video abspielen};
+      \node[block, below of=ready] (jump) {Bild/Frame Weise springen};
+      \node[block, left of=play] (categorise) {Fixation kategorisieren};
+      \node[block, right of=jump] (save) {Programm-status speichen};
+      \node[cloud, right of=ready] (exit) {Beenden};
+      \node[block, above of=exit] (cat_exp) {Kategorien exportieren};
+      \node[block, above of=play] (vid_exp) {Overlayed Video exportieren};
+      \node[block, left of=jump] (set_shortcuts) {Kategorien festlegen};
+      
+      \path
+	(init) edge[->] (open_saved)
+	(open_saved) edge[->] (load_saved)
+	(load_saved) edge[->] (ready)
+	(open_saved) edge[->] (query_data)
+	(query_data) edge[->, bend left=16] (load_saved)
+	(ready) edge[->, bend right=15] (play)
+	(ready) edge[->, bend right=15] (jump)
+	(jump) edge[->, bend right=15] (ready)
+	(ready) edge[->] (exit)
+	(ready) edge[->, bend right=25] (categorise)
+	(ready) edge[->, bend right=15] (save)
+	(save) edge[->, bend right=15] (ready)
+	(play) edge[->] (categorise)
+	(play) edge[->, bend right=15] (ready)
+	(categorise) edge[->, bend right=25] (ready)
+	(ready) edge[->, bend right=15] (vid_exp)
+	(ready) edge[->, bend right=15] (cat_exp)
+	(cat_exp) edge[->, bend right=15] (ready)
+	(vid_exp) edge[->, bend right=15] (ready)
+	(ready) edge[->, bend right=15] (set_shortcuts)
+	(set_shortcuts) edge[->, bend right=15] (ready)
+      ;
+    \end{tikzpicture}
+    \label{flowchart}
+    \caption{Flowchart des Programmablaufs}
+  \end{figure}
+
+\section{offene Fragen}
+  \begin{itemize}
+    \item Welche Daten sollen in der CSV-Export Datei stehen? (Fixationsnr., Kategorie, Dauer, Pixel, Start-, Endzeitpunkt, Frames, ...)
+    \item Werden Kategorien Fixationen zugeordnet oder einzelnen Frame?
+    \item Welche Events sollen für das eventbasierte Navigieren genutzt werden?
+    \item Kann die Eyelink Software das Video ohne Binärzeitbalken und ohne Blickcursor exportieren?
+    \item Können wir ein öffentliches Repository nutzen?
+    \item Muss Blickcursormittelwertberechnung vom Nutzer wählbar sein oder sollen wir die dem Eyelink Blickcursor ähnlichste nutzen?
+    \item Wann soll die Kategorisierungen durchgeschleift werden? (Video abspielen, Einzelbild, Framebasiert weiter)
+    \item Soll auch ein Installationsprogramm geschrieben werden?
+    \item Soll es eine Benutzerhilfe geben?
+    \item Welche Leistung besitzen die Rechner auf dennen das Programm ausgeführt werden soll?
+  \end{itemize}
+\end{document}

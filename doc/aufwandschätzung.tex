@@ -1,0 +1,104 @@
+\documentclass[a4paper]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{arrows, positioning}
+
+\title{Aufwandschätzung für pyPsy}
+\author{Alexandra Weiss und Franz Gregor}
+\date{\today}
+
+\begin{document}
+\maketitle
+\pagebreak
+\section{Einleitung}
+In diesem Dokument wird eine Aufwandschätzung aufgestellt. Eine akkurate Schätzung abzugeben ist nicht einfach. Von ihr hängt jedoch der Umfang des Projektes und u.U. sogar das Stattfinden des Projektes ab.
+
+Eine akkurate Aufwandschätzung ist sehr kompliziert. Im Allgemeinem geht man von einer Falschschätzung um den Faktor 10 aus! Das bedeuted das eine Schätzung von einem Jahr Aufwand in der Umsetzung bis zu 10 Jahre oder auch nur 70 Tage dauert. \footnote{http://de.wikipedia.org/wiki/Aufwandssch\%C3\%A4tzung\_\%28Softwaretechnik\%29\#Genauigkeit}
+
+Um den Schätzungsfehler zu minimieren werden bei dieser Schätzung die Aufgaben auf Komponenten verteilt und diese einzeln geschätzt sowie die Schätzung von zwei Personen einzeln durchgeführt. Mit diesem Vorgehen versuchen wir zufällige Schätzungsfehler durch Mittelwertbildung auszugleichen.
+
+Die Komponenten orientieren sich an einem Grobentwurf des geplanten Programms. Welcher mit Hilfe des Anforderungskatalogs erstellt wurde.
+
+\section{Grobentwurf und Komponenten}
+\begin{figure}[ht]
+  \begin{center}
+  \begin{tikzpicture}[auto, node distance=1.2cm]
+    \node (controller) {Controller};
+    \node[left=0.5cm of controller] (gui) {GUI};
+    \node[right=2.2cm of controller] (vid_reader) {VideoReader};
+    \node[below of=vid_reader] (vid_writer) {VideoWriter};
+    \node[above of=vid_reader] (cursor) {Cursor};
+    \node[above of=cursor] (clock) {Clock};
+    \node[below of=vid_writer] (eyes) {EyeMovement};
+    \node[below of=eyes] (categories) {CategoryContainer};
+    \node[left=2.2cm of gui](mainview) {MainView};
+    \node[below=of mainview] (loadview) {LoadView};
+    \node[below=of loadview] (categoryview) {CategoryView};
+    \node[below=of categoryview] (cursorview) {CursorView};
+    \node[above=of mainview] (exportcsvview) {ExpostCSVView};
+    \node[above=of exportcsvview] (exportvideoview) {ExportVideoView};
+
+    \path
+      (controller) edge (gui)
+      (controller) edge (vid_reader)
+      (controller) edge (vid_writer)
+      (controller) edge (categories)
+      (controller) edge[dotted] (cursor)
+      (controller) edge (clock)
+      (controller) edge (eyes)
+      (gui) edge (mainview)
+      (gui) edge (loadview)
+      (gui) edge (categoryview)
+      (gui) edge[dotted] (cursorview)
+      (gui) edge (exportcsvview)
+      (gui) edge (exportvideoview)
+    ;
+  \end{tikzpicture}
+  \end{center}
+\caption{Grobentwurf}
+\label{Grobentwurf}
+\end{figure}
+
+Abbildung \ref{Grobentwurf} zeigt den Grobentwurf des Programms. Dieser orientiert sich an den festgelegten Anforderungen. Diese werden auf bestimmte die im Entwurf sichtbaren Komponenten verteilt welche im implementierten Programm durch Klassen repräsentiert sein werden. Die beiden gepunkteten Linien binden Komponenten an die nur optionale Anforderungen umsetzen und daher u.U. nicht im Programm als Klassen auftauchen werden.
+
+Der Entwurf zeigt eine Model-View-Controller Architektur mit der Besonderheit das es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
+
+\begin{enumerate}
+  \item[VideoReader] Der VideoReader öffnet Videodateien. Er kann ein einzelnes Bild zu einem bestimmten Zeitpunkt aus dem Video extrahieren und bietet Informationen über das Video an.
+  \item[VideoWriter] Der VideoWriter nimmt Einzelbilder entgegen und schreibt diese in eine Videodatei.
+  \item[CategoryContainer] Der CategoryContainer hält die vom Nutzer angegebenen Kategorien, ihre Tastenkürzel eine Liste der Fixationen und eine Zuordnung der Fixationen zu Kategorien.
+  \item[Clock] Die Clock ist der Programminterne Zeitgeber.
+  \item[EyeMovement] Diese Komponent hält die Daten der Augenbewegungen und ist für die Korrekture dergleichen zuständig (Optional).
+  \item[Cursor] Die Cursor Klasse soll den angezeigten Blickcursor anpassbar machen. Sie erhält Informationen zum aktuellen Status der Augenbewegung und gibt einen Blickcursor zurück. (Optional)
+\end{enumerate}
+
+
+\section{Schätzungen}
+  \begin{table}[!ht]
+  \begin{center}
+  \begin{tabular}{c|c|c|c}
+    Komponente & Schätzung 1 & Schätzung 2 & Durchschnitt \\
+    \hline
+    GUI & 32 & 20 & 26\\
+    Controller & 24 & 55 & 39,5\\
+    VideoReader & 8 & 10 & 9\\
+    VideoWriter & 4 & 10 & 7\\
+    EyeMovement & 8 & 20 & 14\\
+    Clock & 4 & 5 & 4,5\\
+    CategoryContainer & 4 & 10 & 7\\
+    \hline
+    Entwurf & 20 & 12,5 & 16,25\\
+    Dokumentation & 8 & 10 & 9\\
+    Gesamt & 112 & 152,5 & 132,25\\
+  \end{tabular}
+  \caption{Einzelschätzung}
+  \label{Einzelschaetzung}
+  \end{center}
+  \end{table}
+
+  Wir schätzen den Aufwand pro Komponente in Stunden. Durch das Komponentenweise Vorgehen und das einbeziehen mehrerer Personen sollen zufällige Schätzungsfehler verringert werden. Diese Schätzung bezieht sich auf Feinentwurf, Implementierung, Tests und Dokumentation.
+
+  Insgesamt beläuft sich die Schätzung auf 132,25 Stunden. Die einzelnen Daten können in Tabelle \ref{Einzelschaetzung} eingesehen werden.
+\end{document}
+ 

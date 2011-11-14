@@ -1,0 +1,64 @@
+\documentclass[a4paper,draft]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{arrows, positioning}
+\usepackage{pgf-umlcd}
+
+\title{Machbarkeitsuntersuchungen pyPsy}
+\author{Alexandra Weiss und Franz Gregor}
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+\section{Festlegungen}
+\subsection*{Wir nutzen OpenCV als Videobiliothek}
+Unsere Reise durch die Videobiliothekten brachte uns dazu uns für OpenCV und pyOpenCV zu entscheiden. Das hatte unter anderem folgende Gründe. OpenCV nutzt FFMpeg um Videos zu öffnen und zu speichern. Es existieren auch andere FFMpeg Wrapper für Python jedoch waren die untersuchten nicht mehr gewartet (pyMedia) oder konnten keine Videos speichern (pyMedia, pyFFMpeg). Als weitere große und vor allem freie Videobibliothek haben wir uns GStreamer angesehen. GStreamer hat alles was wir brauchen. Um genau zu sein es kann alles was man mit Video und Audio usw. machen kann. Dementsprechend ist es komplex. Und viel zu schlecht dokumentiert für diese Komplexität. Desweiteren haben wir uns noch pyglet angesehen. Welches eigene Videocodecs mitbringt. Jedoch kann auch pyglet nicht Videos speichern.
+
+\subsection*{wxPython}
+Zum Zeichen der GUI werden wir wxPython benutzen. wxPython ist ein Wrapper zu wxWidgets. Eine hervorragend dokumentierte, ausgereifte und mit eine großen, aktiven Entwicklergemeinde ausgestattete GUI Biliothek. Sie nutzt wenn es möglich ist die nativen Fensterbiliothekten der Betriebssysteme, ist frei im Sinne von freier Software und wird von bekannten Firmen eingesetzt. (NASA, AMD, \dots)\footnote{siehe Wikipedia: http://en.wikipedia.org/wiki/WxWidgets}
+
+\section{Machbarkeitsuntersuchungen}
+\subsection*{Bildformat(Bildverarbeitungskomponente) und Geschwindigkeit }
+Der aufwändigste Teil des Programms für die CPU wird die Bildverarbeitung sein. Um nicht noch zusätzliche unnötige Arbeit zu erzeugen wollen wir uns für ein Bildformat entscheiden das von möglichst viele beteigten Komponenten nativ unterstüzt wird. Damit sparen wir uns Rechenzeit für die Umwandlung des Formats.
+
+Folgende Komponenten sind die Beteiligten:
+\begin{description}
+  \item[OpenCV Biliothek] sie gibt uns die Bilder uns sie speichert sie am Ende in eine Videodatei
+  \item[Bilverarbeitungskomponente] sie nimmt ein Bild und zeichnet ein oder zwei Blickcursor darauf
+  \item[wxPython] ist dafür zuständig die Bilder dem Nutzer anzuzeigen
+  \item[die Cursor Klasse] enthält die Cursor. Ist für die Entscheidung eher uninteressant, da sie sich daran orientieren wird.
+\end{description}
+
+Die Bildverarbeitungskomponente bestimmt zu größten Teilen das Bildformat. Daher betrachten wir hier die möglichen Bildverarbeitungskomponenten.
+
+\subsubsection*{Mögliche Bildverarbeitungskomponenten}
+\begin{description}
+  \item[PIL] "The Python Imaging Library" bietet einen sehr einfachen Umgang mit den Bildern.
+  \item[OpenCV] Overlays sind in OpenCV möglich allerdings nicht sehr pythonic. Aber das ist opencv eh nicht ;). \textit{(see http://stackoverflow.com/questions/1571683/opencv-image-on-image)}
+  \item[NumPy] NumPy repräsentiert Bilder als 2-dimensionale Arrays. Darin könnte man die Blickcursor einfügen.
+\end{description}
+
+Am Besten wäre natürlich wenn man direkt OpenCV nutzen könnte. Sollte das nicht funktionieren müssen wir auf PIL oder NumPy, was beides externe Libraries sind, zurückfallen (bevorzugt PIL).
+
+\paragraph*{Ergebnis}
+Wahrscheinlich das OpenCV Bildformat.
+
+\subsection*{Bildanzeige mit wxPython}
+Wir müssen einen Weg finden die Bilder in der GUI mit möglichst 30 Bildern in der Sekunde und ohne Flackern anzuzeigen.
+
+Angedacht ist das Szenario, das die GUI durch den Controller informiert wird (Event?), dass sie das Bild neu zeichnen muss. Daraufhin holt sie sich das Bild vom Controller und zeichnet es. Hierbei sind zwei Threads beteiligt. Einmal der GUI Thread der informiert wird und alles folgende tut und der Clock Thread der den Controller informiert, der schließlich die GUI informiert.
+
+Es muss geprüft werden ob dieses Vorgehen die Anforderungen erfüllt.
+
+\paragraph*{Ergebnis}
+
+\subsubsection*{Matching der Augenbewegungsdaten und des Videos}
+Beim Einführungsgespräch wurde angedeuted, dass die Augenbewegungsdaten und das Video nicht die gleichen Zeitangaben verwenden.
+
+Wir müssen prüfen in wie weit wir dadurch auf Probleme stoßen und wie wir diese Lösen können.
+
+\paragraph*{Ergebnis}
+
+\end{document}

@@ -1,0 +1,169 @@
+\documentclass[a4paper,draft]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{arrows, positioning}
+\usepackage{pgf-umlcd}
+
+\title{Entwurf \& Entwicklerhandbuch pyPsy}
+\author{Alexandra Weiss und Franz Gregor}
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+\section{Klassenentwurf}
+  Der Klassenentwurf orientiert sich an folgendem Grobentwurf:
+  \begin{figure}[ht]
+    \begin{center}
+    \begin{tikzpicture}[auto, node distance=1.2cm]
+      \node (controller) {Controller};
+      \node[left=0.5cm of controller] (gui) {GUI};
+      \node[right=2.2cm of controller] (vid_reader) {VideoReader};
+      \node[below of=vid_reader] (vid_writer) {VideoWriter};
+      \node[above of=vid_reader] (cursor) {Cursor};
+      \node[above of=cursor] (clock) {Clock};
+      \node[below of=vid_writer] (eyes) {EyeMovement};
+      \node[below of=eyes] (categories) {CategoryContainer};
+      \node[left=2.2cm of gui](mainview) {MainView};
+      \node[below=of mainview] (loadview) {LoadView};
+      \node[below=of loadview] (categoryview) {CategoryView};
+      \node[below=of categoryview] (cursorview) {CursorView};
+      \node[above=of mainview] (exportcsvview) {ExpostCSVView};
+      \node[above=of exportcsvview] (exportvideoview) {ExportVideoView};
+
+      \path
+	(controller) edge (gui)
+	(controller) edge (vid_reader)
+	(controller) edge (vid_writer)
+	(controller) edge (categories)
+	(controller) edge[dotted] (cursor)
+	(controller) edge (clock)
+	(controller) edge (eyes)
+	(gui) edge (mainview)
+	(gui) edge (loadview)
+	(gui) edge (categoryview)
+	(gui) edge[dotted] (cursorview)
+	(gui) edge (exportcsvview)
+	(gui) edge (exportvideoview)
+      ;
+    \end{tikzpicture}
+    \end{center}
+  \caption{Grobentwurf}
+  \label{Grobentwurf}
+  \end{figure}
+  
+  Die im Grobentwurf aufgezeigten Komponenten werden im Programm durch Klassen wiedergespiegelt.
+  
+  Der Grobentwurf zeigt eine Model-View-Controller Architektur mit der Besonderheit das es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
+
+  \begin{enumerate}
+    \item[VideoReader] Der VideoReader öffnet Videodateien. Er kann ein einzelnes Bild zu einem bestimmten Zeitpunkt aus dem Video extrahieren und bietet Informationen über das Video an.
+    \item[VideoWriter] Der VideoWriter nimmt Einzelbilder entgegen und schreibt diese in eine Videodatei.
+    \item[CategoryContainer] Der CategoryContainer hält die vom Nutzer angegebenen Kategorien, ihre Tastenkürzel eine Liste der Fixationen und eine Zuordnung der Fixationen zu Kategorien.
+    \item[Clock] Die Clock ist der programminterne Zeitgeber.
+    \item[EyeMovement] Diese Komponent hält die Daten der Augenbewegungen und ist für die Korrekture dergleichen zuständig (Optional).
+    \item[Cursor] Die Cursor Klasse soll den angezeigten Blickcursor anpassbar machen. Sie erhält Informationen zum aktuellen Status der Augenbewegung und gibt einen Blickcursor zurück. (Optional)
+  \end{enumerate}
+
+Folgend werden die Funktionsweisen der Models, des Controllers und der GUI im Detail besprochen.
+
+\subsection{Clock}
+Diese Klasse ist der programminterne Zeitgeber. 
+Das bedeuted sie enth\"alt in erste Linie den aktuellen Zeitpunkt des Programms in Bezug auf das Video bzw. die Augenbewegungsdaten.
+
+Alle Komponenten greifen direkt oder indirekt auf diese Instanz zur\"uck wenn sie eine zeitver\"anderliche Eigenschaft abrufen. Daher gehen alle zeitlichen Steuerbefehle an die Instanze dieser Klasse. Bspw. n\"achstes Frame oder vorherige Fixation.
+
+Zeitabh\"angige Komponenten k\"onnen \"uber die Funktion $register(function)$ gem\"aß des Observer Patterns \"uber eine Ver\"anderung der Zeit informiert werden.
+Wir werden die GUI mit Hilfe dieser Funktion dar\"uber informieren, dass sie das gezeigte Bild aktualisieren muss.
+
+\subsection{VideoReader}
+Die VideoReader Klasse ist f\"ur den Zugriff auf die Videobilder zust\"andig.
+
+Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben.
+Anschließend bietet sie framegenauen Zugriff und Informationen zum geladenem Video.
+
+\subsection{VideoWriter}
+Diese Klasse nimmt einzelne Bilder entgegen und speichert sie in einer Videodatei ab.
+
+Dazu erhält sie bei der Initialisierung den Pfad der zu erstellenden Videodatei, die gewünschte Anzahl der Bilder pro Sekunde und den zu verwendenden Videocodec.
+Die verfügbaren Videocodecs können mit Hilfe einer Klassenmethode abgerufen werden.
+
+\subsection{Cursor}
+Die Cursor Klasse ordnet den aktuellen Augenstatus (Fixation, Sakade, Blinzeln, noch iwas?) einen eigenen Blickcursor zu.
+
+Dafür hat die Klasse eine Methode der der Augenstatus übergeben wird und die den jeweiligen Cursor zurückgibt. Außerdem eine Methode mit der einem Augenstatus ein Cursor zugewiesen wird.
+
+\subsection{CategoryContainer}
+Die CategoryContainer Klasse hält die Kategorien sowie die Zuordnung von Fixationen/Frames zu Kategorien.
+
+Bei der Initialisierung der Klasse wird festgelegt ob sie Fixationen oder Frames zu Kategorien zuordnet.
+
+Anschließend bietet die Instanz Methoden um die Kategorien zu verwalten (anzulegen, Namen o. Tastenkürzel ändern, löschen), ein(e) Fixation/Frame einer Kategorie zuzuordnen, die Zuordnungen zu exportieren und um auf die beinhalteten Daten zuzugreifen.
+
+Außerdem implementiert sie auch das Observer Pattern um andere Komponenten über Veränderungen zu informieren. Was wir für die Anzeige der Fixationen in der Mainview verwenden werden.
+
+\subsection{EyeMovement}
+Die EyeMovement Klasse bereitet die Augenbewegungsdaten auf und bietet sie anderen Komponenten des Programms an.
+
+Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdatendatei übergeben wurde parst sie diese Datei und legt die enthaltenen Daten in internen Datenstrukturen an. Nun können andere Komponenten den Zustand der Augen zu einem bestimmten Zeitpunkt bestimmen. Konkret kann folgendes abgerufen werden: Blickposition, Sakkade, Fixation oder Blinzeln jeweils des linken und rechten Auges und gemittelt für beide Augen.
+
+\subsection{Controller}
+Der Controller ist die zentrale Instanz des Programms. Er führt die einzelnen Datenquellen zusammen und setzt die Befehle des Nutzers auf diese um.
+
+\begin{figure}[hb]
+  \begin{tikzpicture}
+    \begin{class}{VideoContainer}{0,0}
+      \attribute{file : string}
+      \attribute{duration : float}
+      
+      \operation{init( file : string )}
+      \operation{getImageAt( second : float )}
+    \end{class}
+    
+    \begin{class}{EyeMovementData}{8,0}
+      \attribute{times : list of float}
+      \attribute{fixation\_end : list of 2-tuple of point}
+      \attribute{fixation\_start : list of 2-tuple of point}
+      
+      \operation{init( file : string )}
+      \operation{getMeanFixationAt( second : float )}
+      \operation{getLeftFixationAt( second : float )}
+      \operation{getRightFixationAt( second : float )}
+      \operation{getFixationNumber( second : float )}
+      \operation{getFixationStartSecond( number : integer )}
+      \operation{setOffset( )}
+    \end{class}
+    
+    \begin{class}{Clock}{0,-3}
+      \attribute{worker : thread}
+      \attribute{interval : float}
+      \attribute{time : float}
+      
+      \operation{init( interval=0.01 : float)}
+      \operation{register ( f : callable)}
+      \operation{seek ( second : float)}
+      \operation{start ( multiplier : float )}
+      \operation{stop ()}
+    \end{class}
+    
+    \begin{class}{Controller}{0,-8}
+      \attribute{clock : Clock}
+      \attribute{eye\_movement\_data : EyeMovementData}
+      \attribute{video\_container : VideoContainer}
+      \attribute{gui : GUI}
+      
+      \operation{newClockTick( time )}
+      \operation{getOverlayedPicture()}
+      \operation{getCursorPicture()}
+    \end{class}
+    
+    \begin{class}{GUI}{8, -9.5}
+      \operation{refresh()}
+    \end{class}
+  
+  
+  \end{tikzpicture}
+  \caption{Entwurf der Klassen}
+\end{figure} 
+\end{document}
