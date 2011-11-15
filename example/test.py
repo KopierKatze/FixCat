@@ -9,6 +9,7 @@ print cv.GetCaptureProperty(v, cv.CV_CAP_PROP_FOURCC)
 
 def nextImageOf(v):
     f = cv.QueryFrame(v)
+    cv.CvtColor(f, f, cv.CV_BGR2RGB)
     i = wx.ImageFromData(f.width, f.height, f.tostring())
     b = wx.BitmapFromImage(i)
     return b
