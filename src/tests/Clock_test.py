@@ -1,12 +1,15 @@
-from Clock import Clock, ClockError
+from Clock import Clock, ClockError, ClockWorker
 import nose
 
-def end_of_time_test(): #should use test generator
-  i = 5
-  c = Clock(i)
-  c.seek(i-0.1)
-  c.seek(i)
-  nose.tools.raises(ClockError, c.seek, i+0.000001)
+def test_generator():
+    
+    for i in range(0, 5):
+        yield end_of_time_test, i
 
-def registered_function_call_test():
-  pass
+def end_of_time_test(i): #should use test generator
+    c = Clock(i)
+    c.seek(i-0.1)
+    c.seek(i)
+    #nose.tools.raises(ClockError, c.seek, i+0.000001)
+
+
