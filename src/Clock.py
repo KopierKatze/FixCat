@@ -37,8 +37,8 @@ class Clock(object):
     # clock seek to +interval * multi 
     while self.running and (clock < max_duration):
         time.sleep(self.interval) # ??
+        self.interval += self.interval * self.multiplicator
         seek(self.interval * self.multiplicator) # ??
-        self.interval *= self.interval
 
 
   def stop(self): 
