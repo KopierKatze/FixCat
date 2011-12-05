@@ -15,6 +15,7 @@ class Clock(object):
     self.running = True
     self.registered = []
     self.multiplicator = 1
+    self.maximal_duration = maximal_duration
 
   def register(self, function):
     """register a funtion f to be called one every tick.
@@ -57,13 +58,12 @@ class Clock(object):
     # immer zeit ueber seek aendern
     # clock = second
     # registrierte funktionen hier aufrufen (ueber liste iterieren)
-    try:
-        self.clock = second
-        for function in self.registered:
-            function(self.clock)     
+    if second < 0 or second > self.maximal_duration:
+        print "raising error"
         raise ClockError("seek error")
-    except ClockError as e:
-        print "Caught: " + e.arg
+    self.clock = second
+    for function in self.registered:
+        function(self.clock)     
 
 class ClockError(Exception):
      def __init__(self, arg):
