@@ -12,23 +12,21 @@ class Clock(object):
     two ticks) and end_of_time(duration of video)"""
     
     self.clock = 0.0
-    self.running = True
+    self.running = False # initializing with False, True in run()
     self.registered = []
     self.multiplicator = 1
     self.maximal_duration = maximal_duration
+    self.interval = interval
 
   def register(self, function):
     """register a funtion f to be called one every tick.
     f will get the current clock time as one float argument.
     e.g. f(2.3421)"""
-    try:
-        if(function is None):
-            raise ClockError("error during appending function")
-        else:
-            self.registered.append(function)
-    except ClockError as e:
-        print "Caught: " + e.arg 
-
+    if(function is None):
+        raise ClockError("error during appending function. function may not be null")
+    else:
+        self.registered.append(function)
+ 
   def setMultiplicator(self, multi):
     """manipulates how much time of the clock passes within on interval.
        time of clock will be altered within one interval with value of
@@ -36,21 +34,33 @@ class Clock(object):
     """
     if(multi != 0):
         self.multiplicator = multi
-    return self.multiplicator
+        return self.multiplicator
+    else:
+        raise ClockError("multiplicator may not be 0")
+        return 1
 
   def run(self): 
     """let the clock tick until end_of_time is reached"""    
     # while(!self.stop && <max_duration>)
     # sleep interval
     # clock seek to +interval * multi 
-    while self.running and (clock < max_duration):
+    if self.running == False:
+        self.running = True
+    else:
+        raise ClockError("clock already running")
+        
+    while self.running and self.clock <= self.maximal_duration - self.interval:
         time.sleep(self.interval)
-        seek((self.interval + self.interval) * self.multiplicator)
-
+        self.seek((self.clock + self.interval) * self.multiplicator)
+    if self.clock > self.maximal_duration:
+        raise ClockError("running for too long")
 
   def stop(self): 
     """stop the clock at current time"""
-    self.running = False
+    if self.running == True:
+        self.running = False
+    else:
+        raise ClockError("clock already stopped")
 
   def seek(self, second):
     """set current time of clock to second
@@ -59,7 +69,7 @@ class Clock(object):
     # clock = second
     # registrierte funktionen hier aufrufen (ueber liste iterieren)
     if second < 0 or second > self.maximal_duration:
-        print "raising error"
+        self.stop()
         raise ClockError("seek error")
     self.clock = second
     for function in self.registered:
