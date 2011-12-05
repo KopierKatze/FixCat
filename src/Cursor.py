@@ -4,15 +4,17 @@ class Cursor(object):
   those can be altered."""
   def __init__(self):
     """load standard images"""
-    raise NotImplementedError()
+    self.cursor = dict([('blinking', 'standard_cursors/blinking.png'), 
+        ('saccade', 'standard_cursors/saccade.png'), 
+        ('fixation', 'standard_cursors/fixation.png')])
 
   def setCursorFor(self, state, file_or_image):
     """set new cursor image for specific state.
     image can be given as file or image
     raises Errors on file problems (not readable, not existing, ...) or
     if no proper image data is given"""
-    raise NotImplementedError()
+    self.cursor[state] = file_or_image
 
   def cursorFor(self, state):
     """return the cursor image for a certain state"""
-    raise NotImplementedError()
+    return self.cursor[state]
