@@ -8,7 +8,8 @@ class VideoReader(object):
     will raise VideoOpenError on failure"""
     if filepath is not None:
         self.reader = cv.CaptureFromFile(filepath)
-    
+    else:
+        return ReaderError("filepath may not be null")
 
   def frameAt(self, second):
     """returns the image that you would see when playing the video at second
@@ -16,6 +17,11 @@ class VideoReader(object):
     if second >= 0:
         cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
         frame = cv.QueryFrame(reader) #IplImage 
+    else:
+        #second = 1 <-- for fault tolerance?!
+        #cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+        #frame = cv.QueryFrame(reader)
+        return ReaderError("second has to be >= 0")
     return frame
 
   def duration(self):
@@ -29,3 +35,7 @@ class VideoReader(object):
   def releaseReader(self):
     """closes VideoReader after use """
     cv.ReleaseCapture(reader)
+    
+class ReaderError(Exception):
+     def __init__(self, arg):
+         self.arg = arg
