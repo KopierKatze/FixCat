@@ -6,8 +6,11 @@ class VideoReader(object):
   def __init__(self, filepath):
     """open the video file at filepath.
     will raise VideoOpenError on failure"""
+
     if filepath is not None:
         self.reader = cv.CaptureFromFile(filepath)
+        self.duration = duration()
+        self.fps = fps()
     else:
         return ReaderError("filepath may not be null")
 
