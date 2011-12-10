@@ -8,17 +8,17 @@ class VideoWriter(object):
 
     will raise error on file problems or invalid codecs.
     """
-    if not filepath:
+    if filepath is None:
         raise WriterError("please select a valid file")
-    if not codec:
-        codec = CV_FOURCC('X', 'V', 'I', 'D')
-    if not fps or fps < 1:
+    if codec is None:
+        codec = cv.CV_FOURCC('X', 'V', 'I', 'D')
+    if fps is None or fps < 1:
         raise WriterError("please set fps >= 1")
-    if not widht or not height or widht < 1 or height <1:
+    if width is None or height is None or width < 1 or height <1:
         raise WriterError("please specify a valid height/width of your video")
       
     # windows_feature: codec aus dialog waehlen bei codec = -1 ???
-    self.writer = cv.CreateVideoWriter(filepath, codec, fps, cv.Size(width, height), 1)
+    self.writer = cv.CreateVideoWriter(filepath, codec, fps, (width, height), 1)
 
   def addFrame(self, new_frame):
     """add the IplImage new_frame to the end of the video file.
@@ -33,10 +33,10 @@ class VideoWriter(object):
   def codecs(cls):
     """returns a dict that maps codec to human readable codec name"""
     # wie viele?? s. fourcc.org
-    codec = dict([(('D', 'I', 'B') , 'uncompressed RGB'), 
-        (('F', 'F', 'D', 'S') , 'ffdshow'), 
-        (('X', 'V', 'I', 'D') , 'XVID Mpeg4'), 
-        (('D', 'I', 'V', 'X') , 'DivX')])
+    codec = dict([(CV_FOURCC('D', 'I', 'B') , 'uncompressed RGB'), 
+        (CV_FOURCC('F', 'F', 'D', 'S') , 'ffdshow'), 
+        (CV_FOURCC('X', 'V', 'I', 'D') , 'XVID Mpeg4'), 
+        (CV_FOURCC('D', 'I', 'V', 'X') , 'DivX')])
     
   def releaseWriter(self):
     """closes VideoWriter after use """
