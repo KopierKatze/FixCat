@@ -11,8 +11,14 @@ def add_new_category_test():
   # No double shortcut assingment
     c.addCategory("A", "asdsad")
 
+  assert c.listCategories() == {"A":"testCategory"}
+
 def remove_category_test():
   c = CategoryContainer(2)
+
+  with assert_raises(CategoryContainerError):
+    c.removeCategory("A")
+  
   c.addCategory("A", "testCategory")
   c.removeCategory("A")
 
@@ -27,7 +33,7 @@ def change_category_test():
 
 def categorisation_test():
   c = CategoryContainer(2)
-  assert_raises(CategoryContainerError, c.categorise, (1, "A"))
+  assert_raises(CategoryContainerError, c.categorise, 1, "A")
   c.addCategory("A", "a test category")
   c.categorise(1, "A")
   assert c.listCategorisations() == {1: "A", 2: None}
@@ -35,7 +41,7 @@ def categorisation_test():
 def name_of_shortcut_test():
   c = CategoryContainer(100)
   c.addCategory("E", "lalelu")
-  assert c.nameOf("E") == "lalelu"
+  assert c.nameOfShortcut("E") == "lalelu"
 
 def next_not_categoriesed_index_test():
   c = CategoryContainer(2)
@@ -60,4 +66,4 @@ def remove_category_with_categorisations_test():
   c.categorise(1, "A")
   c.removeCategory("A")
   
-  assert c.listCategorisations() == {1: None, 2: None}
+  assert c.listCategorisations() == {1: None, 2: None}, c.listCategorisations()
