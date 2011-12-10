@@ -9,6 +9,13 @@ class VideoReader(object):
 
         if filepath is not None and filepath is not '':
             self.reader = cv.CaptureFromFile(filepath)
+            
+            frames = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
+            cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frames-1)
+            # have to query frame to settle position
+            cv.QueryFrame(self.reader)
+            self._duration = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC)
+            print self._duration
         else:
             raise ReaderError('invalid filepath')
 
@@ -29,20 +36,28 @@ class VideoReader(object):
 
     def duration(self):
         """duration of the video in seconds"""
-        if self.reader is not None: # should be reader ok??
-            framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
-            duration = framecount / self.fps()
-            return duration
-        else: 
-            return ReaderError("invalid video reader")
+        return self._duration
+        
+        framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
+        duration = framecount / self.fps()
+        return duration
 
     def fps(self):
-        if self.reader is not None: # should be reader ok??
-            framerate = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
-            return framerate
-        else:
-            return ReaderError("invalid video reader")
-        
+	framerate = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
+	return framerate
+
+    def frameNumberOfSecond(self, second):
+      duration = self.duration()
+      if second is not None and second >= 0 and second <= duration:
+	cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+	return int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES))
+      else:
+	#second = 1 <-- for fault tolerance?!
+	#cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+	#frame = cv.QueryFrame(reader)
+	return ReaderError("second should be between")
+      
+
     def releaseReader(self):
         """closes VideoReader after use """
         cv.ReleaseCapture(reader)
