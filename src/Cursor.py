@@ -4,6 +4,7 @@ class Cursor(object):
   those can be altered."""
   def __init__(self):
     """load standard images"""
+    # cv.loadimage von den bildern
     self.cursor = dict([('blinking', 'standard_cursors/blinking.png'), 
         ('saccade', 'standard_cursors/saccade.png'), 
         ('fixation', 'standard_cursors/fixation.png')])

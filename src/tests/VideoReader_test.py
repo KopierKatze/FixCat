@@ -12,12 +12,12 @@ def init_test():
 #        frame_wrongduration = reader.frameAt(30)
         #frame_invalid = reader.frameAt(-1)
         
-@nose.tools.raises(ReaderError)
+@nose.tools.raises(ReaderError)#obsolete
 def duration_test():
     reader = VideoReader(None)
     duration = reader.duration()
     
-@nose.tools.raises(ReaderError)
+@nose.tools.raises(ReaderError)#obselete
 def fps_test():
     reader = VideoReader(None)
     fps = reader.fps()

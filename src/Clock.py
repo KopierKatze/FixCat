@@ -46,14 +46,11 @@ class Clock(object):
     # clock seek to +interval * multi 
     if self.running == False:
         self.running = True
+        #worker = ClockWorker()
+        worker.start()
     else:
         raise ClockError("clock already running")
         
-    while self.running and self.clock <= self.maximal_duration - self.interval:
-        time.sleep(self.interval)
-        self.seek((self.clock + self.interval) * self.multiplicator)
-    if self.clock > self.maximal_duration:
-        raise ClockError("running for too long")
 
   def stop(self): 
     """stop the clock at current time"""
@@ -76,12 +73,11 @@ class Clock(object):
         function(self.clock)     
 
 class ClockError(Exception):
-     def __init__(self, arg):
-         self.arg = arg
+    pass
   
 class ClockWorker(threading.Thread, Clock):
-    pass
-    
-    
-worker = ClockWorker()
-worker.start()
+    while self.running and self.clock <= self.maximal_duration - self.interval:
+        time.sleep(self.interval)
+        self.seek((self.clock + self.interval) * self.multiplicator)
+    if self.clock > self.maximal_duration:
+        raise ClockError("running for too long")
