@@ -26,6 +26,7 @@ class EyeMovement(object):
 
   def _findIndexOfSecond(self, second, sec_list):
     index = None
+    sec_list.sort()
     for sec in sec_list:
       if sec <= second*1000:
 	index = sec
