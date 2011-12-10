@@ -82,8 +82,10 @@ class ClockError(Exception):
 class ClockWorker(threading.Thread):
     def __init__(self, Clock):
         threading.Thread.__init__(self)
+        # set to daemon otherwise we can't stop program if clock is running
+        self.daemon = True
         self.c = Clock
-        
+
     def run(self):
         while self.c.running and self.c.time <= self.c.maximal_duration - self.c.interval:
             time.sleep(self.c.interval)
