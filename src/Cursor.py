@@ -1,3 +1,5 @@
+from cv import LoadImage
+
 class Cursor(object):
   """associates eye states(blinking, saccade, fixation) to cursor images.
   on initialation the class already has cursor images.
@@ -5,9 +7,9 @@ class Cursor(object):
   def __init__(self):
     """load standard images"""
     # cv.loadimage von den bildern
-    self.cursor = dict([('blinking', 'standard_cursors/blinking.png'), 
-        ('saccade', 'standard_cursors/saccade.png'), 
-        ('fixation', 'standard_cursors/fixation.png')])
+    self.cursor = dict([('blink', LoadImage('standard_cursors/blinking.png')),
+        ('saccade', LoadImage('standard_cursors/saccade.png')),
+        ('fixated', LoadImage('standard_cursors/fixation.png'))])
 
   def setCursorFor(self, state, file_or_image):
     """set new cursor image for specific state.
