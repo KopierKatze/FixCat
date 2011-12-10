@@ -1,4 +1,5 @@
 import threading
+from thread import start_new_thread
 import time #for sleeping
 
 class Clock(object):
@@ -70,7 +71,10 @@ class Clock(object):
         raise ClockError("seek error")
     self.time = second
     for function in self.registered:
-        function(self.time)     
+	thread = threading.Thread()
+	thread.run = lambda: function(self.time)
+	thread.daemon = True
+	thread.start()
 
 class ClockError(Exception):
     pass
