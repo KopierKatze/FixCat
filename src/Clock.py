@@ -11,8 +11,8 @@ class Clock(object):
     """creates clock with interval(time in the real world that passes between
     two ticks) and end_of_time(duration of video)"""
     
-    self.clock = 0.0
-    self.running = True # initializing with False, True in run()
+    self.time = 0.0
+    self.running = False # initializing with False, True in run()
     self.registered = []
     self.multiplicator = 1
     self.maximal_duration = maximal_duration
@@ -63,25 +63,29 @@ class Clock(object):
     """set current time of clock to second
     if second > end_of_time a ClockError will be raised"""
     # immer zeit ueber seek aendern
-    # clock = second
+    # time = second
     # registrierte funktionen hier aufrufen (ueber liste iterieren)
     if second < 0 or second > self.maximal_duration:
         self.stop()
         raise ClockError("seek error")
-    self.clock = second
+    self.time = second
     for function in self.registered:
-        function(self.clock)     
+        function(self.time)     
 
 class ClockError(Exception):
     pass
   
 class ClockWorker(threading.Thread):
     def __init__(self, Clock):
+        threading.Thread.__init__(self)
         self.c = Clock
         
     def run(self):
-        while self.c.running and self.c.clock <= self.c.maximal_duration - self.c.interval:
+        while self.c.running and self.c.time <= self.c.maximal_duration - self.c.interval:
             time.sleep(self.c.interval)
-            self.c.seek((self.c.clock + self.c.interval) * self.c.multiplicator)
-        if self.c.clock > self.c.maximal_duration:
-            raise ClockError("running for too long")
+            new_time = self.c.time + self.c.interval * self.c.multiplicator
+            if new_time > self.c.maximal_duration:
+	      self.c.seek(self.c.maximal_duration)
+	      self.c.stop()
+	    else:
+	      self.c.seek(new_time)
