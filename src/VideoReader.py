@@ -1,43 +1,51 @@
 import cv
 
 class VideoReader(object):
-  """provides a image-by-image access to a video file"""
+    """provides a image-by-image access to a video file"""
   
-  def __init__(self, filepath):
-    """open the video file at filepath.
-    will raise VideoOpenError on failure"""
+    def __init__(self, filepath):
+        """open the video file at filepath.
+        will raise VideoOpenError on failure"""
 
-    if filepath is not None:
-        self.reader = cv.CaptureFromFile(filepath)
-        self.duration = duration()
-        self.fps = fps()
-    else:
-        return ReaderError("filepath may not be null")
+        if filepath is not None and filepath is not '':
+            self.reader = cv.CaptureFromFile(filepath)
+        else:
+            raise ReaderError('invalid filepath')
 
-  def frameAt(self, second):
-    """returns the image that you would see when playing the video at second
-    'second'"""
-    if second >= 0:
-        cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-        frame = cv.QueryFrame(reader) #IplImage 
-    else:
-        #second = 1 <-- for fault tolerance?!
-        #cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-        #frame = cv.QueryFrame(reader)
-        return ReaderError("second has to be >= 0")
-    return frame
+    def frameAt(self, second):
+        """returns the image that you would see when playing the video at second
+        'second'"""
+        duration = self.duration()
+        if second >= 0 and second <= duration and second is not None: 
+            cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+            frame = cv.QueryFrame(self.reader) #IplImage 
+            return frame
+        else:
+            #second = 1 <-- for fault tolerance?!
+            #cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+            #frame = cv.QueryFrame(reader)
+            return ReaderError("second: 0 <= second <= duration")
 
-  def duration(self):
-    """duration of the video in seconds"""
-    self.duration = (long(cv.GetCaptureProperty(video, cv.CV_CAP_PROP_POS_MSEC))) / 1000
-    return self.duration
 
-  def fps(self):
-    self.framerate = int(cv.GetCaptureProperty(reader, cv.CV_CAP_PROP_FPS))
-    return selfframerate    
-  def releaseReader(self):
-    """closes VideoReader after use """
-    cv.ReleaseCapture(reader)
+    def duration(self):
+        """duration of the video in seconds"""
+        if self.reader is not None:
+            framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
+            duration = framecount / self.fps()
+            return duration
+        else: 
+            return ReaderError("invalid video reader")
+
+    def fps(self):
+        if self.reader is not None:
+            framerate = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS))
+            return framerate
+        else:
+            return ReaderError("invalid video reader")
+        
+    def releaseReader(self):
+        """closes VideoReader after use """
+        cv.ReleaseCapture(reader)
     
 class ReaderError(Exception):
      def __init__(self, arg):
