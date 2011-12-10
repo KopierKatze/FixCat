@@ -2,13 +2,13 @@ import cv
 
 class VideoWriter(object):
   """creates a new video file where one can add frames to"""
-  def __init__(self, file, width, height, fps, codec=None):
+  def __init__(self, filepath, width, height, fps, codec=None):
     """creates video file with the given properties.
     codec should be one of the codecs yielded by codecs().
 
     will raise error on file problems or invalid codecs.
     """
-    if not file:
+    if not filepath:
         raise WriterError("please select a valid file")
     if not codec:
         codec = CV_FOURCC('X', 'V', 'I', 'D')
@@ -18,7 +18,7 @@ class VideoWriter(object):
         raise WriterError("please specify a valid height/width of your video")
       
     # windows_feature: codec aus dialog waehlen bei codec = -1 ???
-    self.writer = cv.CreateVideoWriter(file, codec, fps, cv.Size(width, height), 1)
+    self.writer = cv.CreateVideoWriter(filepath, codec, fps, cv.Size(width, height), 1)
 
   def addFrame(self, new_frame):
     """add the IplImage new_frame to the end of the video file.
@@ -43,5 +43,4 @@ class VideoWriter(object):
     cv.ReleaseVideoWriter(writer)
     
 class WriterError(Exception):
-     def __init__(self, arg):
-         self.arg = arg
+    pass

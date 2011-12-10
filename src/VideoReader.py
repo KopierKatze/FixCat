@@ -16,7 +16,7 @@ class VideoReader(object):
         """returns the image that you would see when playing the video at second
         'second'"""
         duration = self.duration()
-        if second >= 0 and second <= duration and second is not None: 
+        if second is not None and second >= 0 and second <= duration: 
             cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
             frame = cv.QueryFrame(self.reader) #IplImage 
             return frame
@@ -24,12 +24,12 @@ class VideoReader(object):
             #second = 1 <-- for fault tolerance?!
             #cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
             #frame = cv.QueryFrame(reader)
-            return ReaderError("second: 0 <= second <= duration")
+            return ReaderError("second should be between")
 
 
     def duration(self):
         """duration of the video in seconds"""
-        if self.reader is not None:
+        if self.reader is not None: # should be reader ok??
             framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
             duration = framecount / self.fps()
             return duration
@@ -37,8 +37,8 @@ class VideoReader(object):
             return ReaderError("invalid video reader")
 
     def fps(self):
-        if self.reader is not None:
-            framerate = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS))
+        if self.reader is not None: # should be reader ok??
+            framerate = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
             return framerate
         else:
             return ReaderError("invalid video reader")
@@ -48,5 +48,4 @@ class VideoReader(object):
         cv.ReleaseCapture(reader)
     
 class ReaderError(Exception):
-     def __init__(self, arg):
-         self.arg = arg
+    pass

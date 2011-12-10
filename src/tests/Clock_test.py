@@ -16,6 +16,7 @@ def set_multiplicator_test():
 def stop_test():
     c = Clock(2)
     c.stop()
+    c.stop()
     
 @nose.tools.raises(ClockError)
 def running_test():

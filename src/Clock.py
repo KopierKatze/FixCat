@@ -12,7 +12,7 @@ class Clock(object):
     two ticks) and end_of_time(duration of video)"""
     
     self.clock = 0.0
-    self.running = False # initializing with False, True in run()
+    self.running = True # initializing with False, True in run()
     self.registered = []
     self.multiplicator = 1
     self.maximal_duration = maximal_duration
@@ -46,14 +46,11 @@ class Clock(object):
     # clock seek to +interval * multi 
     if self.running == False:
         self.running = True
+        worker = ClockWorker(self)
+        worker.start()
     else:
         raise ClockError("clock already running")
         
-    while self.running and self.clock <= self.maximal_duration - self.interval:
-        time.sleep(self.interval)
-        self.seek((self.clock + self.interval) * self.multiplicator)
-    if self.clock > self.maximal_duration:
-        raise ClockError("running for too long")
 
   def stop(self): 
     """stop the clock at current time"""
@@ -76,12 +73,15 @@ class Clock(object):
         function(self.clock)     
 
 class ClockError(Exception):
-     def __init__(self, arg):
-         self.arg = arg
-  
-class ClockWorker(threading.Thread, Clock):
     pass
-    
-    
-worker = ClockWorker()
-worker.start()
+  
+class ClockWorker(threading.Thread):
+    def __init__(self, Clock):
+        self.c = Clock
+        
+    def run(self):
+        while self.c.running and self.c.clock <= self.c.maximal_duration - self.c.interval:
+            time.sleep(self.c.interval)
+            self.c.seek((self.c.clock + self.c.interval) * self.c.multiplicator)
+        if self.c.clock > self.c.maximal_duration:
+            raise ClockError("running for too long")
