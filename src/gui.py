@@ -39,14 +39,15 @@ class Example(wx.Frame):
         #sizer boxes for panels
         mainbox = wx.BoxSizer(wx.HORIZONTAL)
         
+        # -------------------- video 
         self.videopanel = wx.Panel(self, -1)
         self.videopanel.SetBackgroundColour(wx.BLACK)
         pnl2 = wx.Panel(self, -1) 
         self.slider1 = wx.Slider(pnl2, -1, 0, 0, 1000)
         pause = wx.Button(pnl2, -1, "Pause")
         play  = wx.Button(pnl2, -1, "Play")
-        next  = wx.Button(pnl2, -1, "Next")
-        prev  = wx.Button(pnl2, -1, "Prev")
+        next  = wx.Button(pnl2, -1, "Next F")
+        prev  = wx.Button(pnl2, -1, "Prev F")
         
         #self.Bind(wx.EVT_BUTTON, self.onPlay, play)
         
@@ -65,21 +66,35 @@ class Example(wx.Frame):
         vbox.Add(hbox2, 1, wx.EXPAND)
         pnl2.SetSizer(vbox)
         
+        # -------------------- category
         categorybox = wx.BoxSizer(wx.VERTICAL)
+        cattablebox = wx.BoxSizer(wx.HORIZONTAL)
+        catbtnbox = wx.BoxSizer(wx.HORIZONTAL)
         
         #table content for category
         self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-        self.lc.InsertColumn(0, 'Kategorie')
-        self.lc.InsertColumn(1, 'Shortcut')
+        self.lc.InsertColumn(0, 'Index')
+        self.lc.InsertColumn(1, 'Kategorie')
         self.lc.SetColumnWidth(0, 100)
         self.lc.SetColumnWidth(1, 90)
         
+        catbtnpnl = wx.Panel(self, -1)
+        nextuncat = wx.Button(catbtnpnl , -1, "naechster Index")
+        catbtnbox.Add(nextuncat, flag=wx.CENTER, border=3)
+        catbtnpnl.SetSizer(catbtnbox)
+        
         # add table to category box
-        categorybox.Add(self.lc, 1, wx.EXPAND | wx.ALL, 3)
+        #categorybox.Add(self.lc, 1, wx.EXPAND | wx.ALL, 3)
+        cattablebox.Add(self.lc, 1, wx.EXPAND | wx.ALL, 1)
+        
+        categorybox.Add(cattablebox, 4, wx.EXPAND | wx.ALL, 1)
+        #categorybox.Add(catbtnbox, 1, wx.EXPAND | wx.ALL, 1)   <-----------------segfault----------------
+        categorybox.Add(catbtnpnl, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
         
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
         sizer.Add(pnl2, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
+        
         mainbox.Add(sizer,3, flag=wx.EXPAND)
         mainbox.Add(categorybox,1, flag=wx.EXPAND)     
         self.SetSizer(mainbox)    
