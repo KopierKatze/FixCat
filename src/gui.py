@@ -71,7 +71,6 @@ class Example(wx.Frame):
         self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
         self.lc.InsertColumn(0, 'Kategorie')
         self.lc.InsertColumn(1, 'Shortcut')
-        self.lc.InsertLine()
         self.lc.SetColumnWidth(0, 100)
         self.lc.SetColumnWidth(1, 90)
         
