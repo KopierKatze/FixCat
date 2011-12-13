@@ -1,20 +1,22 @@
 import wx
-import os
-import cv
 import wx.gizmos
 
-class Example(wx.Frame): 
-    def __init__(self, parent, title):   
-        super(Example, self).__init__(parent, title=title, 
+from OpenCVImage import OpenCVImage
+
+
+
+class MainFrame(wx.Frame):
+    def __init__(self):
+        wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
 
         self.InitUI()
         self.Centre()
-        self.Show(True)     
+        self.Show(True)
         self.dirname=""
-        
+
     def InitUI(self):
-        
+
         # menubar elements
         statusBar = self.CreateStatusBar()
 
@@ -27,13 +29,13 @@ class Example(wx.Frame):
 
         codecMenu = wx.Menu()
         codecMenu.Append(wx.ID_PREFERENCES, "&Codecs", "Set codec")
-        
+
         cursorMenu = wx.Menu()
         menuSetImage = cursorMenu.Append(wx.ID_PREFERENCES, "&Cursor", "Change Cursor Image")
-        
+
         categoryMenu = wx.Menu()
         categoryAdd = categoryMenu.Append(wx.ID_PREFERENCES, "&Category", "Add A Category")
-        
+
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
         menuBar.Append(codecMenu, "C&odecs")
@@ -47,22 +49,21 @@ class Example(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
         #self.Bind(wx.EVT_MENU, self.OnAddCategory, categoryAdd)
         #self.Bind(wx.EVT_MENU, self., )
-        
+
         #sizer boxes for panels
         mainbox = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         # ------------------------------------------ video ctrl
-        self.videopanel = wx.Panel(self, -1)
-        self.videopanel.SetBackgroundColour(wx.BLACK)
-        vbtnpanel = wx.Panel(self, -1) 
+        self.videopanel = OpenCVImage(self, wx.ID_ANY)
+        vbtnpanel = wx.Panel(self, -1)
         self.slider1 = wx.Slider(vbtnpanel, -1, 0, 0, 1000)
         pause = wx.Button(vbtnpanel, -1, "Pause")
         play  = wx.Button(vbtnpanel, -1, "Play")
         next  = wx.Button(vbtnpanel, -1, "Next F")
         prev  = wx.Button(vbtnpanel, -1, "Prev F")
-        
+
         #self.Bind(wx.EVT_BUTTON, self.onPlay, play)
-        
+
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -77,12 +78,12 @@ class Example(wx.Frame):
         vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
         vbox.Add(hbox2, 1, wx.EXPAND)
         vbtnpanel.SetSizer(vbox)
-        
-        
+
+
         # ------------------------------------------------ new category ctrl
         self.catpanel = wx.Panel(self, wx.ID_ANY)
         self.categorylist = list(["Tisch", "Monitor", "Maus", "Tastatur"])
-         
+
         self.elistbox = wx.gizmos.EditableListBox(self.catpanel, wx.ID_ANY,
         label="Category Editor")
         # get the actual control portion of the EditableListBox
@@ -90,7 +91,7 @@ class Example(wx.Frame):
         # binds to any newly focused/selected item
         self.actual_listctrl.Bind(wx.EVT_LIST_ITEM_FOCUSED,
         self.listctrlClick)
-         
+
         # create action widgets
         load_button = wx.Button(self.catpanel, wx.ID_ANY, "Load Example")
         clear_button = wx.Button(self.catpanel, wx.ID_ANY, "Clear Categories")
@@ -101,7 +102,7 @@ class Example(wx.Frame):
         sort_button.Bind(wx.EVT_BUTTON, self.sort_buttonClick)
         # create an output widget
         self.label = wx.StaticText(self.catpanel, wx.ID_ANY, "")
-         
+
         catsizer = wx.GridBagSizer(vgap=5, hgap=5)
         # pos=(row, column) span=(rowspan, columnspan)
         # wx.ALL puts the specified border on all sides
@@ -114,50 +115,53 @@ class Example(wx.Frame):
         catsizer.Add(load_button, pos=(9, 0), flag=wx.ALL, border=5)
         # set the sizer and fit all its widgets
         self.catpanel.SetSizerAndFit(catsizer)
-         
+
         # size the frame so all its widgets fit inside
         #self.Fit()
-        
-        
-        
-        
+
+
+
+
         # ------------------------------ setting size of main window
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
         sizer.Add(vbtnpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-        
+
         mainbox.Add(sizer,4, flag=wx.EXPAND)
-        mainbox.Add(self.catpanel,flag=wx.EXPAND)     
-        self.SetSizer(mainbox)    
-        
-        
+        mainbox.Add(self.catpanel,flag=wx.EXPAND)
+        self.SetSizer(mainbox)
+
+
     def OnAbout(self, e):
         dlg = wx.MessageDialog(self, "<slipsum>", "about eyepy", wx.OK)
         dlg.ShowModal()
         dlg.Destroy()
-        
+
     def OnExit(self, e):
         self.Close(True)
-        
+
     def OnOpen(self, e):
         filters = 'AVI files (*.avi)|*.avi|All files (*.*)|*.*'
         dlg = wx.FileDialog(None, message = 'Select AVI files....', wildcard=filters, style=wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
-            
+
     def OnAddCategory(self, e):
         CategoryEditor().Show()
 
-    # -------------------- category editor buttons 
+    def setImageAndTime(self, image, time):
+      wx.CallAfter(self.videopanel.SetImage, (image))
+
+    # -------------------- category editor buttons
     def load_buttonClick(self, event):
         """load the name list into the bistbox"""
         self.elistbox.SetStrings(self.categorylist)
-     
+
     def clear_buttonClick(self, event):
         """clear all items from the elistbox"""
         self.elistbox.SetStrings([])
         self.label.SetLabel("")
-     
+
     def sort_buttonClick(self, event):
         """sort the items in the elistbox"""
         # GetStrings() puts the elistbox items into a list
@@ -165,7 +169,7 @@ class Example(wx.Frame):
         categorylist.sort()
         # SetStrings() clears and reloads the elistbox
         self.elistbox.SetStrings(categorylist)
-     
+
     def listctrlClick(self, event):
         """display the selected listctrl item of the elistbox"""
         for n in range(self.actual_listctrl.GetItemCount()):
@@ -173,11 +177,5 @@ class Example(wx.Frame):
             if self.actual_listctrl.GetItemState(n, state):
                 selected_item = self.actual_listctrl.GetItemText(n)
         s = "You selected " + selected_item
-        self.label.SetLabel(s)            
-        
-if __name__ == '__main__':
-  
-    app = wx.App()
-    Example(None, title="eyepsy window")
-    app.MainLoop()
-
+        self.label.SetLabel(s)
+ 

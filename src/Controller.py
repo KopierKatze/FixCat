@@ -8,7 +8,8 @@ from VideoWriter import VideoWriter
 import cv
 
 class Controller(object):
-  def __init__(self):
+  def __init__(self, gui):
+    self.gui = gui
     self.video_reader = None
     self.eye_movement = None
     self.clock = None
@@ -30,7 +31,7 @@ class Controller(object):
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
-    self.clock = Clock(self.video_reader.duration(), 0.2)
+    self.clock = Clock(self.video_reader.duration(), 0.1)
     self.clock.register(self._tick)
     
     if self.categorise_frames:
@@ -41,9 +42,7 @@ class Controller(object):
     self.category_container = CategoryContainer(int(number_of_indexes))
 
   def _tick(self, time):
-    global test
-    
-    test.picture = self.overlayedFrameAt(time, False, False, True)
+    self.gui.setImageAndTime(self.overlayedFrameAt(time, False, False, True), time)
 
   def overlayedFrameAt(self, second, left, right, mean):
     image = self.video_reader.frameAt(second)
@@ -85,18 +84,27 @@ class Controller(object):
       pass
 
 if __name__ == '__main__':
-  controller = Controller()
+  from gui.MainFrame import MainFrame
+  import wx
+  a = wx.App()
+  e = MainFrame()
+  e.Show()
+  
+  from thread import start_new_thread
+  start_new_thread(a.MainLoop, ())
+  controller = Controller(e)
   controller._new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
   print "ready:", controller.ready()
-  controller.clock.setMultiplicator(0.5)
+  #controller.clock.setMultiplicator(0.5)
   controller.play()
-  import test
-  test.app = test.wx.App()
-  test.mframe = test.MyFrame()
-  test.mframe.Show()
+  #import test
+  #test.app = test.wx.App()
+  #test.mframe = test.MyFrame()
+  #test.mframe.Show()
 
-  import thread
-  thread.start_new_thread(test.app.MainLoop, ())
-  time.sleep(2)
-  controller.pause()
+  #import thread, time
+  #thread.start_new_thread(test.app.MainLoop, ())
+  #time.sleep(2)
+  #controller.pause()
   
+  #controller.clock.register(lambda x:e.videopanel.SetImage(controller.overlayedFrameAt(x, False, False, True)))

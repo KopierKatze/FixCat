@@ -28,16 +28,13 @@ class VideoReader(object):
             frame = cv.QueryFrame(self.reader) #IplImage 
             return frame
         else:
-            #second = 1 <-- for fault tolerance?!
-            #cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-            #frame = cv.QueryFrame(reader)
             return ReaderError("second should be between")
 
 
     def duration(self):
         """duration of the video in seconds"""
         return self._duration
-        
+
         framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
         duration = framecount / self.fps()
         return duration
@@ -52,15 +49,16 @@ class VideoReader(object):
 	cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
 	return int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES))
       else:
-	#second = 1 <-- for fault tolerance?!
-	#cv.SetCaptureProperty(reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-	#frame = cv.QueryFrame(reader)
 	return ReaderError("second should be between")
-      
+
+    def beginOfFrame(self, number):
+      """returns the second from which on the frame is seen in the video"""
+      cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, number)
+      return cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC)
 
     def releaseReader(self):
         """closes VideoReader after use """
         cv.ReleaseCapture(reader)
-    
+
 class ReaderError(Exception):
     pass
