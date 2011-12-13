@@ -1,4 +1,5 @@
 import wx
+import cv
 
 class OpenCVImage(wx.Panel):
     def __init__(self, parent, id):
@@ -19,6 +20,8 @@ class OpenCVImage(wx.Panel):
         return event
 
     def SetImage(self, image):
+        cv.ResetImageROI(image)
+        cv.CvtColor(image, image, cv.CV_BGR2RGB)
         self.image = wx.BitmapFromBuffer(image.width, image.height, image.tostring())
         self.Refresh()
 

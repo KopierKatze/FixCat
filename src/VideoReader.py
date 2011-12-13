@@ -14,8 +14,7 @@ class VideoReader(object):
             cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frames-1)
             # have to query frame to settle position
             cv.QueryFrame(self.reader)
-            self._duration = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC)
-            print self._duration
+            self._duration = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC) / 1000.0
         else:
             raise ReaderError('invalid filepath')
 
@@ -44,6 +43,8 @@ class VideoReader(object):
 	return framerate
 
     def frameNumberOfSecond(self, second):
+      return int(second * self.fps())
+      
       duration = self.duration()
       if second is not None and second >= 0 and second <= duration:
 	cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
@@ -53,6 +54,8 @@ class VideoReader(object):
 
     def beginOfFrame(self, number):
       """returns the second from which on the frame is seen in the video"""
+      return float(number)/self.fps()
+      
       cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, number)
       return cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC)
 

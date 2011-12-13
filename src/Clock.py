@@ -15,7 +15,7 @@ class Clock(object):
     self.time = 0.0
     self.running = False # initializing with False, True in run()
     self.registered = []
-    self.multiplicator = 1
+    self.multiplicator = 1.0
     self.maximal_duration = maximal_duration
     self.interval = interval
 
@@ -34,11 +34,9 @@ class Clock(object):
        interval * multi
     """
     if(multi != 0):
-        self.multiplicator = multi
-        return self.multiplicator
+        self.multiplicator = float(multi)
     else:
         raise ClockError("multiplicator may not be 0")
-        return 1
 
   def run(self): 
     """let the clock tick until end_of_time is reached"""    

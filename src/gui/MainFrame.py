@@ -11,6 +11,7 @@ class MainFrame(wx.Frame):
         self.Centre()
         self.Show(True)
         self.dirname=""
+        self.controller = None
 
     def InitUI(self):
 
@@ -54,12 +55,22 @@ class MainFrame(wx.Frame):
         self.videopanel = OpenCVImage(self, wx.ID_ANY)
         vbtnpanel = wx.Panel(self, -1)
         self.slider1 = wx.Slider(vbtnpanel, -1, 0, 0, 1000)
+        self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
         pause = wx.Button(vbtnpanel, -1, "Pause")
+        self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
         play  = wx.Button(vbtnpanel, -1, "Play")
+        self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
         next  = wx.Button(vbtnpanel, -1, "Next F")
+        self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
         prev  = wx.Button(vbtnpanel, -1, "Prev F")
+        self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
+        slower  = wx.Button(vbtnpanel, -1, "90%")
+        self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
+        normal  = wx.Button(vbtnpanel, -1, "100%")
+        self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
+        faster  = wx.Button(vbtnpanel, -1, "110%")
+        self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
 
-        #self.Bind(wx.EVT_BUTTON, self.onPlay, play)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -71,6 +82,9 @@ class MainFrame(wx.Frame):
         hbox2.Add(next, flag=wx.LEFT, border=5)
         hbox2.Add(prev)
         hbox2.Add((150, -1), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
+        hbox2.Add(slower)
+        hbox2.Add(normal)
+        hbox2.Add(faster)
 
         vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
         vbox.Add(hbox2, 1, wx.EXPAND)
@@ -120,8 +134,72 @@ class MainFrame(wx.Frame):
 
         mainbox.Add(sizer,4, flag=wx.EXPAND)
         mainbox.Add(catbox,2,flag=wx.EXPAND)
-        #mainbox.Add(pnl1, flag=wx.EXPAND) 
-        self.SetSizer(mainbox)    
+        #mainbox.Add(pnl1, flag=wx.EXPAND)
+        self.SetSizer(mainbox)
+
+    def newVideo(self, duration):
+      wx.CallAfter(self.slider1.SetMax, (duration))
+
+    def setImageAndTime(self, image, time):
+      wx.CallAfter(self.videopanel.SetImage, (image))
+      wx.CallAfter(self.slider1.SetValue, (time))
+
+    def controllerIO(self):
+      if self.controller is None: pass
+      if not self.controller.ready(): pass
+      return True
+
+    # ---------------- PLAYBACK CONTROLL --------------
+    
+    def OnPlay(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.play()
+
+    def OnPause(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.pause()
+
+    def OnNextFrame(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.nextFrame()
+
+    def OnPrevFrame(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.prevFrame()
+
+    def OnSlower(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.slowerPlayback()
+
+    def OnNormal(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.normalPlayback()
+
+    def OnFaster(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.fasterPlayback()
+      
+    def OnSliderScroll(self, event):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.seek(self.slider1.GetValue())
+
+      # ---------------- PLAYBACK CONTROLL END ----------
         
     #------------------------------------------- menu items     
     def OnAbout(self, e):
@@ -130,6 +208,7 @@ class MainFrame(wx.Frame):
         dlg.Destroy()
 
     def OnExit(self, e):
+        #wx.CallAfter(self.controller.pause ()) doesn't work
         self.Close(True)
 
     def OnOpen(self, e):
@@ -141,8 +220,6 @@ class MainFrame(wx.Frame):
     def OnAddCategory(self, e):
         CategoryEditor().Show()
 
-    def setImageAndTime(self, image, time):
-      wx.CallAfter(self.videopanel.SetImage, (image))
 
     # -------------------- category editor buttons
     def load_buttonClick(self, event):
