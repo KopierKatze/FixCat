@@ -4,7 +4,7 @@ class CategoryFrame(wx.Frame):
     def __init__(self, parent, id, controller, title='Kategorie Uebersicht'):
         infotext = "In diesem Fenster koennen die Kategorien editiert werden. \nKategorie in der Tabelle aswaehlen und auf Editieren klicken. \nIn dem neuen Dialog koennen dann die Parameter der Kategorie \n- Buchstabe und Name - geaendert werden.\n Mit Hilfe des Buchstabes wird Tastenkombination fuer die Kategorie festgelegt."
         wx.Frame.__init__(self, parent, id, title, size=(600,600))
-        
+        self.Center()
         # get dict from controler
         categories = parent.controller.getCategoryContainer().categories
         self.category = None
