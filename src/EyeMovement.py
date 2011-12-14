@@ -1,4 +1,5 @@
 import re
+from math import floor
 
 class EyeMovement(object):
   number = r'([ 0-9]{5}.[0-9])'
@@ -25,18 +26,17 @@ class EyeMovement(object):
       self._parseFile(filename)
 
   def _findIndexOfSecond(self, second, sec_list):
-    index = None
-    sec_list.sort()
-    for sec in sec_list:
-      if sec <= second*1000:
-	index = sec
-      else:
+    index = int(floor(second*1000))
+    while not index in sec_list:
+      print "index", index, "not in list"
+      index -= 1
+      if index <= 0:
+	index = None
 	break
-
-
+    print "index is:", index
+	
     if index == None:
       raise EyeMovementError("list doesn't contain anything!?")
-    
     return index
 
       
@@ -164,6 +164,7 @@ class EyeMovement(object):
   def meanLookAt(self, second):
     l = self.leftLookAt(second)
     r = self.rightLookAt(second)
+    if r is None or l is None: return None
 
     return ((l[0] + r[0])/2.0, (l[1] + r[1])/2.0)
 

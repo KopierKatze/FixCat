@@ -39,7 +39,7 @@ class Controller(object):
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
-    self.clock = Clock(self.video_reader.duration(), 0.1)
+    self.clock = Clock(self.video_reader.duration(), 1.0/30.0)
     self.clock.register(self._tick)
     
     if self.categorise_frames:
@@ -60,25 +60,30 @@ class Controller(object):
     second = self.clock.time
     
     image = self.video_reader.frameAt(second)
+    
     left_look = self.eye_movement.leftLookAt(second)
     right_look = self.eye_movement.rightLookAt(second)
     mean_look = self.eye_movement.meanLookAt(second)
-    left_cursor = self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(second))
-    right_cursor = self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(second))
-    mean_cursor = self.cursor.cursorFor(self.eye_movement.meanStatusAt(second))
-    
-    if left and left_cursor:
-      cv.SetImageROI(image, (int(left_look[0]), int(left_look[1]), left_cursor.width, left_cursor.height))
-      cv.Add(image, left_cursor, image)
-      
-    if right and right_cursor:
-      cv.SetImageROI(image, (int(right_look[0]), int(right_look[1]), right_cursor.width, right_cursor.height))
-      cv.Add(image, right_cursor, image)
+    # TODO: this try-except block is really bad taste! only for the show today
+    try:
+      if left and right_look[0] < image.width and right_look[1] < image.height:
+	left_cursor = self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(second))
+	cv.SetImageROI(image, (int(left_look[0]), int(left_look[1]), left_cursor.width, left_cursor.height))
+	cv.Add(image, left_cursor, image)
 
-      
-    if mean and mean_cursor:
-      cv.SetImageROI(image, (int(mean_look[0]), int(mean_look[1]), mean_cursor.width, mean_cursor.height))
-      cv.Add(image, mean_cursor, image)
+      if right and left_look[0] < image.width and left_look[1] < image.height:
+	right_cursor = self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(second))
+	cv.SetImageROI(image, (int(right_look[0]), int(right_look[1]), right_cursor.width, right_cursor.height))
+	cv.Add(image, right_cursor, image)
+
+
+      if mean and mean_look[0] < image.width and mean_look[1] < image.height:
+	mean_cursor = self.cursor.cursorFor(self.eye_movement.meanStatusAt(second))
+	cv.SetImageROI(image, (int(mean_look[0]), int(mean_look[1]), mean_cursor.width, mean_cursor.height))
+	cv.Add(image, mean_cursor, image)
+    except Exception:
+      pass
+
     return image
 
   def play(self):
@@ -100,10 +105,8 @@ class Controller(object):
   def nextFrame(self):
     """jump one frame into the future"""
     cur_frame = self.video_reader.frameNumberOfSecond(self.clock.time)
-    print "current frame is:", cur_frame, "at:", self.clock.time
     try:
       nextFrameTime = self.video_reader.beginOfFrame(cur_frame + 1)
-      print "jumped to:", nextFrameTime
     except ReaderError:
       """we are already at the end of the video"""
       pass

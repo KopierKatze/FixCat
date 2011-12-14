@@ -24,8 +24,10 @@ class VideoReader(object):
         duration = self.duration()
         if second is not None and second >= 0 and second <= duration: 
             cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-            frame = cv.QueryFrame(self.reader) #IplImage 
-            return frame
+            frame = cv.QueryFrame(self.reader) #IplImage
+            return_frame = cv.CreateImage((frame.width, frame.height), cv.IPL_DEPTH_8U, 3)
+            cv.Copy(frame, return_frame)
+            return return_frame
         else:
             return ReaderError("second should be between")
 

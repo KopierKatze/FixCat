@@ -73,6 +73,7 @@ class Clock(object):
 	thread.run = lambda: function(self.time)
 	thread.daemon = True
 	thread.start()
+	#function(self.time)
 
 class ClockError(Exception):
     pass
