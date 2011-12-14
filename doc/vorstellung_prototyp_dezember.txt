@@ -1,0 +1,25 @@
+Präsentation 1. Protoyp (14.12.)
+
+Prioritäten:
+  hoch:
+    - Synchronisierung von Clock, Video
+    - Stabilität und fault tolerance (→ Zwischenspeichern?)
+  niedrig:
+    -deinterlacing
+
+Festgelegt:
+  - Augenstatus: 
+    - Fixationskategorisierung in absteigender Reihenfolge: Fixation, Saccade, Blink
+    - Nummerierung der Kategorien bei neuem Projekt anhand von einem Auge
+      → Bei fehlenden Daten gemittelten Cursor anzeigen
+  - Kategoriesierung exportierbar und in anderem Projekt importierbar
+  
+Probleme:
+  - Umrechnung von Sekunden auf Frames und umgekehrt bei Clock 
+    → Umstellung des Zeitformats der Clock auf  Frames?
+  - Performance-Problem durch Implementierung von Threads in Python
+    → Multi-Processing
+  
+Wünsche: 
+  - Menü zum Festlegen der Shortcuts für Steuerung der GUI
+  
