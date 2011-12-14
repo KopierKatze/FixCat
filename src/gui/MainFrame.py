@@ -19,26 +19,26 @@ class MainFrame(wx.Frame):
         statusBar = self.CreateStatusBar()
 
         fileMenu = wx.Menu()
-        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "open")
-        menuAbout = fileMenu.Append(wx.ID_ABOUT, "&About", "Information About")
-        menuSave = fileMenu.Append(wx.ID_SAVE, '&Save')
+        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Oeffnen")
+        menuAbout = fileMenu.Append(wx.ID_ABOUT, "About", "Ueber pyPsy")
+        menuSave = fileMenu.Append(wx.ID_SAVE, '&Save', "Speichern")
         fileMenu.AppendSeparator()
-        menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Terminate")
+        menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Schliessen")
 
         codecMenu = wx.Menu()
-        codecMenu.Append(wx.ID_PREFERENCES, "Codecs", "Set codec")
+        setCodec = codecMenu.Append(wx.ID_PREFERENCES, "Codecs", "Codec aendern")
 
         cursorMenu = wx.Menu()
-        menuSetImage = cursorMenu.Append(wx.ID_PREFERENCES, "Cursor", "Change Cursor Image")
+        menuSetImage = cursorMenu.Append(wx.ID_PREFERENCES, "Cursor", "Cursor aendern")
 
         categoryMenu = wx.Menu()
         categoryEdit = categoryMenu.Append(wx.ID_PREFERENCES, "Category", "Kategorie editieren")
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
-        menuBar.Append(codecMenu, "C&odecs")
-        menuBar.Append(cursorMenu, "&Cursor")
-        menuBar.Append(categoryMenu, "&Category")
+        menuBar.Append(codecMenu, "Codecs")
+        menuBar.Append(cursorMenu, "Cursor")
+        menuBar.Append(categoryMenu, "Category")
         self.SetMenuBar(menuBar)
 
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
@@ -46,7 +46,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
         self.Bind(wx.EVT_MENU, self.OnEditCategory, categoryEdit)
-        #self.Bind(wx.EVT_MENU, self., )
+        self.Bind(wx.EVT_MENU, self.OnAbout, menuSetImage)
+        self.Bind(wx.EVT_MENU, self.OnAbout, setCodec)
 
         #sizer boxes for panels
         mainbox = wx.BoxSizer(wx.HORIZONTAL)
