@@ -12,7 +12,7 @@ class CategoryFrame(wx.Frame):
         tablebox = wx.BoxSizer(wx.HORIZONTAL)
         textbox = wx.BoxSizer(wx.VERTICAL)
         
-        tablepnl = wx.Panel(self, -1, style=wx.SUNKEN_BORDER)
+        #tablepnl = wx.Panel(self, -1, style=wx.SUNKEN_BORDER)
         textpnl = wx.Panel(self, -1, style=wx.SUNKEN_BORDER)
         
         self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
@@ -29,25 +29,21 @@ class CategoryFrame(wx.Frame):
             self.lc.InsertStringItem(num_items, self.category)
             self.lc.SetStringItem(num_items, 1, self.shortcut)
         # -----------------------------------
+        
         tablebox.Add(self.lc, 4, wx.EXPAND)
-        tablebox.Add(tablepnl, 1, wx.EXPAND) # | wx.ALIGN_RIGHT)
-        tablebox.Add(wx.Button(textpnl, 1, 'Bearbeiten'), 0, wx.ALIGN_RIGHT)
+        #tablebox.Add(tablepnl, 1, wx.EXPAND | wx.ALIGN_RIGHT)
+        #tablebox.Add(wx.Button(tablepnl, 1, 'Bearbeiten'), 0, wx.ALIGN_RIGHT)
+        tablebox.Add(wx.Button(self, 1, 'Bearbeiten'), 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER)
         self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
+        
         info = wx.StaticText(textpnl, -1, infotext,(50,10), style=wx.ALIGN_CENTER)
         textbox.Add(textpnl, 3, wx.EXPAND | wx.ALL)
-        textbox.Add(wx.Button(textpnl, 2, 'Schliessen'))
+        textbox.Add(wx.Button(self, 2, 'Schliessen'), 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
         #self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
         self.Bind (wx.EVT_BUTTON, self.OnEdit, id=2)
         
-        #tablesizer = wx.BoxSizer(wx.VERTICAL)
-        #tablesizer.Add(tablepnl, 1, flag=wx.EXPAND)
-        #textsizer = wx.BoxSizer(wx.VERTICAL)
-        #textsizer.Add(textpnl, flag=wx.EXPAND | wx.BOTTOM)
-        
-        mainbox.Add(tablebox, 3, wx.EXPAND)
-        mainbox.Add(textbox, 1, wx.EXPAND)
-        #mainbox.Add(tablesizer, 1, wx.EXPAND)
-        #mainbox.Add(textsizer, 1, wx.EXPAND)
+        mainbox.Add(tablebox, 3, flag=wx.EXPAND)
+        mainbox.Add(textbox, 1, flag=wx.EXPAND)
         self.SetSizer(mainbox)
 
     def OnClose(self, event):
@@ -67,7 +63,7 @@ class CategoryFrame(wx.Frame):
 
 class MyApp(wx.App):
    def OnInit(self):
-       frame = CategoryFrame(None, -1, 'layout.py')
+       frame = CategoryFrame(None, -1, 'Kategorie Uebersicht')
        frame.Show(True)
        frame.Centre()
        return True
