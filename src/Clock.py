@@ -8,16 +8,20 @@ class Clock(object):
      'register()' on every tick. informs those funtions about current time
      in seconds.
      the time passed within one interval can be altered by a multiplicator."""
-  def __init__(self, maximal_duration, interval = 1.0/30):
+  def __init__(self, total_frames, fps):
     """creates clock with interval(time in the real world that passes between
     two ticks) and end_of_time(duration of video)"""
     
-    self.time = 0.0
+    self._frame = 0.0 # is not always a round number! do to the multiplicator
     self.running = False # initializing with False, True in run()
     self.registered = []
     self.multiplicator = 1.0
-    self.maximal_duration = maximal_duration
-    self.interval = interval
+    self.total_frames = total_frames
+    self.interval = 1.0/fps
+
+  @property
+  def frame(self):
+    return int(round(self._frame))
 
   def register(self, function):
     """register a funtion f to be called one every tick.
@@ -39,10 +43,7 @@ class Clock(object):
         raise ClockError("multiplicator may not be 0")
 
   def run(self): 
-    """let the clock tick until end_of_time is reached"""    
-    # while(!self.stop && <max_duration>)
-    # sleep interval
-    # clock seek to +interval * multi 
+    """let the clock tick until end_of_time is reached"""
     if self.running == False:
         self.running = True
         worker = ClockWorker(self)
@@ -58,22 +59,21 @@ class Clock(object):
     else:
         raise ClockError("clock already stopped")
 
-  def seek(self, second):
-    """set current time of clock to second
-    if second > end_of_time a ClockError will be raised"""
+  def seek(self, frame):
+    """set current time of clock to frame
+    if frame > end_of_time a ClockError will be raised"""
     # immer zeit ueber seek aendern
-    # time = second
     # registrierte funktionen hier aufrufen (ueber liste iterieren)
-    if second < 0 or second > self.maximal_duration:
+    if frame < 0 or frame > self.total_frames:
         self.stop()
-        raise ClockError("seek error")
-    self.time = second
+        raise ClockError("seek error: frame out of scope")
+    self._frame = frame
     for function in self.registered:
 	thread = threading.Thread()
-	thread.run = lambda: function(self.time)
+	thread.run = lambda: function(self.frame)
 	thread.daemon = True
 	thread.start()
-	#function(self.time)
+	#function(self.frame)
 
 class ClockError(Exception):
     pass
@@ -86,11 +86,11 @@ class ClockWorker(threading.Thread):
         self.c = Clock
 
     def run(self):
-        while self.c.running and self.c.time <= self.c.maximal_duration - self.c.interval:
+        while self.c.running:
             time.sleep(self.c.interval)
-            new_time = self.c.time + self.c.interval * self.c.multiplicator
-            if new_time > self.c.maximal_duration:
-	      self.c.seek(self.c.maximal_duration)
+            new_frame = self.c._frame + (1.0 * self.c.multiplicator)
+            if round(new_frame) > self.c.total_frames:
+	      self.c.seek(self.c.total_frames)
 	      self.c.stop()
 	    else:
-	      self.c.seek(new_time)
+	      self.c.seek(new_frame)

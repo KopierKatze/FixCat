@@ -39,46 +39,44 @@ class Controller(object):
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
-    self.clock = Clock(self.video_reader.duration(), 1.0/30.0)
+    self.clock = Clock(self.video_reader.duration, self.video_reader.fps)
     self.clock.register(self._tick)
     
     if self.categorise_frames:
-      number_of_indexes = self.video_reader.fps() * self.video_reader.duration()
+      number_of_indexes = self.video_reader.total_frames
     else:
       number_of_indexes = self.eye_movement.countFixations()
 
     self.category_container = CategoryContainer(int(number_of_indexes))
 
-    self.gui.newVideo(self.video_reader.duration())
+    self.gui.newVideo(self.video_reader.total_frames)
 
-  def _tick(self, time):
+  def _tick(self, frame):
     """will populate current image to gui.
     have a look at Clock class for more information."""
-    self.gui.setImageAndTime(self.overlayedFrameAt(False, False, True), time)
+    self.gui.setImageAndTime(self.overlayedFrame(frame, False, False, True), frame)
 
-  def overlayedFrameAt(self, left, right, mean):
-    second = self.clock.time
-    
-    image = self.video_reader.frameAt(second)
-    
-    left_look = self.eye_movement.leftLookAt(second)
-    right_look = self.eye_movement.rightLookAt(second)
-    mean_look = self.eye_movement.meanLookAt(second)
+  def overlayedFrame(self, frame, left, right, mean):
+    image = self.video_reader.frame(frame)
+
+    left_look = self.eye_movement.leftLookAt(frame)
+    right_look = self.eye_movement.rightLookAt(frame)
+    mean_look = self.eye_movement.meanLookAt(frame)
     # TODO: this try-except block is really bad taste! only for the show today
     try:
       if left and right_look[0] < image.width and right_look[1] < image.height:
-	left_cursor = self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(second))
+	left_cursor = self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(frame))
 	cv.SetImageROI(image, (int(left_look[0]), int(left_look[1]), left_cursor.width, left_cursor.height))
 	cv.Add(image, left_cursor, image)
 
       if right and left_look[0] < image.width and left_look[1] < image.height:
-	right_cursor = self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(second))
+	right_cursor = self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(frame))
 	cv.SetImageROI(image, (int(right_look[0]), int(right_look[1]), right_cursor.width, right_cursor.height))
 	cv.Add(image, right_cursor, image)
 
 
       if mean and mean_look[0] < image.width and mean_look[1] < image.height:
-	mean_cursor = self.cursor.cursorFor(self.eye_movement.meanStatusAt(second))
+	mean_cursor = self.cursor.cursorFor(self.eye_movement.meanStatusAt(frame))
 	cv.SetImageROI(image, (int(mean_look[0]), int(mean_look[1]), mean_cursor.width, mean_cursor.height))
 	cv.Add(image, mean_cursor, image)
     except Exception:
@@ -104,25 +102,11 @@ class Controller(object):
 # -----------  FRAME JUMPING ----
   def nextFrame(self):
     """jump one frame into the future"""
-    cur_frame = self.video_reader.frameNumberOfSecond(self.clock.time)
-    try:
-      nextFrameTime = self.video_reader.beginOfFrame(cur_frame + 1)
-    except ReaderError:
-      """we are already at the end of the video"""
-      pass
-    else:
-      self.seek(nextFrameTime)
+    self.seek(self.clock.frame + 1)
 
   def prevFrame(self):
     """jump one frame into the past"""
-    cur_frame = self.video_reader.frameNumberOfSecond(self.clock.time)
-    try:
-      prevFrameTime = self.video_reader.beginOfFrame(cur_frame - 1)
-    except ReaderError:
-      """we are already at the beginning of the video"""
-      pass
-    else:
-      self.seek(prevFrameTime)
+    self.seek(self.clock.frame - 1)
 
   def jumpToNextUncategorisedFixation(self):
     """no yet"""
@@ -149,7 +133,8 @@ if __name__ == '__main__':
   from thread import start_new_thread
   start_new_thread(a.MainLoop, ())
   controller = Controller(e)
-  controller.new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
+  #controller.new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
+  controller.new_project("../example/overlayed_video.avi", "../example/t2d1gl.asc", True)
   
   import yappi
   yappi.start(True)

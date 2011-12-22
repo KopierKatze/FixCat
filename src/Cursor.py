@@ -21,5 +21,4 @@ class Cursor(object):
   def cursorFor(self, state):
     """return the cursor image for a certain state"""
     if state == None: return None
-    if state == "don't know": return None
     return self.cursor[state]

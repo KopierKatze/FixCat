@@ -10,56 +10,23 @@ class VideoReader(object):
         if filepath is not None and filepath is not '':
             self.reader = cv.CaptureFromFile(filepath)
             
-            frames = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
-            cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frames-1)
-            # have to query frame to settle position
-            cv.QueryFrame(self.reader)
-            self._duration = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC) / 1000.0
+            self.total_frames = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
+            self.fps = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
+            self.duration = self.total_frames * self.fps
         else:
             raise ReaderError('invalid filepath')
 
-    def frameAt(self, second):
+    def frame(self, frame_number):
         """returns the image that you would see when playing the video at second
         'second'"""
-        duration = self.duration()
-        if second is not None and second >= 0 and second <= duration: 
-            cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
+        if frame_number is not None and frame_number >= 0 and frame_number <= self.total_frames: 
+            cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frame_number)
             frame = cv.QueryFrame(self.reader) #IplImage
             return_frame = cv.CreateImage((frame.width, frame.height), cv.IPL_DEPTH_8U, 3)
             cv.Copy(frame, return_frame)
             return return_frame
         else:
             return ReaderError("second should be between")
-
-
-    def duration(self):
-        """duration of the video in seconds"""
-        return self._duration
-
-        framecount = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
-        duration = framecount / self.fps()
-        return duration
-
-    def fps(self):
-	framerate = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
-	return framerate
-
-    def frameNumberOfSecond(self, second):
-      return int(second * self.fps())
-      
-      duration = self.duration()
-      if second is not None and second >= 0 and second <= duration:
-	cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC, second*1000)
-	return int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES))
-      else:
-	return ReaderError("second should be between")
-
-    def beginOfFrame(self, number):
-      """returns the second from which on the frame is seen in the video"""
-      return float(number)/self.fps()
-      
-      cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, number)
-      return cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_MSEC)
 
     def releaseReader(self):
         """closes VideoReader after use """
