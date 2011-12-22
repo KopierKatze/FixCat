@@ -127,14 +127,23 @@ class EyeMovement(object):
     return 'blink'
 
   def rightLookAt(self, frame):
-    return self._looks[frame][1]
+    try:
+      return self._looks[frame][1]
+    except TypeError:
+      return None
 
   def leftLookAt(self, frame):
-    return self._looks[frame][0]
+    try:
+      return self._looks[frame][0]
+    except TypeError:
+      return None
 
   def meanLookAt(self, frame):
     l = self.leftLookAt(frame)
     r = self.rightLookAt(frame)
+
+    if l is None or r is None:
+      return None
 
     return ((l[0] + r[0])/2.0, (l[1] + r[1])/2.0)
 
