@@ -64,16 +64,22 @@ class Clock(object):
     if frame > end_of_time a ClockError will be raised"""
     # immer zeit ueber seek aendern
     # registrierte funktionen hier aufrufen (ueber liste iterieren)
+
+    if self.frame == frame:
+      # nothing to change so save cpu time
+      return
+
     if frame < 0 or frame > self.total_frames:
-        self.stop()
-        raise ClockError("seek error: frame out of scope")
+      self.stop()
+      raise ClockError("seek error: frame out of scope")
+
     self._frame = frame
     for function in self.registered:
-	thread = threading.Thread()
-	thread.run = lambda: function(self.frame)
-	thread.daemon = True
-	thread.start()
-	#function(self.frame)
+	#thread = threading.Thread()
+	#thread.run = lambda: function(self.frame)
+	#thread.daemon = True
+	#thread.start()
+	function(self.frame)
 
 class ClockError(Exception):
     pass
