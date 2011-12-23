@@ -56,6 +56,7 @@ class EyeMovement(object):
       frame = frame_re.match(line)
       if frame:
 	current_frame = int(frame.groups()[2])
+	current_frame -= 1 # cvs frames start at 0 eyelinks frames at 1
 	
       # we index by frames... so everything bevor a frame indication is thrown away!
       if current_frame == None:

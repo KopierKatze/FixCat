@@ -125,9 +125,9 @@ class MainFrame(wx.Frame):
     def newVideo(self, duration):
       wx.CallAfter(self.slider1.SetMax, (duration))
 
-    def setImageAndTime(self, image, time):
+    def setImageAndFrame(self, image, frame):
       wx.CallAfter(self.videopanel.SetImage, (image))
-      wx.CallAfter(self.slider1.SetValue, (time))
+      wx.CallAfter(self.slider1.SetValue, (frame))
 
     def controllerIO(self):
       if self.controller is None: pass

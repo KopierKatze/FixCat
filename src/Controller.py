@@ -54,7 +54,7 @@ class Controller(object):
   def _tick(self, frame):
     """will populate current image to gui.
     have a look at Clock class for more information."""
-    self.gui.setImageAndTime(self.overlayedFrame(frame, False, False, True), frame)
+    self.gui.setImageAndFrame(self.overlayedFrame(frame, True, True, True), frame)
 
   def overlayedFrame(self, frame, left, right, mean):
     image = self.video_reader.frame(frame)
@@ -129,7 +129,6 @@ if __name__ == '__main__':
   e = MainFrame()
   e.Show()
 
-  
   from thread import start_new_thread
   start_new_thread(a.MainLoop, ())
   controller = Controller(e)

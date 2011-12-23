@@ -1,6 +1,8 @@
 import wx
 import cv
 
+from time import time
+
 class OpenCVImage(wx.Panel):
     def __init__(self, parent, id):
         wx.Panel.__init__(self, parent, id)
@@ -8,6 +10,8 @@ class OpenCVImage(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
         self.image = None
+
+        self.t1 = 0
 
     def OnPaint(self, event):
         dc = wx.BufferedPaintDC(self)
@@ -20,6 +24,8 @@ class OpenCVImage(wx.Panel):
         return event
 
     def SetImage(self, image):
+        print "showing dauert %f" % (time() - self.t1)
+	self.t1 = time()
         cv.ResetImageROI(image)
         cv.CvtColor(image, image, cv.CV_BGR2RGB)
         self.image = wx.BitmapFromBuffer(image.width, image.height, image.tostring())
