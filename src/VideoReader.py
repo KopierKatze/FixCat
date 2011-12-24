@@ -19,7 +19,7 @@ class VideoReader(object):
             self._last_frame = 0
             self.prefetcher = VideoPrefetcher(self)
             self.prefetcher.daemon = True
-            self.prefetcher.start()
+            #self.prefetcher.start()
         else:
             raise ReaderError('invalid filepath')
 
@@ -29,10 +29,10 @@ class VideoReader(object):
         if frame_number is not None and frame_number >= 0 and frame_number <= self.total_frames:
 	  self._last_frame = frame_number
 	  if self.cache.has_key(frame_number):
-	    print "cache hit!"
+	    #print "cache hit!"
 	    frame = self.cache.get(frame_number)
 	  else:
-	    print "cache miss"
+	    #print "cache miss"
             cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frame_number)
             frame = cv.QueryFrame(self.reader) #IplImage
 	  return_frame = cv.CreateImage((frame.width, frame.height), cv.IPL_DEPTH_8U, 3)

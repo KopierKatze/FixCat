@@ -1,6 +1,6 @@
 import threading
 from thread import start_new_thread
-import time #for sleeping
+from time import time, sleep
 
 class Clock(object):
   """a clock!
@@ -83,7 +83,9 @@ class Clock(object):
 
 class ClockError(Exception):
     pass
-  
+
+import cProfile
+    
 class ClockWorker(threading.Thread):
     def __init__(self, Clock):
         threading.Thread.__init__(self)
@@ -92,11 +94,24 @@ class ClockWorker(threading.Thread):
         self.c = Clock
 
     def run(self):
+      prof = cProfile.Profile()
+      prof.runctx('l()', {}, {'l':self.run1})
+      prof.print_stats('time')
+
+    def run1(self):
+        target = self.c.interval
+        actual = self.c.interval
+        sleeptime = self.c.interval
         while self.c.running:
-            time.sleep(self.c.interval)
+	    temptime = time()
+	    sleeptime = 0.8 * sleeptime + 0.2 * (target - actual)
+	    if sleeptime > 0.1: sleep(sleeptime)
+	    else: sleep(0.1)
             new_frame = self.c._frame + (1.0 * self.c.multiplicator)
             if round(new_frame) > self.c.total_frames:
 	      self.c.seek(self.c.total_frames)
 	      self.c.stop()
 	    else:
 	      self.c.seek(new_frame)
+	    actual = time() - temptime
+	    #print int(actual/target*100), sleeptime

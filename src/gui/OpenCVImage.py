@@ -24,8 +24,8 @@ class OpenCVImage(wx.Panel):
         return event
 
     def SetImage(self, image):
-        print "showing dauert %f" % (time() - self.t1)
-	self.t1 = time()
+        #print "showing dauert %f" % (time() - self.t1)
+	#self.t1 = time()
         cv.ResetImageROI(image)
         cv.CvtColor(image, image, cv.CV_BGR2RGB)
         self.image = wx.BitmapFromBuffer(image.width, image.height, image.tostring())

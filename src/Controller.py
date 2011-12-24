@@ -130,13 +130,22 @@ if __name__ == '__main__':
   e.Show()
 
   from thread import start_new_thread
-  start_new_thread(a.MainLoop, ())
+  #start_new_thread(a.MainLoop, ())
+  import cProfile
   controller = Controller(e)
   #controller.new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
   controller.new_project("../example/overlayed_video.avi", "../example/t2d1gl.asc", True)
+  prof = cProfile.Profile()
+  prof.runctx('l()', {}, {'l':a.MainLoop})
+  prof.print_stats('time')
+
   
-  import yappi
-  yappi.start(True)
+  #import yappi, time
+  #controller.play()
+  #yappi.start(True)
+  #time.sleep(100)
+  #print yappi.get_stats(sorttype=yappi.SORTTYPE_TSUB, limit=100)
+  
   #print "ready:", controller.ready()
   ##controller.clock.setMultiplicator(0.5)
   #controller.play()
