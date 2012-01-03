@@ -17,7 +17,10 @@ class Clock(object):
     self.registered = []
     self.multiplicator = 1.0
     self.total_frames = total_frames
-    self.interval = 1.0/fps
+    try:
+      self.interval = 1.0/fps
+    except ZeroDivisionError:
+      self.interval = 1.0/30.0
 
   @property
   def frame(self):
@@ -105,8 +108,8 @@ class ClockWorker(threading.Thread):
         while self.c.running:
 	    temptime = time()
 	    sleeptime = 0.8 * sleeptime + 0.2 * (target - actual)
-	    if sleeptime > 0.1: sleep(sleeptime)
-	    else: sleep(0.1)
+	    if sleeptime > 0.00001: sleep(sleeptime)
+	    else: sleep(0.00001)
             new_frame = self.c._frame + (1.0 * self.c.multiplicator)
             if round(new_frame) > self.c.total_frames:
 	      self.c.seek(self.c.total_frames)

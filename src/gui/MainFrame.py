@@ -3,7 +3,7 @@ from CategoryFrame import CategoryFrame
 from OpenCVImage import OpenCVImage
 
 class MainFrame(wx.Frame):
-    def __init__(self):
+    def __init__(self, video_str, video_str_length, frame_size, controller):
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
 
@@ -11,7 +11,12 @@ class MainFrame(wx.Frame):
         self.Centre()
         self.Show(True)
         self.dirname=""
-        self.controller = None
+        self.controller = controller
+
+        self.frame_size = frame_size
+        self.video_str = video_str
+        self.video_str_length = video_str_length
+
 
     def InitUI(self):
 
@@ -108,8 +113,6 @@ class MainFrame(wx.Frame):
         pnl1.SetSizer(vbox3)
         vbox3.Add(wx.Button(pnl1, 12, 'naechste Kategorie'), 0, wx.ALIGN_CENTER| wx.TOP, 15)
         
-        #self.Bind (wx.EVT_BUTTON, self.OnAdd, id=12)
-        
         catbox.Add(vbox2, 1, wx.EXPAND)
         catbox.Add(vbox1, 1, wx.EXPAND)
         
@@ -122,16 +125,21 @@ class MainFrame(wx.Frame):
         mainbox.Add(catbox,2,flag=wx.EXPAND)
         self.SetSizer(mainbox)
 
-    def newVideo(self, duration):
-      wx.CallAfter(self.slider1.SetMax, (duration))
+    def reloadImage(self):
+      image_str = self.video_str.get_obj().raw[:self.video_str_length.value]
+      self.videopanel.SetImage(image_str, self.frame_size[0], self.frame_size[1])
+      
+      self.repaintTimer = wx.CallLater(1.0/20.0*1000, self.reloadImage)
+      self.repaintTimer.Restart()
 
-    def setImageAndFrame(self, image, frame):
-      wx.CallAfter(self.videopanel.SetImage, (image))
-      wx.CallAfter(self.slider1.SetValue, (frame))
+    def newProject(self, video_filepath, eyemovement_filepath):
+      # controller new project
+      # controller get frames, fps
+      pass
 
     def controllerIO(self):
-      if self.controller is None: pass
-      if not self.controller.ready(): pass
+      if self.controller is None: return False
+      if not self.controller.ready(): return False
       return True
 
     # ---------------- PLAYBACK CONTROLL --------------
@@ -141,24 +149,29 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.play()
+      #TODO start auto reload
 
     def OnPause(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.pause()
+      #TODO stop auto reload
 
     def OnNextFrame(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.nextFrame()
+      self.reloadImage()
+      #TODO reload image
 
     def OnPrevFrame(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.prevFrame()
+      #TODO reload image
 
     def OnSlower(self, event):
       """ check whether contoller is ready"""
@@ -183,6 +196,7 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.seek(self.slider1.GetValue())
+      #TODO reload image
 
       # ---------------- PLAYBACK CONTROLL END ----------
         

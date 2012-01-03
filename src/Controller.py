@@ -7,18 +7,24 @@ from VideoWriter import VideoWriter
 
 import cv
 
+import hashlib
+
 class Controller(object):
   """this class connects all the in- and output classes together and provides a
   clean interface for the connection to the gui"""
-  def __init__(self, gui):
-    self.gui = gui
-    self.gui.controller = self
+  def __init__(self, video_str, video_str_length, frame_size):
     self.video_reader = None
     self.eye_movement = None
     self.clock = None
     self.cursor = None
     self.category_container = None
     self.categorise_frames = False
+
+    self.frame_size = frame_size
+    self.video_str = video_str
+    self.video_str_length = video_str_length
+    """contains the current image of the overlayed video.
+    shared memory, so no latent ipc is needed"""
 
   def ready(self):
     """you should'nt always make sure this class is ready before using it's functions.
@@ -49,12 +55,16 @@ class Controller(object):
 
     self.category_container = CategoryContainer(int(number_of_indexes))
 
-    self.gui.newVideo(self.video_reader.total_frames)
-
   def _tick(self, frame):
     """will populate current image to gui.
     have a look at Clock class for more information."""
-    self.gui.setImageAndFrame(self.overlayedFrame(frame, True, True, True), frame)
+    fr = self.overlayedFrame(frame, True, True, True)
+    cv.CvtColor(fr, fr, cv.CV_BGR2RGB)
+    video_str = fr.tostring()
+    self.frame_size[0] = fr.width
+    self.frame_size[1] = fr.height
+    self.video_str_length.value = len(video_str)
+    self.video_str.value = video_str
 
   def overlayedFrame(self, frame, left, right, mean):
     image = self.video_reader.frame(frame)
@@ -122,41 +132,28 @@ class Controller(object):
     self.clock.setMultiplicator(1.0)
   def fasterPlayback(self):
     self.clock.setMultiplicator(self.clock.multiplicator * 1.1)
+
 if __name__ == '__main__':
+  from multiprocessing import Process, Value
+
+  video_str = Value('c' '')
+
   from gui.MainFrame import MainFrame
   import wx
   a = wx.App()
-  e = MainFrame()
+  e = MainFrame(video_str)
   e.Show()
+  gui_process = Process()
+  gui_process.run = a.MainLoop
+  gui_process.start()
+
 
   from thread import start_new_thread
   #start_new_thread(a.MainLoop, ())
   import cProfile
-  controller = Controller(e)
+  controller = Controller(video_str)
   #controller.new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
   controller.new_project("../example/overlayed_video.avi", "../example/t2d1gl.asc", True)
-  prof = cProfile.Profile()
-  prof.runctx('l()', {}, {'l':a.MainLoop})
-  prof.print_stats('time')
-
-  
-  #import yappi, time
-  #controller.play()
-  #yappi.start(True)
-  #time.sleep(100)
-  #print yappi.get_stats(sorttype=yappi.SORTTYPE_TSUB, limit=100)
-  
-  #print "ready:", controller.ready()
-  ##controller.clock.setMultiplicator(0.5)
-  #controller.play()
-  #import test
-  #test.app = test.wx.App()
-  #test.mframe = test.MyFrame()
-  #test.mframe.Show()
-
-  #import thread, time
-  #thread.start_new_thread(test.app.MainLoop, ())
-  #time.sleep(2)
-  #controller.pause()
-  
-  #controller.clock.register(lambda x:e.videopanel.SetImage(controller.overlayedFrameAt(x, False, False, True)))
+  #prof = cProfile.Profile()
+  #prof.runctx('l()', {}, {'l':a.MainLoop})
+  #prof.print_stats('time')

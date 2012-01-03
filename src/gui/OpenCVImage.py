@@ -11,8 +11,6 @@ class OpenCVImage(wx.Panel):
 
         self.image = None
 
-        self.t1 = 0
-
     def OnPaint(self, event):
         dc = wx.BufferedPaintDC(self)
         dc.SetBackground(wx.Brush('#000'))
@@ -23,12 +21,10 @@ class OpenCVImage(wx.Panel):
             dc.EndDrawing()
         return event
 
-    def SetImage(self, image):
-        #print "showing dauert %f" % (time() - self.t1)
-	#self.t1 = time()
-        cv.ResetImageROI(image)
-        cv.CvtColor(image, image, cv.CV_BGR2RGB)
-        self.image = wx.BitmapFromBuffer(image.width, image.height, image.tostring())
+    def SetImage(self, image, width, height):
+        #cv.ResetImageROI(image)
+        #cv.CvtColor(image, image, cv.CV_BGR2RGB)
+        self.image = wx.BitmapFromBuffer(width, height, image)
         self.Refresh()
 
 if __name__ == '__main__':
