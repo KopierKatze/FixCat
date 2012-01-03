@@ -31,13 +31,13 @@ class MainFrame(wx.Frame):
         menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Schliessen")
 
         codecMenu = wx.Menu()
-        setCodec = codecMenu.Append(wx.ID_PREFERENCES, "Codecs", "Codec aendern")
+        setCodec = codecMenu.Append(wx.ID_ANY, "Codecs", "Codec aendern")
 
         cursorMenu = wx.Menu()
-        menuSetImage = cursorMenu.Append(wx.ID_PREFERENCES, "Cursor", "Cursor aendern")
+        menuSetImage = cursorMenu.Append(wx.ID_ANY, "Cursor", "Cursor aendern")
 
         categoryMenu = wx.Menu()
-        categoryEdit = categoryMenu.Append(wx.ID_PREFERENCES, "Category", "Kategorie editieren")
+        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Category", "Kategorie editieren")
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
