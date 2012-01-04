@@ -17,6 +17,7 @@ class MainFrame(wx.Frame):
         self.current_frame = current_frame
 
         self.reloadTimer = wx.CallLater(1.0/20.0*1000, self.loadImage)
+        self.autoreload = False
 
     def InitUI(self):
 
@@ -130,7 +131,8 @@ class MainFrame(wx.Frame):
       self.videopanel.SetImage(image_str)
       self.slider1.SetValue(self.current_frame.value)
 
-      self.reloadTimer.Restart()
+      if self.autoreload:
+	self.reloadTimer.Restart()
 
     def newProject(self, video_filepath, eyemovement_filepath):
       self.controller.new_project(video_filepath, eyemovement_filepath, True)
@@ -150,14 +152,16 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.play()
-      self.reloadTimer.Start()
+      self.autoreload = True
+      self.loadImage()
 
     def OnPause(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.pause()
-      self.reloadTimer.Stop()
+      self.autoreload = False
+      self.loadImage()
 
     def OnNextFrame(self, event):
       """ check whether contoller is ready"""
