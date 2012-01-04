@@ -1,9 +1,9 @@
 import wx
 from CategoryFrame import CategoryFrame
-from OpenCVImage import OpenCVImage
+from StringImage import StringImage
 
 class MainFrame(wx.Frame):
-    def __init__(self, video_str, video_str_length, frame_size, controller):
+    def __init__(self, video_str, current_frame, controller):
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
 
@@ -13,10 +13,10 @@ class MainFrame(wx.Frame):
         self.dirname=""
         self.controller = controller
 
-        self.frame_size = frame_size
         self.video_str = video_str
-        self.video_str_length = video_str_length
+        self.current_frame = current_frame
 
+        self.reloadTimer = wx.CallLater(1.0/20.0*1000, self.loadImage)
 
     def InitUI(self):
 
@@ -58,7 +58,7 @@ class MainFrame(wx.Frame):
         mainbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # ------------------------------------------ video ctrl
-        self.videopanel = OpenCVImage(self, wx.ID_ANY)
+        self.videopanel = StringImage(self, wx.ID_ANY)
         vbtnpanel = wx.Panel(self, -1)
         self.slider1 = wx.Slider(vbtnpanel, -1, 0, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
@@ -125,17 +125,18 @@ class MainFrame(wx.Frame):
         mainbox.Add(catbox,2,flag=wx.EXPAND)
         self.SetSizer(mainbox)
 
-    def reloadImage(self):
-      image_str = self.video_str.get_obj().raw[:self.video_str_length.value]
-      self.videopanel.SetImage(image_str, self.frame_size[0], self.frame_size[1])
-      
-      self.repaintTimer = wx.CallLater(1.0/20.0*1000, self.reloadImage)
-      self.repaintTimer.Restart()
+    def loadImage(self):
+      image_str = self.video_str.get_obj().raw[:self.video_str_length]
+      self.videopanel.SetImage(image_str)
+      self.slider1.SetValue(self.current_frame.value)
+
+      self.reloadTimer.Restart()
 
     def newProject(self, video_filepath, eyemovement_filepath):
-      # controller new project
-      # controller get frames, fps
-      pass
+      self.controller.new_project(video_filepath, eyemovement_filepath, True)
+      self.video_str_length = self.controller.getVideoStrLength()
+      self.videopanel.SetSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
+      self.slider1.SetMax(self.controller.getVideoFrameCount())
 
     def controllerIO(self):
       if self.controller is None: return False
@@ -149,29 +150,28 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.play()
-      #TODO start auto reload
+      self.reloadTimer.Start()
 
     def OnPause(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.pause()
-      #TODO stop auto reload
+      self.reloadTimer.Stop()
 
     def OnNextFrame(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.nextFrame()
-      self.reloadImage()
-      #TODO reload image
+      self.loadImage()
 
     def OnPrevFrame(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.prevFrame()
-      #TODO reload image
+      self.loadImage()
 
     def OnSlower(self, event):
       """ check whether contoller is ready"""
@@ -196,7 +196,7 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.seek(self.slider1.GetValue())
-      #TODO reload image
+      self.loadImage()
 
       # ---------------- PLAYBACK CONTROLL END ----------
         

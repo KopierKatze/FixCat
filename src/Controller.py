@@ -13,7 +13,7 @@ except ImportError:
 class Controller(object):
   """this class connects all the in- and output classes together and provides a
   clean interface for the connection to the gui"""
-  def __init__(self, video_str, video_str_length, frame_size):
+  def __init__(self, video_str, current_frame):
     self.video_reader = None
     self.eye_movement = None
     self.clock = None
@@ -21,9 +21,8 @@ class Controller(object):
     self.category_container = None
     self.categorise_frames = False
 
-    self.frame_size = frame_size
     self.video_str = video_str
-    self.video_str_length = video_str_length
+    self.current_frame = current_frame
     """contains the current image of the overlayed video.
     shared memory, so no latent ipc is needed"""
 
@@ -50,7 +49,7 @@ class Controller(object):
     self.clock.register(self._tick)
     
     if self.categorise_frames:
-      number_of_indexes = self.video_reader.total_frames
+      number_of_indexes = self.video_reader.frame_count
     else:
       number_of_indexes = self.eye_movement.countFixations()
 
@@ -60,11 +59,11 @@ class Controller(object):
     """will populate current image to gui.
     have a look at Clock class for more information."""
     fr = self.overlayedFrame(frame, True, True, True)
-    cv.CvtColor(fr, fr, cv.CV_BGR2RGB)
-    video_str = fr.tostring()
-    self.frame_size[0] = fr.width
-    self.frame_size[1] = fr.height
-    self.video_str_length.value = len(video_str)
+    return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
+    cv.Copy(fr, return_frame)
+    cv.CvtColor(return_frame, return_frame, cv.CV_BGR2RGB)
+    video_str = return_frame.tostring()
+    self.current_frame.value = frame
     self.video_str.value = video_str
 
   def overlayedFrame(self, frame, left, right, mean):
@@ -93,6 +92,7 @@ class Controller(object):
     except Exception:
       pass
 
+    cv.ResetImageROI(image)
     return image
 
   def play(self):
@@ -101,15 +101,8 @@ class Controller(object):
   def pause(self):
     if self.clock.running: self.clock.stop()
 
-  def seek(self, second):
-    self.clock.seek(second)
-
-  def categorise(self, shortcut):
-    if self.categorise_frames:
-      index = self.video_reader.frameNumberOfSecond(self.clock.time)
-      self.category_container.categorise(index, shortcut)
-    else:
-      pass
+  def seek(self, frame):
+    self.clock.seek(frame)
 # -----------  FRAME JUMPING ----
   def nextFrame(self):
     """jump one frame into the future"""
@@ -122,10 +115,6 @@ class Controller(object):
   def jumpToNextUncategorisedFixation(self):
     """no yet"""
     pass
-
-  def getCategoryContainer(self):
-    """returns the category_container of this controller."""
-    return self.category_container
 # --------------- PLAYBACK SPEED -----
   def slowerPlayback(self):
     self.clock.setMultiplicator(self.clock.multiplicator * 0.9)
@@ -133,6 +122,15 @@ class Controller(object):
     self.clock.setMultiplicator(1.0)
   def fasterPlayback(self):
     self.clock.setMultiplicator(self.clock.multiplicator * 1.1)
+# --------------- VIDEO INFORMATION -----
+  def getVideoStrLength(self):
+    return len(self.video_reader.frame(0).tostring())
+  def getVideoHeight(self):
+    return self.video_reader.height
+  def getVideoWidth(self):
+    return self.video_reader.width
+  def getVideoFrameCount(self):
+    return self.video_reader.frame_count
 
 if __name__ == '__main__':
   from multiprocessing import Process, Value
