@@ -1,4 +1,7 @@
-import cv
+try:
+  from cv2 import cv
+except ImportError:
+  import cv
 
 class VideoWriter(object):
   """creates a new video file where one can add frames to"""

@@ -1,5 +1,4 @@
 import wx
-import cv
 
 from time import time
 

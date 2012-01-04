@@ -1,6 +1,9 @@
 from threading import Thread
 from time import sleep, time
-import cv
+try:
+  from cv2 import cv
+except ImportError:
+  import cv
 
 class VideoReader(object):
     """provides a image-by-image access to a video file"""
@@ -11,10 +14,12 @@ class VideoReader(object):
 
         if filepath is not None and filepath is not '':
             self.reader = cv.CaptureFromFile(filepath)
-            
+            # have to check if codec is available!
             self.total_frames = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT)
             self.fps = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
             self.duration = self.total_frames * self.fps
+            self.height = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_HEIGHT)
+            self.width = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_WIDTH)
             self.cache = dict() # maps frame number to frame ressource
             self._last_frame = 0
             self.prefetcher = VideoPrefetcher(self)

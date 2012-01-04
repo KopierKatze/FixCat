@@ -5,9 +5,10 @@ from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
 
-import cv
-
-import hashlib
+try:
+  from cv2 import cv
+except ImportError:
+  import cv
 
 class Controller(object):
   """this class connects all the in- and output classes together and provides a
