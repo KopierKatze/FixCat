@@ -1,4 +1,7 @@
-from cv import LoadImage
+try:
+  from cv2.cv import LoadImage
+except ImportError:
+  from cv import LoadImage
 
 class Cursor(object):
   """associates eye states(blinking, saccade, fixation) to cursor images.
