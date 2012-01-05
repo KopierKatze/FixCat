@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from multiprocessing import Process
 from multiprocessing.sharedctypes import Array, Value
 from multiprocessing.managers import SyncManager
