@@ -29,6 +29,7 @@ class ControllerManager(SyncManager):
   pass
 
 ControllerManager.register('getController', getController)
+
 if __name__ == '__main__':
   video_str = Array('c', 2**20*'_')
   current_frame = Value('i', 0)
@@ -42,4 +43,6 @@ if __name__ == '__main__':
   e = MainFrame(video_str, current_frame, controllerproxy)
   e.Show()
   e.newProject("../example/overlayed_video.avi", "../example/t2d1gl.asc")
+  #from thread import start_new_thread
+  #start_new_thread(a.MainLoop, ())
   a.MainLoop()

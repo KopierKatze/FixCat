@@ -16,11 +16,10 @@ class MainFrame(wx.Frame):
         self.video_str = video_str
         self.current_frame = current_frame
 
-        self.reloadTimer = wx.CallLater(1.0/20.0*1000, self.loadImage)
+        self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
         self.autoreload = False
 
-    def InitUI(self):
-
+    def InitMenu(self):
         # menubar elements
         statusBar = self.CreateStatusBar()
 
@@ -55,29 +54,24 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSetImage)
         self.Bind(wx.EVT_MENU, self.OnAbout, setCodec)
 
-        #sizer boxes for panels
-        mainbox = wx.BoxSizer(wx.HORIZONTAL)
-
-        # ------------------------------------------ video ctrl
-        self.videopanel = StringImage(self, wx.ID_ANY)
-        vbtnpanel = wx.Panel(self, -1)
-        self.slider1 = wx.Slider(vbtnpanel, -1, 0, 0, 1000)
+    def InitUIVideoControlls(self):
+        self.videocontrollspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
+        self.slider1 = wx.Slider(self.videocontrollspanel, wx.ID_ANY, 0, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
-        pause = wx.Button(vbtnpanel, -1, "Pause")
+        pause = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Pause")
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
-        play  = wx.Button(vbtnpanel, -1, "Play")
+        play  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Play")
         self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
-        next  = wx.Button(vbtnpanel, -1, "Next F")
+        next  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Next F")
         self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
-        prev  = wx.Button(vbtnpanel, -1, "Prev F")
+        prev  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Prev F")
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
-        slower  = wx.Button(vbtnpanel, -1, "90%")
+        slower  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "90%")
         self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
-        normal  = wx.Button(vbtnpanel, -1, "100%")
+        normal  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "100%")
         self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
-        faster  = wx.Button(vbtnpanel, -1, "110%")
+        faster  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "110%")
         self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
-
 
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -88,47 +82,73 @@ class MainFrame(wx.Frame):
         hbox2.Add(play, flag=wx.RIGHT, border=5)
         hbox2.Add(next, flag=wx.LEFT, border=5)
         hbox2.Add(prev)
-        hbox2.Add((150, -1), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
+        hbox2.Add((150, wx.ID_ANY), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
         hbox2.Add(slower)
         hbox2.Add(normal)
         hbox2.Add(faster)
 
         vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
         vbox.Add(hbox2, 1, wx.EXPAND)
-        vbtnpanel.SetSizer(vbox)
-        # ------------------------------------------------ new category ctrl  
-        self.categorylist = list(["Tisch", "Monitor", "Maus", "Tastatur"])
-         
-        catbox = wx.BoxSizer(wx.VERTICAL)
-        vbox1 = wx.BoxSizer(wx.VERTICAL)
-        vbox2 = wx.BoxSizer(wx.VERTICAL)
-        vbox3 = wx.GridSizer(8,2,0,0)
-        pnl1 = wx.Panel(self, -1)
-        self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-        self.lc.InsertColumn(0, 'Kategorie')
-        self.lc.InsertColumn(1, 'Shortcut')
-        self.lc.SetColumnWidth(0, 150)
-        self.lc.SetColumnWidth(1, 100)
-        vbox1.Add(pnl1, 1, wx.EXPAND | wx.ALL, 3)
-        vbox2.Add(self.lc, 1, wx.EXPAND | wx.ALL, 3)
-        pnl1.SetSizer(vbox3)
-        vbox3.Add(wx.Button(pnl1, 12, 'naechste Kategorie'), 0, wx.ALIGN_CENTER| wx.TOP, 15)
+        self.videocontrollspanel.SetSizer(vbox)
         
-        catbox.Add(vbox2, 1, wx.EXPAND)
-        catbox.Add(vbox1, 1, wx.EXPAND)
-        
-        # ------------------------------ setting size of main window
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
-        sizer.Add(vbtnpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
+    def InitUI(self):
+        self.InitMenu()
 
-        mainbox.Add(sizer,4, flag=wx.EXPAND)
-        mainbox.Add(catbox,2,flag=wx.EXPAND)
-        self.SetSizer(mainbox)
+        # why do we need this? - correct colors in windows 7 - working shortcuts
+        self.mainpanel = wx.Panel(self, wx.ID_ANY)
+        self.mainpanel.SetBackgroundColour('blue')
+
+        # this sizer will locate the widgets
+        contentsizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.mainpanel.SetSizer(contentsizer)
+
+        # left side: videoimage and video controlls
+        leftsidesizer = wx.BoxSizer(wx.VERTICAL)
+        self.videoimage = StringImage(self.mainpanel, wx.ID_ANY)
+        leftsidesizer.Add(self.videoimage, 1, flag=wx.EXPAND)
+        self.InitUIVideoControlls()
+        leftsidesizer.Add(self.videocontrollspanel, flag=wx.EXPAND | wx.TOP, border=5)
+
+        # add left side to main (horizontal) sizer
+        contentsizer.Add(leftsidesizer, 1, flag=wx.EXPAND)
+        
+        self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyPressed)
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
+
+        ##sizer boxes for panels
+        #mainbox = wx.BoxSizer(wx.HORIZONTAL)
+        
+        ## ------------------------------ setting size of main window
+        
+        #mainbox.Add(sizer,4, flag=wx.EXPAND)
+        #mainbox.Add(catbox,2,flag=wx.EXPAND)
+
+
+        
+        ## ------------------------------------------------ new category ctrl  
+        #self.categorylist = list(["Tisch", "Monitor", "Maus", "Tastatur"])
+         
+        #catbox = wx.BoxSizer(wx.VERTICAL)
+        #vbox1 = wx.BoxSizer(wx.VERTICAL)
+        #vbox2 = wx.BoxSizer(wx.VERTICAL)
+        #vbox3 = wx.GridSizer(8,2,0,0)
+        #pnl1 = wx.Panel(self.mainpanel, -1)
+        #self.lc = wx.ListCtrl(self.mainpanel, -1, style=wx.LC_REPORT)
+        #self.lc.InsertColumn(0, 'Kategorie')
+        #self.lc.InsertColumn(1, 'Shortcut')
+        #self.lc.SetColumnWidth(0, 150)
+        #self.lc.SetColumnWidth(1, 100)
+        #vbox1.Add(pnl1, 1, wx.EXPAND | wx.ALL, 3)
+        #vbox2.Add(self.lc, 1, wx.EXPAND | wx.ALL, 3)
+        #pnl1.SetSizer(vbox3)
+        #vbox3.Add(wx.Button(pnl1, 12, 'naechste Kategorie'), 0, wx.ALIGN_CENTER| wx.TOP, 15)
+        
+        #catbox.Add(vbox2, 1, wx.EXPAND)
+        #catbox.Add(vbox1, 1, wx.EXPAND)
 
     def loadImage(self):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
-      self.videopanel.SetImage(image_str)
+      self.videoimage.SetImage(image_str)
       self.slider1.SetValue(self.current_frame.value)
 
       if self.autoreload:
@@ -137,13 +157,20 @@ class MainFrame(wx.Frame):
     def newProject(self, video_filepath, eyemovement_filepath):
       self.controller.new_project(video_filepath, eyemovement_filepath, True)
       self.video_str_length = self.controller.getVideoStrLength()
-      self.videopanel.SetSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
+      self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
 
     def controllerIO(self):
       if self.controller is None: return False
       if not self.controller.ready(): return False
       return True
+
+    # ----- SHORTCUTS ----
+    def OnMousewheel(self, event):
+      print event.GetWheelRotation()
+
+    def OnKeyPressed(self, event):
+      print event.GetKeyCode()
 
     # ---------------- PLAYBACK CONTROLL --------------
     

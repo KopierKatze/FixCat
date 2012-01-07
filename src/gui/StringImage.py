@@ -27,7 +27,7 @@ class StringImage(wx.Panel):
             self.image = None # in case of an error paint black
         self.Refresh()
 
-    def SetSize(self, width, height):
+    def SetImageSize(self, width, height):
         self.width = width
         self.height = height
 
