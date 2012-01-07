@@ -111,9 +111,10 @@ class MainFrame(wx.Frame):
 
         # add left side to main (horizontal) sizer
         contentsizer.Add(leftsidesizer, 1, flag=wx.EXPAND)
-        
-        self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyPressed)
+
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
+        # catching key events is a lot more complicated. they are not propagated to parent classes...
+        wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnKeyPressed)
 
         ##sizer boxes for panels
         #mainbox = wx.BoxSizer(wx.HORIZONTAL)
