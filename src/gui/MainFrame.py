@@ -167,7 +167,10 @@ class MainFrame(wx.Frame):
 
     # ----- SHORTCUTS ----
     def OnMousewheel(self, event):
-      print event.GetWheelRotation()
+      if event.GetWheelRotation() > 0:
+	self.OnNextFrame(event)
+      else:
+	self.OnPrevFrame(event)
 
     def OnKeyPressed(self, event):
       print event.GetKeyCode()
