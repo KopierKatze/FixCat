@@ -30,12 +30,6 @@ class MainFrame(wx.Frame):
         fileMenu.AppendSeparator()
         menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Schliessen")
 
-        codecMenu = wx.Menu()
-        setCodec = codecMenu.Append(wx.ID_ANY, "Codecs", "Codec aendern")
-
-        cursorMenu = wx.Menu()
-        menuSetImage = cursorMenu.Append(wx.ID_ANY, "Cursor", "Cursor aendern")
-
         categoryMenu = wx.Menu()
         categoryEdit = categoryMenu.Append(wx.ID_ANY, "Category", "Kategorie editieren")
 
@@ -94,9 +88,8 @@ class MainFrame(wx.Frame):
     def InitUI(self):
         self.InitMenu()
 
-        # why do we need this? - correct colors in windows 7 - working shortcuts
+        # why do we need this? - correct colors in windows 7
         self.mainpanel = wx.Panel(self, wx.ID_ANY)
-        self.mainpanel.SetBackgroundColour('blue')
 
         # this sizer will locate the widgets
         contentsizer = wx.BoxSizer(wx.HORIZONTAL)
