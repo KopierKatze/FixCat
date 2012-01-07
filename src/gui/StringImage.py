@@ -6,6 +6,9 @@ class StringImage(wx.Panel):
         
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
+        # no flickering in windows!?
+        self.SetDoubleBuffered(True)
+
         self.image = None
         self.width = None
         self.height = None
