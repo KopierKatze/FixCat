@@ -5,11 +5,13 @@ class StringImage(wx.Panel):
         wx.Panel.__init__(self, parent, id)
         
         self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_SIZE, self._PrepareImage)
 
-        # no flickering in windows!?
+        # no flickering even in windows
         self.SetDoubleBuffered(True)
 
-        self.image = None
+        self.original_image = None
+        self.bitmap = None
         self.width = None
         self.height = None
 
@@ -17,18 +19,29 @@ class StringImage(wx.Panel):
         dc = wx.BufferedPaintDC(self)
         dc.SetBackground(wx.Brush('#000'))
         dc.Clear()
-        if not self.image is None:
+        if not self.bitmap is None:
             dc.BeginDrawing()
-            dc.DrawBitmap(self.image, 0, 0)
+            # center picture according to scale
+            dc.DrawBitmap(self.bitmap, 0, 0)
             dc.EndDrawing()
         return event
 
-    def SetImage(self, image):
-        try:
-            self.image = wx.BitmapFromBuffer(self.width, self.height, image)
+    def _PrepareImage(self, event_stub=None):
+	try:
+	    size = self.GetSize()
+	    # scale picture by original width to height scale
+	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(size[0], size[1]))
         except:
-            self.image = None # in case of an error paint black
-        self.Refresh()
+            self.bitmap = None # in case of an error paint black
+
+    def SetImage(self, image_string):
+	try:
+	  self.original_image = wx.ImageFromBuffer(self.width, self.height, image_string)
+	except:
+	  self.image = None
+	else:
+	  self._PrepareImage()
+	  self.Refresh()
 
     def SetImageSize(self, width, height):
         self.width = width
