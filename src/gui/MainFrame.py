@@ -35,8 +35,6 @@ class MainFrame(wx.Frame):
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
-        menuBar.Append(codecMenu, "Codecs")
-        menuBar.Append(cursorMenu, "Cursor")
         menuBar.Append(categoryMenu, "Category")
         self.SetMenuBar(menuBar)
 
@@ -44,9 +42,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
-        self.Bind(wx.EVT_MENU, self.OnEditCategory, categoryEdit)
-        self.Bind(wx.EVT_MENU, self.OnAbout, menuSetImage)
-        self.Bind(wx.EVT_MENU, self.OnAbout, setCodec)
 
     def InitUIVideoControlls(self):
         self.videocontrollspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
