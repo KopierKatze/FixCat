@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
   controllerproxy = controllermanager.getController()
 
-  a = wx.App()
+  a = wx.PySimpleApp()
   e = MainFrame(video_str, current_frame, controllerproxy)
   e.Show()
   e.newProject("../example/overlayed_video.avi", "../example/t2d1gl.asc")
