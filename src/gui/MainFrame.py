@@ -19,6 +19,8 @@ class MainFrame(wx.Frame):
         self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
         self.autoreload = False
 
+        self.playing = False
+
     def InitMenu(self):
         # menubar elements
         statusBar = self.CreateStatusBar()
@@ -162,53 +164,73 @@ class MainFrame(wx.Frame):
 	self.OnPrevFrame(event)
 
     def OnKeyPressed(self, event):
-      print event.GetKeyCode()
+      keyCode = event.GetKeyCode()
+
+      # left arrow key
+      if keyCode == wx.WXK_LEFT:
+	self.OnPrevFrame()
+      # right arrow key
+      elif keyCode == wx.WXK_RIGHT:
+	self.OnNextFrame()
+      # up arrow key
+      elif keyCode == wx.WXK_UP:
+	self.OnFaster()
+      # down arrow key
+      elif keyCode == wx.WXK_DOWN:
+	self.OnSlower()
+      elif keyCode == wx.WXK_SPACE:
+	if self.playing:
+	  self.OnPause()
+	else:
+	  self.OnPlay()
 
     # ---------------- PLAYBACK CONTROLL --------------
     
-    def OnPlay(self, event):
+    def OnPlay(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
+      self.playing = True
       self.controller.play()
       self.autoreload = True
       self.loadImage()
 
-    def OnPause(self, event):
+    def OnPause(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
+      self.playing = False
       self.controller.pause()
       self.autoreload = False
       self.loadImage()
 
-    def OnNextFrame(self, event):
+    def OnNextFrame(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.nextFrame()
       self.loadImage()
 
-    def OnPrevFrame(self, event):
+    def OnPrevFrame(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.prevFrame()
       self.loadImage()
 
-    def OnSlower(self, event):
+    def OnSlower(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.slowerPlayback()
 
-    def OnNormal(self, event):
+    def OnNormal(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.controller.normalPlayback()
 
-    def OnFaster(self, event):
+    def OnFaster(self, event=None):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
