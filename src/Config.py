@@ -99,8 +99,8 @@ class Config(object):
 	return value
       elif value == None:
 	return None
-      else:
-	raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
+      # if none of the above found the correct key not valid
+      raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
     if category == 'cursors':
       try:
 	cv.LoadImage(self.raw[category][attr])
