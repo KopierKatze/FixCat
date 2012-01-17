@@ -33,15 +33,38 @@ class Config(object):
     # check consistency of configuration
     self.check()
 
+  def _check(self, soll, haben, category_name=None):
+    """compare soll and haben """
+    soll = set(soll)
+    haben = set(haben)
+    
+    to_less = soll - haben
+    if not len(to_less) == 0:
+      if category_name:
+	raise ConfigError('In Kategorie %s der Konfigurationsdatei fehlen folgende Attribute: %s' % (category_name, to_less))
+      else:
+	raise ConfigError('Fehlende Kategorien in der Konfigurationsdatei: %s.' % to_less)
+
+    to_much = (haben - set(['__comment'])) - soll
+    if not len(to_much) == 0:
+      if category_name:
+	raise ConfigError('In Kategorie %s der Konfigurationsdatei sind folgende unbekannte Attribute: %s' % (category_name, to_much))
+      else:
+	raise ConfigError('Unbekannte Kategorien in der Konfigurationsdatei: %s.' % to_much)
+
   def check(self):
     """evaluate the current raw dict whether it is a valid pypsy config."""
-    to_less = set(categories_and_attributes.keys()) - set(self.raw.keys())
-    if not len(to_less) == 0:
-      raise ConfigError('Fehlende Kategorien in der Konfigurationsdatei: %s.' % to_less)
-    to_much = set(self.raw.keys()) - set(categories_and_attributes.keys()) - set(['__commit'])
-    if not len(to_much) == 0:
-      raise ConfigError('Unbekannte Kategorien in der Konfigurationsdatei: %s.' % to_much)
+
+    # vollstaendigkeit und nicht uebervoll
+    self._check(categories_and_attributes.keys(), self.raw.keys())
+    for category in categories_and_attributes.keys():
+      self._check(categories_and_attributes[category], self.raw[category].keys())
+
     # keyboard_shortcuts
+    for category in categories_and_attributes.keys():
+      for attr in categories_and_attributes[category]:
+	# will raise errors
+	self.get(category, attr)
 
   def write_default(self):
     f = open(config_filepath, "wb")
@@ -50,7 +73,18 @@ class Config(object):
 
   def get(self, category, attr):
     if category == 'keyboard_shortcuts':
-      return 0 
+      value = self.raw[category][attr]
+      if type(value) == str:
+	if value.isdigit():
+	  return int(value)
+	elif hasattr(wx, "WXK_"+value.upper()):
+	  return getattr(wx, "WXK_"+value.upper())
+      elif type(value) == int:
+	return value
+      elif value == None:
+	return None
+      else:
+	raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
     else:
       return self.raw[category][attr]
 
@@ -76,3 +110,9 @@ default_config_raw = {
   },
 }
 default_config = json.dumps(default_config_raw, indent=4)
+
+
+if __name__ == '__main__':
+  c = Config()
+  c.raw = default_config_raw
+  c.check()
