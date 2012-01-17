@@ -9,6 +9,8 @@ import wx
 from Controller import Controller
 from gui.MainFrame import MainFrame
 
+import Config
+
 
 myController = None
 def getController():
@@ -31,6 +33,16 @@ class ControllerManager(SyncManager):
 ControllerManager.register('getController', getController)
 
 if __name__ == '__main__':
+  # configuration file check
+  try:
+    # will raise configerror on problems
+    Config.Config()
+  except Config.ConfigError, e:
+    app = wx.PySimpleApp()
+    wx.MessageBox('Fehler beim Laden der Konfiguration: %s'% e.message, 'Fehler')
+    app.MainLoop()
+    raise SystemExit()
+  
   video_str = Array('c', 2**20*'_')
   current_frame = Value('i', 0)
 

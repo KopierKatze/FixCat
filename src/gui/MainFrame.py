@@ -1,6 +1,8 @@
-import wx
 from CategoryFrame import CategoryFrame
 from StringImage import StringImage
+from Config import Config
+
+import wx
 
 class MainFrame(wx.Frame):
     def __init__(self, video_str, current_frame, controller):
@@ -20,6 +22,8 @@ class MainFrame(wx.Frame):
         self.autoreload = False
 
         self.playing = False
+
+        self.config = Config()
 
     def InitMenu(self):
         # menubar elements
@@ -167,18 +171,18 @@ class MainFrame(wx.Frame):
       keyCode = event.GetKeyCode()
 
       # left arrow key
-      if keyCode == wx.WXK_LEFT:
+      if keyCode == self.config.get('keyboard_shortcuts', 'prev_frame'):
 	self.OnPrevFrame()
       # right arrow key
-      elif keyCode == wx.WXK_RIGHT:
+      elif keyCode == self.config.get('keyboard_shortcuts', 'next_frame'):
 	self.OnNextFrame()
       # up arrow key
-      elif keyCode == wx.WXK_UP:
+      elif keyCode == self.config.get('keyboard_shortcuts', 'faster'):
 	self.OnFaster()
       # down arrow key
-      elif keyCode == wx.WXK_DOWN:
+      elif keyCode == self.config.get('keyboard_shortcuts', 'slower'):
 	self.OnSlower()
-      elif keyCode == wx.WXK_SPACE:
+      elif keyCode == self.config.get('keyboard_shortcuts', 'play/pause'):
 	if self.playing:
 	  self.OnPause()
 	else:

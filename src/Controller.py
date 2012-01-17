@@ -4,6 +4,7 @@ from Cursor import Cursor
 from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
+from Config import Config
 
 try:
   from cv2 import cv
@@ -25,6 +26,8 @@ class Controller(object):
     self.current_frame = current_frame
     """contains the current image of the overlayed video.
     shared memory, so no latent ipc is needed"""
+
+    self.config = Config()
 
   def ready(self):
     """you should'nt always make sure this class is ready before using it's functions.
