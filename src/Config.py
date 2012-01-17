@@ -35,7 +35,12 @@ class Config(object):
 
   def check(self):
     """evaluate the current raw dict whether it is a valid pypsy config."""
-    pass
+    to_less = set(categories_and_attributes.keys()) - set(self.raw.keys())
+    if not len(to_less) == 0:
+      raise ConfigError('Fehlende Kategorien in der Konfigurationsdatei: %s.' % to_less)
+    to_much = set(self.raw.keys()) - set(categories_and_attributes.keys()) - set(['__commit'])
+    if not len(to_much) == 0:
+      raise ConfigError('Unbekannte Kategorien in der Konfigurationsdatei: %s.' % to_much)
     # keyboard_shortcuts
 
   def write_default(self):
