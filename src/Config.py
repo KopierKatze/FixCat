@@ -5,7 +5,9 @@ config_filepath = None
 
 categories_and_attributes = {
   'keyboard_shortcuts':
-    ['play/pause', 'prev_frame', 'next_frame', 'faster', 'slower']
+    ['play/pause', 'prev_frame', 'next_frame', 'faster', 'slower'],
+  'cursors':
+    ['blink', 'fixated', 'saccade'],
 }
 
 class Config(object):
@@ -15,7 +17,20 @@ class Config(object):
 
   def load(self):
     """load and check configuration from a file."""
-    self.raw = json.loads(config_filepath)
+    try:
+      fp = open(config_filepath)
+      try:
+        self.raw = json.load(fp)
+      except ValueError:
+        raise ConfigError('Konfigurationsdatei nicht valid formatiert (JSON).')
+      else:
+        self.raw = []
+    except IOError:
+      raise ConfigError('Konfigurationsdatei nicht lesbar.')
+    else:
+      fp.close()
+    
+    # check consistency of configuration
     self.check()
 
   def check(self):
@@ -38,5 +53,21 @@ class ConfigError(Exception):
   pass
 
 # default configuration
-default_config_raw = {}
+default_config_raw = {
+'__comment':"This is the pypsy configuration. It is writen in JSON Format. So be shure to write valid JSON. (http://www.json.org/)",
+'keyboard_shortcuts':{
+    '__comment': 'You could use the ascii code of a key or the wxPython key name without WXK_ prefix (see http://wxpython.org/docs/api/wx.KeyEvent-class.html).',
+    'play/pause': 97,
+    'prev_frame': "98",
+    'next_frame': "LEFT",
+    'faster': "up",
+    'slower': None
+  },
+'cursors': {
+    '__comment': 'Path of pictures used as cursors for the different eye states. (supported filetypes: http://opencv.willowgarage.com/documentation/python/highgui_reading_and_writing_images_and_video.html#loadimage )',
+    'blink': '',
+    'fixated': '',
+    'saccade': '',
+  },
+}
 default_config = json.dumps(default_config_raw, indent=4)
