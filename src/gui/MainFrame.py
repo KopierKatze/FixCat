@@ -170,16 +170,16 @@ class MainFrame(wx.Frame):
     def OnKeyPressed(self, event):
       keyCode = event.GetKeyCode()
 
-      # left arrow key
       if keyCode == self.config.get('keyboard_shortcuts', 'prev_frame'):
 	self.OnPrevFrame()
-      # right arrow key
       elif keyCode == self.config.get('keyboard_shortcuts', 'next_frame'):
 	self.OnNextFrame()
-      # up arrow key
+      elif keyCode == self.config.get('keyboard_shortcuts', 'next_fixation'):
+	self.OnNextFixation()
+      elif keyCode == self.config.get('keyboard_shortcuts', 'prev_fixation'):
+	self.OnPrevFixation()
       elif keyCode == self.config.get('keyboard_shortcuts', 'faster'):
 	self.OnFaster()
-      # down arrow key
       elif keyCode == self.config.get('keyboard_shortcuts', 'slower'):
 	self.OnSlower()
       elif keyCode == self.config.get('keyboard_shortcuts', 'play/pause'):
@@ -220,6 +220,20 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.prevFrame()
+      self.loadImage()
+
+    def OnNextFixation(self, event=None):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.nextFixation()
+      self.loadImage()
+
+    def OnPrevFixation(self, event=None):
+      """ check whether contoller is ready"""
+      if not self.controllerIO(): return event
+
+      self.controller.prevFixation()
       self.loadImage()
 
     def OnSlower(self, event=None):

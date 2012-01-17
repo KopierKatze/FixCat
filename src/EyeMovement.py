@@ -73,23 +73,23 @@ class EyeMovement(object):
       saccade = saccade_re.match(line)
       if saccade:
 	if saccade.groups()[1] == 'L':
-	  status_left[current_frame] = 'saccade'
+	  status_left[current_frame] = (saccade.groups()[2], 'saccade')
 	else:
-	  status_rigth[current_frame] = 'saccade'
+	  status_rigth[current_frame] = (saccade.groups()[2], 'saccade')
 
       fixation = fixation_re.match(line)
       if fixation:
 	if fixation.groups()[1] == 'L':
-	  status_left[current_frame] = 'fixated'
+	  status_left[current_frame] = (fixation.groups()[2], 'fixated')
 	else:
-	  status_rigth[current_frame] = 'fixated'
+	  status_rigth[current_frame] = (fixation.groups()[2], 'fixated')
 
       blink = blink_re.match(line)
       if blink:
 	if blink.groups()[1] == 'L':
-	  status_left[current_frame] = 'blink'
+	  status_left[current_frame] = (blink.groups()[2], 'blink')
 	else:
-	  status_rigth[current_frame] = 'blink'
+	  status_rigth[current_frame] = (blink.groups()[2], 'blink')
 
       if (end_re.match(line)):
 	break # we reached end of file
@@ -110,10 +110,10 @@ class EyeMovement(object):
     return complete
 
   def statusLeftEyeAt(self, frame):
-    return self._status_left[frame]
+    return self._status_left[frame][1]
 
   def statusRightEyeAt(self, frame):
-    return self._status_rigth[frame]
+    return self._status_rigth[frame][1]
 
   def meanStatusAt(self, frame):
     l = self.statusLeftEyeAt(frame)
@@ -147,6 +147,36 @@ class EyeMovement(object):
       return None
 
     return ((l[0] + r[0])/2.0, (l[1] + r[1])/2.0)
+
+  def nextFixationFrame(self, frame, left):
+    if left is True:
+      return self._prev_nextFixationFrame(frame, 1, self.statusLeftEyeAt)
+    elif left is False:
+      return self._prev_nextFixationFrame(frame, 1, self.statusRightEyeAt)
+    elif left is None:
+      return self._prev_nextFixationFrame(frame, 1, self.meanStatusAt)
+    else:
+      raise Exception("left has to be True, False or None!")
+
+  def prevFixationFrame(self, frame, left):
+    if left is True:
+      return self._prev_nextFixationFrame(frame, -1, self.statusLeftEyeAt)
+    elif left is False:
+      return self._prev_nextFixationFrame(frame, -1, self.statusRightEyeAt)
+    elif left is None:
+      return self._prev_nextFixationFrame(frame, -1, self.meanStatusAt)
+    else:
+      raise Exception("left has to be True, False or None!")
+
+  def _prev_nextFixationFrame(self, frame, direction, func):
+    saw_other_state = False
+    current_frame = frame
+
+    while not saw_other_state or not func(current_frame) == 'fixated':
+      current_frame = current_frame + direction
+      if func(current_frame) != 'fixated':
+	saw_other_state = True
+    return current_frame
 
 class EyeMovementError(Exception):
   pass

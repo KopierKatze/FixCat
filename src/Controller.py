@@ -118,6 +118,16 @@ class Controller(object):
   def jumpToNextUncategorisedFixation(self):
     """no yet"""
     pass
+  
+  def nextFixation(self):
+    '''jump to next fixation'''
+    frame = self.eye_movement.nextFixationFrame(self.clock.frame, None)
+    self.seek(frame)
+
+  def prevFixation(self):
+    '''jump to prev fixation'''
+    frame = self.eye_movement.prevFixationFrame(self.clock.frame, None)
+    self.seek(frame)
 # --------------- PLAYBACK SPEED -----
   def slowerPlayback(self):
     self.clock.setMultiplicator(self.clock.multiplicator * 0.9)

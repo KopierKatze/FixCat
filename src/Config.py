@@ -13,7 +13,7 @@ config_filepath = 'config.json'
 
 categories_and_attributes = {
   'keyboard_shortcuts':
-    ['play/pause', 'prev_frame', 'next_frame', 'faster', 'slower'],
+    ['play/pause', 'prev_frame', 'next_frame', 'next_fixation', 'prev_fixation', 'faster', 'slower'],
   'cursors':
     ['blink', 'fixated', 'saccade'],
 }
@@ -104,8 +104,8 @@ class Config(object):
     if category == 'cursors':
       try:
 	cv.LoadImage(self.raw[category][attr])
-      except IOError:
-	raise ConfigError('Konnte Cursor fuer %s nicht oeffnen (Pfad: %s).' % (attr, self.raw[category][attr]))
+      except IOError, e:
+	raise ConfigError('Konnte Cursor fuer %s nicht oeffnen (%s) (Pfad: %s).' % (attr, e.message, self.raw[category][attr]))
     else:
       return self.raw[category][attr]
 
@@ -120,8 +120,10 @@ default_config_raw = {
     'play/pause': "space",
     'prev_frame': "left",
     'next_frame': "right",
-    'faster': "up",
-    'slower': "down",
+    'prev_fixation': "up",
+    'next_fixation': "down",
+    'faster': None,
+    'slower': None,
   },
 'cursors': {
     '__comment': 'Path of pictures used as cursors for the different eye states. (supported filetypes: http://opencv.willowgarage.com/documentation/python/highgui_reading_and_writing_images_and_video.html#loadimage )',
