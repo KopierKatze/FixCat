@@ -16,6 +16,10 @@ class StringImage(wx.Panel):
         self.height = None
 
     def OnPaint(self, event):
+	"""paint the scaled image onto widget.
+	
+	if there were problems retrieving or scaling the image
+	the widget will be black."""
         dc = wx.BufferedPaintDC(self)
         dc.SetBackground(wx.Brush('#000'))
         dc.Clear()
@@ -27,23 +31,38 @@ class StringImage(wx.Panel):
         return event
 
     def _PrepareImage(self, event_stub=None):
+	"""scale the image to widgets size"""
 	try:
-	    size = self.GetSize()
+	    widget_size = self.GetSize()
 	    # scale picture by original width to height scale
-	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(size[0], size[1]))
+	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(widget_size[0], widget_size[1]))
         except:
             self.bitmap = None # in case of an error paint black
 
     def SetImage(self, image_string):
+	"""set a new image.
+	the image is a string containing the rgb value of the pixels.
+	
+	to restore a real image out of this string this method needs information
+	about the size of the image which is encoded in ``image_string``.
+	so be sure to give this information with ``SetImageSize`` before calling
+	this method.
+	"""
 	try:
+	  # build a wxImage of this image_string and size information
 	  self.original_image = wx.ImageFromBuffer(self.width, self.height, image_string)
 	except:
+	  # this will result in a black widget
 	  self.image = None
 	else:
+	  # scale image to current widget size
 	  self._PrepareImage()
 	  self.Refresh()
 
     def SetImageSize(self, width, height):
+	"""assigne dimensions of the image encoded in ``image_string`` argument of ``SetImage``.
+
+	this information is needed to retrieve the image out of the ``image_string``."""
         self.width = width
         self.height = height
 
