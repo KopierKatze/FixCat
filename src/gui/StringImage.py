@@ -34,8 +34,23 @@ class StringImage(wx.Panel):
 	"""scale the image to widgets size"""
 	try:
 	    widget_size = self.GetSize()
+	    widgeth = widget_size[1]
+	    widgetw = widget_size[0]
+	    
+	    image_size = self.original_image.GetSize()
+	    imageh = image_size[1]
+	    imagew = image_size[0]
+	    ratio = float(imagew) / float(imageh)
+	    
+	    if widgetw < (widgeth * ratio):
+	      imagew_scale = widgetw
+	      imageh_scale = widgetw / ratio
+	    else:
+	      imagew_scale = widgeth * ratio
+	      imageh_scale = widgeth
+ 
 	    # scale picture by original width to height scale
-	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(widget_size[0], widget_size[1]))
+	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(imagew_scale, imageh_scale))
         except:
             self.bitmap = None # in case of an error paint black
 
