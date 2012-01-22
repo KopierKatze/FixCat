@@ -68,6 +68,13 @@ class MainFrame(wx.Frame):
         faster  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "110%")
         self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
 
+        self.left_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "linkes Auge")
+        self.Bind(wx.EVT_CHECKBOX, self.OnLeftEyeCheckbox, self.left_eye)
+        self.right_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "rechtes Auge")
+        self.Bind(wx.EVT_CHECKBOX, self.OnRightEyeCheckbox, self.right_eye)
+        self.mean_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "gemittelt")
+        self.Bind(wx.EVT_CHECKBOX, self.OnMeanEyeCheckbox, self.mean_eye)
+
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -77,6 +84,9 @@ class MainFrame(wx.Frame):
         hbox2.Add(play, flag=wx.RIGHT, border=5)
         hbox2.Add(next, flag=wx.LEFT, border=5)
         hbox2.Add(prev)
+        hbox2.Add(self.left_eye)
+        hbox2.Add(self.right_eye)
+        hbox2.Add(self.mean_eye)
         hbox2.Add((150, wx.ID_ANY), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
         hbox2.Add(slower)
         hbox2.Add(normal)
@@ -141,6 +151,12 @@ class MainFrame(wx.Frame):
         #catbox.Add(vbox2, 1, wx.EXPAND)
         #catbox.Add(vbox1, 1, wx.EXPAND)
 
+    def setEyeCheckboxStates(self):
+      left, right, mean = self.controller.getEyeStatus()
+      self.left_eye.SetValue(left)
+      self.right_eye.SetValue(right)
+      self.mean_eye.SetValue(mean)
+
     def loadImage(self):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
       self.videoimage.SetImage(image_str)
@@ -154,6 +170,8 @@ class MainFrame(wx.Frame):
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
+      self.setEyeCheckboxStates()
+      self.loadImage()
 
     def controllerIO(self):
       if self.controller is None: return False
@@ -261,8 +279,21 @@ class MainFrame(wx.Frame):
       self.controller.seek(self.slider1.GetValue())
       self.loadImage()
 
-      # ---------------- PLAYBACK CONTROLL END ----------
-        
+    # ---------------- PLAYBACK CONTROLL END ----------
+    # ---------------- SHOWING EYE STATUS CONTROLLS ---
+    def OnLeftEyeCheckbox(self, event):
+      self.controller.leftEyeStatus(event.Checked())
+      # load changed image, important if we currently not playing
+      self.loadImage()
+    def OnRightEyeCheckbox(self, event):
+      self.controller.rightEyeStatus(event.Checked())
+      # load changed image, important if we currently not playing
+      self.loadImage()
+    def OnMeanEyeCheckbox(self, event):
+      self.controller.meanEyeStatus(event.Checked())
+      # load changed image, important if we currently not playing
+      self.loadImage()
+    # ---------------- SHOWING EYE STATUS END -------- 
     #------------------------------------------- menu items     
     def OnAbout(self, e):
         dlg = wx.MessageDialog(self, "<slipsum>", "about eyepy", wx.OK)
