@@ -90,6 +90,9 @@ class Controller(object):
     self.current_frame.value = frame
     self.video_str.value = video_str
 
+  def categorise(self, shortcut):
+    self.category_container.categorise(self.clock.frame, shortcut)
+
   def overlayedFrame(self, frame, left, right, mean):
     image = self.video_reader.frame(frame)
 

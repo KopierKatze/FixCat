@@ -205,6 +205,9 @@ class MainFrame(wx.Frame):
 	  self.OnPause()
 	else:
 	  self.OnPlay()
+      else:
+	# try to categorise the current frame to the category which may belong tho keyCode
+        self.controller.categorise(keyCode)
 
     # ---------------- PLAYBACK CONTROLL --------------
     

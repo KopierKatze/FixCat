@@ -9,6 +9,9 @@ class CategoryContainer(object):
     """
 
     self.indices = indices
+    # used to iterate in order over all object under categorisation
+    self.start_end_frames = self.indices.keys()
+    self.start_end_frames.sort()
     # index to category
     self.categorisations = {}
     for index in self.indices.keys():
@@ -46,23 +49,25 @@ class CategoryContainer(object):
     # remove old shortcut
     self.removeCategory(old_shortcut)
 
-  def categorise(self, index, shortcut):
+  def categorise(self, frame, shortcut):
     """categorieses an index"""
-    if not shortcut in self.categories.keys(): raise CategoryContainerError("Can't categorise! no such shortcut assigned")
-    if not index in self.categorisations.keys(): raise CategoryContainerError("Can't categorise! Index out of range")
-    self.categorisations[index] = shortcut
+    if not shortcut in self.categories.keys(): raise CategoryContainerError("Can't categorise! no such shortcut assigned (%s)" % shortcut)
+    if frame > self.start_end_frames[len(self.start_end_frames)-1][1]: raise CategoryContainerError("Can't categorise! Index out of range")
+    for index in self.start_end_frames:
+      if frame >= index[0] and frame <= index[1]:
+        self.categorisations[index] = shortcut
 
   def listCategorisations(self):
     return self.categorisations
 
-  def nameOfShortcut(self, shortcut):
-    if not shortcut in self.categories.keys(): raise CategoryContainerError("No such shortcut assigned")
-    return self.categories[shortcut]
+  def nextNotCategorisedIndex(self, current_frame):
+    i = 0
+    while self.start_end_frames[i][0] < current_frame:
+      i += 1
 
-  def nextNotCategorisedIndex(self):
-    for index in self.categorisations.keys():
-      if self.categorisations[index] == None:
-	return index
+    while i < len(self.start_end_frames):
+      if self.categorisations[self.start_end_frames[i]] == None:
+	return self.start_end_frames[i][0]
     return None
 
 class CategoryContainerError(Exception):

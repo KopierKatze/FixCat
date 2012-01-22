@@ -57,7 +57,6 @@ if __name__ == '__main__':
   e = MainFrame(video_str, current_frame, controllerproxy)
   e.Show()
   e.newProject("../example/overlayed_video.avi", "../example/t2d1gl.asc")
-  print controllerproxy.getFix()
   #from thread import start_new_thread
   #start_new_thread(a.MainLoop, ())
   a.MainLoop()
