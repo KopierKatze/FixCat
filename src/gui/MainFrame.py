@@ -1,5 +1,7 @@
-from CategoryFrame import CategoryFrame
-from StringImage import StringImage
+from gui.CategoryFrame import CategoryFrame
+from gui.StringImage import StringImage
+from gui.CategoryList import CategoryList
+
 from Config import Config
 
 import wx
@@ -9,11 +11,12 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
 
+        self.controller = controller
+
         self.InitUI()
         self.Centre()
         self.Show(True)
         self.dirname=""
-        self.controller = controller
 
         self.video_str = video_str
         self.current_frame = current_frame
@@ -95,7 +98,11 @@ class MainFrame(wx.Frame):
         vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
         vbox.Add(hbox2, 1, wx.EXPAND)
         self.videocontrollspanel.SetSizer(vbox)
-        
+
+    def seek(self, frame):
+      self.controller.seek(frame)
+      self.loadImage()
+
     def InitUI(self):
         self.InitMenu()
 
@@ -114,12 +121,23 @@ class MainFrame(wx.Frame):
         leftsidesizer.Add(self.videocontrollspanel, flag=wx.EXPAND | wx.TOP, border=5)
 
         # add left side to main (horizontal) sizer
-        contentsizer.Add(leftsidesizer, 1, flag=wx.EXPAND)
+        contentsizer.Add(leftsidesizer, 4, flag=wx.EXPAND)
 
+        # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
         # catching key events is a lot more complicated. they are not propagated to parent classes...
+        # so we have to get them from the app itself
         wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnKeyPressed)
 
+        # ------ right side of application --------------
+        # ------ categorisation table etc. --------------
+        rightsidesizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.category_list = CategoryList(self.mainpanel, wx.ID_ANY, self.seek)
+        rightsidesizer.Add(self.category_list, flag=wx.EXPAND)
+
+        contentsizer.Add(rightsidesizer, 1)
+        
         ##sizer boxes for panels
         #mainbox = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -161,16 +179,19 @@ class MainFrame(wx.Frame):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
       self.videoimage.SetImage(image_str)
       self.slider1.SetValue(self.current_frame.value)
+      self.category_list.markFrame(self.current_frame.value)
 
       if self.autoreload:
 	self.reloadTimer.Restart()
 
     def newProject(self, video_filepath, eyemovement_filepath):
-      self.controller.new_project(video_filepath, eyemovement_filepath, True)
+      self.controller.new_project(video_filepath, eyemovement_filepath, False)
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
       self.setEyeCheckboxStates()
+      self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
+      self.category_list.FillInCategorisations(self.controller.getCategorisations())
       self.loadImage()
 
     def controllerIO(self):
@@ -186,28 +207,31 @@ class MainFrame(wx.Frame):
 	self.OnPrevFrame(event)
 
     def OnKeyPressed(self, event):
-      keyCode = event.GetKeyCode()
+      key_code = event.GetKeyCode()
 
-      if keyCode == self.config.get('keyboard_shortcuts', 'prev_frame'):
+      if key_code == self.config.get('keyboard_shortcuts', 'prev_frame'):
 	self.OnPrevFrame()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'next_frame'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'next_frame'):
 	self.OnNextFrame()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'next_fixation'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'next_fixation'):
 	self.OnNextFixation()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'prev_fixation'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'prev_fixation'):
 	self.OnPrevFixation()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'faster'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'faster'):
 	self.OnFaster()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'slower'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'slower'):
 	self.OnSlower()
-      elif keyCode == self.config.get('keyboard_shortcuts', 'play/pause'):
+      elif key_code == self.config.get('keyboard_shortcuts', 'play/pause'):
 	if self.playing:
 	  self.OnPause()
 	else:
 	  self.OnPlay()
       else:
-	# try to categorise the current frame to the category which may belong tho keyCode
-        self.controller.categorise(keyCode)
+	# try to categorise the current frame to the category which may belong tho key_code
+        if self.controller.categorise(key_code):
+	  self.category_list.FillInCategorisations(self.controller.getCategorisations())
+	  # load Image so category_list will jump to categorised frame
+	  self.loadImage()
 
     # ---------------- PLAYBACK CONTROLL --------------
     
@@ -279,8 +303,7 @@ class MainFrame(wx.Frame):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
-      self.controller.seek(self.slider1.GetValue())
-      self.loadImage()
+      self.seek(self.slider1.GetValue())
 
     # ---------------- PLAYBACK CONTROLL END ----------
     # ---------------- SHOWING EYE STATUS CONTROLLS ---

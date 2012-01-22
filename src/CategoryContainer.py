@@ -18,7 +18,7 @@ class CategoryContainer(object):
       self.categorisations[index] = None
 
     # keyboard shortcut to category name
-    self.categories = {}
+    self.categories = {68:'HALLO WELT!'}
 
   def editCategory(self, old_shortcut, new_shortcut, category_name):
     if not new_shortcut is None and new_shortcut in self.categories.keys(): raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
@@ -47,16 +47,18 @@ class CategoryContainer(object):
     for index in self.start_end_frames:
       if frame >= index[0] and frame <= index[1]:
         self.categorisations[index] = shortcut
+        return True
+    return False
 
   def listCategories(self):
     return self.categories
 
-  def displayListOfCategorisations(self):
-    l = []
+  def dictOfCategorisations(self):
+    d = {}
     for index in self.start_end_frames:
-      l.append((self.indices[index], self.categories.get(self.categorisations[index], "-")))
+      d[index]=(self.indices[index], self.categories.get(self.categorisations[index], "-"))
 
-    return l
+    return d
 
   def nextNotCategorisedIndex(self, current_frame):
     i = 0
