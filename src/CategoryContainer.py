@@ -1,13 +1,21 @@
 class CategoryContainer(object):
-  def __init__(self, max_index):
+  def __init__(self, indices):
     """
-    max_index : how much frames/fixations should be available
+    ``indices`` is a dict mapping a tuple (begin frame number, end frame number)
+    to indices of the object which are categoriesed.
+    Fixations are indexed by the second in the edf file the fixation starts.
+    Frames are indexed by their number (of occurrence in the video). So in the
+    case of categoriesed frames this mapping maps (1,1) to 1, (2,2) to 2, (i,i) to i ...
     """
-    self.categorisations = {} # index to category
-    for i in xrange(max_index):
-      self.categorisations[i+1] = None
 
-    self.categories = {} # shortcut to name
+    self.indices = indices
+    # index to category
+    self.categorisations = {}
+    for index in self.indices.keys():
+      self.categorisations[index] = None
+
+    # keyboard shortcut to category name
+    self.categories = {}
 
   def addCategory(self, shortcut, category_name):
     if not shortcut or len(shortcut) != 1: raise CategoryContainerError("Shortcut has to be a char")

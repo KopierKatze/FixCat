@@ -14,8 +14,9 @@ class EyeMovement(object):
     assert filename or saved_state, "No data for EyeMovement provided!"
     assert filename and not saved_state or saved_state and not filename, "filename and saved_state provided! Don't know which to take."
 
-    self._status_left = [] # 'fixated', 'saccade' or 'blink'; indexed by frame
-    self._status_rigth = [] #  -- " --
+    self._status_left = [] # 'fixated', 'saccade', 'blink' or None; indexed by frame
+    self._status_right = [] #  -- " --
+    self._status_mean = [] #  -- " --
 
     self._looks = [] # (left, right); indexed by frame
 
@@ -98,7 +99,8 @@ class EyeMovement(object):
     # now complete our containers for faster access of data
     self._looks = self._completeContainer(looks)
     self._status_left = self._completeContainer(status_left)
-    self._status_rigth = self._completeContainer(status_rigth)
+    self._status_right = self._completeContainer(status_rigth)
+    self._calculateMeanStatusList()
 
   def _completeContainer(self, container):
     complete = []
@@ -109,23 +111,61 @@ class EyeMovement(object):
       complete.append(current_value)
     return complete
 
+  def _calculateMeanStatus(self, left, right):
+    if left is None and right is None:
+      return None
+    elif left is None:
+      return right
+    elif right is None:
+      return left
+    
+    if left[1] == 'fixated' or right[1] == 'fixated':
+      return (max(int(left[0]), int(right[0])), 'fixated')
+
+    elif left[1] == 'saccade' or right[1] == 'saccade':
+      return (max(int(left[0]), int(right[0])), 'saccade')
+
+    else:
+      return (max(int(left[0]), int(right[0])), 'blink')
+
+  def _calculateMeanStatusList(self):
+    self._status_mean = []
+    previous_state = None
+    previous_index = None
+    
+    for frame in xrange(max(len(self._status_left), len(self._status_right))):
+      # shouldn't be needed as we complete them until the last frame
+      # but safety first
+      if frame > len(self._status_left):
+	left = (0,None)
+      else:
+	left = self._status_left[frame]
+      if frame > len(self._status_right):
+	right = (0,None)
+      else:
+	right = self._status_right[frame]
+
+      inference = self._calculateMeanStatus(left, right)
+      # if this is the first entry simply take the inference
+      if previous_index is None or previous_state is None:
+	self._status_mean.append(inference)
+	continue
+
+      # if the state didn't change retain the current index
+      if previous_state == inference[1]:
+	self._status_mean.append((previous_index, previous_state))
+      else:
+	# otherwise take new state and maximum index (see _calculateMeanStatus)
+	self._status_mean.append(inference)
+
   def statusLeftEyeAt(self, frame):
     return self._status_left[frame][1]
 
   def statusRightEyeAt(self, frame):
-    return self._status_rigth[frame][1]
+    return self._status_right[frame][1]
 
   def meanStatusAt(self, frame):
-    l = self.statusLeftEyeAt(frame)
-    r = self.statusRightEyeAt(frame)
-
-    if r == 'fixated' or l == 'fixated':
-      return 'fixated'
-
-    if r == 'saccade' or l == 'saccade':
-      return 'saccade'
-
-    return 'blink'
+    return self._status_mean[frame][1]
 
   def rightLookAt(self, frame):
     try:
@@ -177,6 +217,40 @@ class EyeMovement(object):
       if func(current_frame) != 'fixated':
 	saw_other_state = True
     return current_frame
+
+  def fixations(self, left):
+    """returns a list of fixation indexes (times of their occurence in edf file)
+    indexed by (start of fixation video frame, end of fixation video frame)"""
+    if left is True:
+      status = self._status_left
+    elif left is False:
+      status = self._status_right
+    elif left is None:
+      status = self._status_mean
+    else:
+      raise Exception("left has to be True or False or None!")
+
+    result = {}
+    last_index = None
+    current_start_frame = None
+    current_index = None
+    for frame in xrange(len(status)):
+      stat = status[frame]
+      if stat is None:
+	continue
+      if stat[1] == 'fixated' and stat[0] != last_index:
+	last_index = stat[0]
+	current_start_frame = frame
+	current_index = stat[0]
+      elif not current_index is None and not current_start_frame is None and stat[1] != 'fixated':
+	result[(current_start_frame, frame-1)] = current_index
+	current_start_frame = None
+	current_index = None
+
+    if not current_index is None and not current_start_frame is None:
+      result[(current_start_frame, len(status)-1)] = current_index
+    return result
+
 
 class EyeMovementError(Exception):
   pass

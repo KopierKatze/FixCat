@@ -52,11 +52,13 @@ class Controller(object):
     self.clock.register(self._tick)
     
     if self.categorise_frames:
-      number_of_indexes = self.video_reader.frame_count
+      objects = {}
+      for frame in xrange(int(self.video_reader.frame_count)):
+        objects[(frame, frame)] = str(frame)
     else:
-      number_of_indexes = self.eye_movement.countFixations()
+      objects = self.eye_movement.fixations(None)
 
-    self.category_container = CategoryContainer(int(number_of_indexes))
+    self.category_container = CategoryContainer(objects)
 
   def _tick(self, frame):
     """will populate current image to gui.
@@ -144,6 +146,9 @@ class Controller(object):
     return self.video_reader.width
   def getVideoFrameCount(self):
     return self.video_reader.frame_count
+
+  def getFix(self):
+    return self.eye_movement.fixations(None)
 
 if __name__ == '__main__':
   from multiprocessing import Process, Value
