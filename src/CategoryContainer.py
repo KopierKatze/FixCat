@@ -20,34 +20,25 @@ class CategoryContainer(object):
     # keyboard shortcut to category name
     self.categories = {}
 
-  def addCategory(self, shortcut, category_name):
-    if not shortcut or len(shortcut) != 1: raise CategoryContainerError("Shortcut has to be a char")
-    if shortcut in self.categories.keys(): raise CategoryContainerError("Shortcut already assigned")
-    self.categories[shortcut] = category_name
+  def editCategory(self, old_shortcut, new_shortcut, category_name):
+    if not new_shortcut is None and new_shortcut in self.categories.keys(): raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
+    if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Fehler: Das zu loeschende Tastenkuerzel ist nicht vorhanden.')
+    if category_name is None or len(category_name) < 1: raise CategoryContainerError('Bitte Namen der Kategorie angeben.')
 
-  def listCategories(self):
-    return self.categories
+    if not new_shortcut is None:
+      self.categories[new_shortcut] = category_name
 
-  def removeCategory(self, shortcut):
-    if not self.categories.has_key(shortcut): raise CategoryContainerError("Can't delete this category: no such shortcut assigned")
-    del self.categories[shortcut]
+      if not old_shortcut is None:
+	# move already categoriesed objects to new shortcut
+	for index in self.categorisations.keys():
+	  if self.categorisations[index] == old_shortcut:
+	    self.categorisations[index] = new_shortcut
 
-    for index in self.categorisations.keys():
-      if self.categorisations[index] == shortcut:
-	self.categorisations[index] = None
-
-  def changeCategory(self, old_shortcut, new_shortcut, category_name):
-    if not self.categories.has_key(old_shortcut): raise CategoryContainerError("Can't change this category: no such shortcut assigned")
-    # add new category, does checking :)
-    self.addCategory(new_shortcut, category_name)
-    
-    # replace already assigned indexes to new shortcut
-    for index in self.categorisations.keys():
-      if self.categorisations[index] == old_shortcut:
-	self.categorisations[index] = new_shortcut
-	
-    # remove old shortcut
-    self.removeCategory(old_shortcut)
+    if not old_shortcut is None:
+      del self.categories[old_shortcut]
+      for index in self.categorisations.keys():
+	if self.categorisations[index] == old_shortcut:
+	  self.categorisations[index] = None
 
   def categorise(self, frame, shortcut):
     """categorieses an index"""
@@ -57,8 +48,15 @@ class CategoryContainer(object):
       if frame >= index[0] and frame <= index[1]:
         self.categorisations[index] = shortcut
 
-  def listCategorisations(self):
-    return self.categorisations
+  def listCategories(self):
+    return self.categories
+
+  def displayListOfCategorisations(self):
+    l = []
+    for index in self.start_end_frames:
+      l.append((self.indices[index], self.categories.get(self.categorisations[index], "-")))
+
+    return l
 
   def nextNotCategorisedIndex(self, current_frame):
     i = 0
