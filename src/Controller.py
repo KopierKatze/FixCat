@@ -22,12 +22,29 @@ class Controller(object):
     self.category_container = None
     self.categorise_frames = False
 
+    self.show_eyes = [False, False, False] # [left_eye, right_eye, mean_eye]
+
     self.video_str = video_str
     self.current_frame = current_frame
     """contains the current image of the overlayed video.
     shared memory, so no latent ipc is needed"""
 
     self.config = Config()
+
+  def leftEyeStatus(self, show):
+    self.show_eyes[0] = bool(show)
+    # reproduce the current image to show or exclude this eye
+    self._tick(self.clock.frame)
+  def rightEyeStatus(self, show):
+    self.show_eyes[1] = bool(show)
+    # reproduce the current image to show or exclude this eye
+    self._tick(self.clock.frame)
+  def meanEyeStatus(self, show):
+    self.show_eyes[2] = bool(show)
+    # reproduce the current image to show or exclude this eye
+    self._tick(self.clock.frame)
+  def getEyeStatus(self):
+    return self.show_eyes
 
   def ready(self):
     """you should'nt always make sure this class is ready before using it's functions.
@@ -60,10 +77,12 @@ class Controller(object):
 
     self.category_container = CategoryContainer(objects)
 
+    self.show_eyes = [False, False, True] # show mean eye
+
   def _tick(self, frame):
     """will populate current image to gui.
     have a look at Clock class for more information."""
-    fr = self.overlayedFrame(frame, True, True, True)
+    fr = self.overlayedFrame(frame, self.show_eyes[0], self.show_eyes[1], self.show_eyes[2])
     return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
     cv.Copy(fr, return_frame)
     cv.CvtColor(return_frame, return_frame, cv.CV_BGR2RGB)

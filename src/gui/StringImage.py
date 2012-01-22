@@ -15,6 +15,10 @@ class StringImage(wx.Panel):
         self.width = None
         self.height = None
 
+        # offset of image display begin -> center image in widget
+        self.offseth = 0
+        self.offsetw = 0
+
     def OnPaint(self, event):
 	"""paint the scaled image onto widget.
 	
@@ -26,29 +30,30 @@ class StringImage(wx.Panel):
         if not self.bitmap is None:
             dc.BeginDrawing()
             # center picture according to scale
-            dc.DrawBitmap(self.bitmap, 0, 0)
+            dc.DrawBitmap(self.bitmap, self.offsetw, self.offseth)
             dc.EndDrawing()
         return event
 
     def _PrepareImage(self, event_stub=None):
 	"""scale the image to widgets size"""
 	try:
-	    widget_size = self.GetSize()
-	    widgeth = widget_size[1]
-	    widgetw = widget_size[0]
-	    
-	    image_size = self.original_image.GetSize()
-	    imageh = image_size[1]
-	    imagew = image_size[0]
+	    widgetw, widgeth = self.GetSize()
+	    imagew, imageh = self.original_image.GetSize()
 	    ratio = float(imagew) / float(imageh)
 	    
 	    if widgetw < (widgeth * ratio):
 	      imagew_scale = widgetw
 	      imageh_scale = widgetw / ratio
+              # center image in widget
+              self.offsetw = 0
+              self.offseth = (widgeth - imageh_scale) / 2
 	    else:
 	      imagew_scale = widgeth * ratio
 	      imageh_scale = widgeth
- 
+              # center image in widget
+              self.offsetw = (widgetw - imagew_scale) / 2
+              self.offseth = 0
+
 	    # scale picture by original width to height scale
 	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(imagew_scale, imageh_scale))
         except:
