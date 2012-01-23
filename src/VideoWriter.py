@@ -47,7 +47,7 @@ class VideoWriter(object):
         (CV_FOURCC('D', 'I', 'V', 'X') , 'DivX')])
     
   def releaseWriter(self):
-    """closes VideoWriter after use """
+    """closes VideoWriter after use """ 
     del self.writer
     
 class WriterError(Exception):

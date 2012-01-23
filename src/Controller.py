@@ -140,7 +140,7 @@ class Controller(object):
 
   def exportVideo(self, input_file, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
-    # TODO: add codec support for this
+    # TODO: add codec support for this 
     self.seek(0)
     frame_size = (self.getVideoWidth(), self.getVideoHeight())
     vidfps = self.getVideoFrameRate() 
