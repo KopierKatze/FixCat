@@ -1,6 +1,7 @@
 from gui.CategoryFrame import CategoryFrame
 from gui.StringImage import StringImage
 from gui.CategoryList import CategoryList
+from gui.OpenDialog import OpenDialog
 
 from Config import Config
 
@@ -187,8 +188,8 @@ class MainFrame(wx.Frame):
       if self.autoreload:
 	self.reloadTimer.Restart()
 
-    def newProject(self, video_filepath, eyemovement_filepath):
-      self.controller.new_project(video_filepath, eyemovement_filepath, False)
+    def newProject(self, video_filepath, eyemovement_filepath, categorise_frames):
+      self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames)
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
@@ -343,11 +344,9 @@ class MainFrame(wx.Frame):
         #wx.CallAfter(self.controller.pause ()) doesn't work
         self.Close(True)
 
-    def OnOpen(self, e):
-        filters = 'AVI files (*.avi)|*.avi|All files (*.*)|*.*'
-        dlg = wx.FileDialog(None, message = 'Select AVI files....', wildcard=filters, style=wx.OPEN)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
+    def OnOpen(self, event):
+      open_dialog = OpenDialog(self)
+      open_dialog.Show()
 
     def OnEditCategory(self, e):
         CategoryFrame(self, wx.ID_ANY, self.controller).Show()
