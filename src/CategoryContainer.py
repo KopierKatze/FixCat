@@ -47,7 +47,7 @@ class CategoryContainer(object):
     for index in self.start_end_frames:
       if frame >= index[0] and frame <= index[1]:
         self.categorisations[index] = shortcut
-        return True
+        return (index, self.categories[shortcut])
     return False
 
   def listCategories(self):

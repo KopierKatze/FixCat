@@ -15,6 +15,7 @@ class MainFrame(wx.Frame):
 
         self.InitUI()
         self.Centre()
+        self.Maximize()
         self.Show(True)
         self.dirname=""
 
@@ -179,7 +180,7 @@ class MainFrame(wx.Frame):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
       self.videoimage.SetImage(image_str)
       self.slider1.SetValue(self.current_frame.value)
-      self.category_list.markFrame(self.current_frame.value)
+      self.category_list.MarkFrame(self.current_frame.value)
 
       if self.autoreload:
 	self.reloadTimer.Restart()
@@ -228,10 +229,12 @@ class MainFrame(wx.Frame):
 	  self.OnPlay()
       else:
 	# try to categorise the current frame to the category which may belong tho key_code
-        if self.controller.categorise(key_code):
-	  self.category_list.FillInCategorisations(self.controller.getCategorisations())
+	return_info = self.controller.categorise(key_code)
+        if return_info:
+	  index, category = return_info
+	  self.category_list.Update(index, category)
 	  # load Image so category_list will jump to categorised frame
-	  self.loadImage()
+	  self.category_list.MarkFrame(self.current_frame.value)
 
     # ---------------- PLAYBACK CONTROLL --------------
     

@@ -26,7 +26,10 @@ class CategoryList(wx.ListCtrl):
   def SetCategorisationOrder(self, order):
     self.order = order
 
-  def markFrame(self, frame):
+  def Update(self, index, name):
+    self.SetStringItem(self.order.index(index), 1, name)
+
+  def MarkFrame(self, frame):
     sel = self.GetFirstSelected()
     while sel != -1:
       self.Select(sel, False)
