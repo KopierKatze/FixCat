@@ -151,8 +151,8 @@ class Controller(object):
     self.seek(self.clock.frame - 1)
 
   def jumpToNextUncategorisedFixation(self):
-    """no yet"""
-    pass
+    frame = self.eye_movement.nextNotCategorisedIndex(self.clock.frame)
+    self.seek(frame)
   
   def nextFixation(self):
     '''jump to next fixation'''
