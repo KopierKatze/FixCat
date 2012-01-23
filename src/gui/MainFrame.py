@@ -327,7 +327,7 @@ class MainFrame(wx.Frame):
     # ---------------- SHOWING EYE STATUS END --------
 
     def OnCategoryExport(self, event):
-      file_dialog = wx.FileDialog(self, "Hallo welt", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV Datei (*.csv)|*.csv")
+      file_dialog = wx.FileDialog(self, "CSV Export", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV Datei (*.csv)|*.csv")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
