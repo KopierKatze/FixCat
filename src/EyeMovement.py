@@ -238,7 +238,7 @@ class EyeMovement(object):
       stat = status[frame]
       if stat is None:
 	continue
-      if stat[1] == 'fixated' and stat[0] != last_index:
+      if stat[1] == 'fixated' and current_start_frame is None:
 	last_index = stat[0]
 	current_start_frame = frame
 	current_index = stat[0]

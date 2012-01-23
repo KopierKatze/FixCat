@@ -56,7 +56,6 @@ if __name__ == '__main__':
   a = wx.PySimpleApp()
   e = MainFrame(video_str, current_frame, controllerproxy)
   e.Show()
-  e.newProject("../example/overlayed_video.avi", "../example/t2d1gl.asc")
   #from thread import start_new_thread
   #start_new_thread(a.MainLoop, ())
   a.MainLoop()

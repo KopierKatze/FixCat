@@ -1,4 +1,4 @@
-from CategoryContainer import CategoryContainer
+from CategoryContainer import CategoryContainer, CategoryContainerError
 from Clock import Clock
 from Cursor import Cursor
 from EyeMovement import EyeMovement
@@ -23,6 +23,7 @@ class Controller(object):
     self.categorise_frames = False
     self.video_image = None
     self.show_eyes = [False, False, False] # [left_eye, right_eye, mean_eye]
+    self.categorising_eye_is_left = None # True -> left, False -> right, None -> mean
 
     self.video_str = video_str
     self.current_frame = current_frame
@@ -73,7 +74,7 @@ class Controller(object):
       for frame in xrange(int(self.video_reader.frame_count)):
         objects[(frame, frame)] = str(frame)
     else:
-      objects = self.eye_movement.fixations(None)
+      objects = self.eye_movement.fixations(self.categorising_eye_is_left)
 
     self.category_container = CategoryContainer(objects)
 
@@ -93,7 +94,20 @@ class Controller(object):
     
 
   def categorise(self, shortcut):
-    self.category_container.categorise(self.clock.frame, shortcut)
+    try:
+      return self.category_container.categorise(self.clock.frame, shortcut)
+    except CategoryContainerError:
+      raise
+      return False
+
+  def getCategorisations(self):
+    return self.category_container.dictOfCategorisations()
+
+  def getCategorisationsOrder(self):
+    return self.category_container.start_end_frames
+
+  def exportCategorisations(self, filepath):
+    self.category_container.export(filepath)
 
   def overlayedFrame(self, frame, left, right, mean):
     image = self.video_reader.frame(frame)
@@ -157,17 +171,17 @@ class Controller(object):
     self.seek(self.clock.frame - 1)
 
   def jumpToNextUncategorisedFixation(self):
-    """no yet"""
-    pass
+    frame = self.eye_movement.nextNotCategorisedIndex(self.clock.frame)
+    self.seek(frame)
   
   def nextFixation(self):
     '''jump to next fixation'''
-    frame = self.eye_movement.nextFixationFrame(self.clock.frame, None)
+    frame = self.eye_movement.nextFixationFrame(self.clock.frame, self.categorising_eye_is_left)
     self.seek(frame)
 
   def prevFixation(self):
     '''jump to prev fixation'''
-    frame = self.eye_movement.prevFixationFrame(self.clock.frame, None)
+    frame = self.eye_movement.prevFixationFrame(self.clock.frame, self.categorising_eye_is_left)
     self.seek(frame)
 # --------------- PLAYBACK SPEED -----
   def slowerPlayback(self):
