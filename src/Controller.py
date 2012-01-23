@@ -104,6 +104,9 @@ class Controller(object):
   def getCategorisationsOrder(self):
     return self.category_container.start_end_frames
 
+  def exportCategorisations(self, filepath):
+    self.category_container.export(filepath)
+
   def overlayedFrame(self, frame, left, right, mean):
     image = self.video_reader.frame(frame)
 

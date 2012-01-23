@@ -20,6 +20,14 @@ class CategoryContainer(object):
     # keyboard shortcut to category name
     self.categories = {68:'HALLO WELT!'}
 
+  def export(self, filepath):
+    f = open(filepath, "wb")
+    # header
+    f.write('Startframe, Endframe, Index, Kategorie\n')
+    for start_frame, end_frame in self.start_end_frames:
+      f.write('%s, %s, %s, %s\n' %(start_frame, end_frame, self.indices[(start_frame, end_frame)], self.categories.get(self.categorisations[(start_frame, end_frame)], "-")))
+    f.close()
+
   def editCategory(self, old_shortcut, new_shortcut, category_name):
     if not new_shortcut is None and new_shortcut in self.categories.keys(): raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
     if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Fehler: Das zu loeschende Tastenkuerzel ist nicht vorhanden.')

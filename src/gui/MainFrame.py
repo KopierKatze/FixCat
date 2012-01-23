@@ -42,6 +42,7 @@ class MainFrame(wx.Frame):
 
         categoryMenu = wx.Menu()
         categoryEdit = categoryMenu.Append(wx.ID_ANY, "Category", "Kategorie editieren")
+        category_export = categoryMenu.Append(wx.ID_ANY, "Export", "Kategorisierungen exportieren")
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
@@ -52,6 +53,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
+        self.Bind(wx.EVT_MENU, self.OnCategoryExport, category_export)
 
     def InitUIVideoControlls(self):
         self.videocontrollspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
@@ -322,7 +324,15 @@ class MainFrame(wx.Frame):
       self.controller.meanEyeStatus(event.Checked())
       # load changed image, important if we currently not playing
       self.loadImage()
-    # ---------------- SHOWING EYE STATUS END -------- 
+    # ---------------- SHOWING EYE STATUS END --------
+
+    def OnCategoryExport(self, event):
+      file_dialog = wx.FileDialog(self, "Hallo welt", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV Datei (*.csv)|*.csv")
+      if file_dialog.ShowModal() == wx.ID_OK:
+	path = file_dialog.GetPath()
+	if not "." in path:
+	  path += ".csv"
+        self.controller.exportCategorisations(path)
     #------------------------------------------- menu items     
     def OnAbout(self, e):
         dlg = wx.MessageDialog(self, "<slipsum>", "about eyepy", wx.OK)
