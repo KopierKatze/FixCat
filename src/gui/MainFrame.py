@@ -38,16 +38,21 @@ class MainFrame(wx.Frame):
 
         categoryMenu = wx.Menu()
         categoryEdit = categoryMenu.Append(wx.ID_ANY, "Category", "Kategorie editieren")
+        
+        tempMenu = wx.Menu()
+        exportVideo = tempMenu.Append(wx.ID_ANY, "Video Menu", "Video Exportieren")
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
         menuBar.Append(categoryMenu, "Category")
+        menuBar.Append(tempMenu, "Video Exportieren")
         self.SetMenuBar(menuBar)
 
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
+        self.Bind(wx.EVT_MENU, self.OnExport, exportVideo)
 
     def InitUIVideoControlls(self):
         self.videocontrollspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
@@ -315,6 +320,12 @@ class MainFrame(wx.Frame):
 
     def OnEditCategory(self, e):
         CategoryFrame(self, wx.ID_ANY, self.controller).Show()
+        
+    def OnExport(self, e):
+      self.autoreload = True
+      self.loadImage()
+      self.controller.exportVideo('../example/overlayed_video.avi', '../example/output.avi')
+      self.autoreload = False
 
         
 if __name__ == '__main__':

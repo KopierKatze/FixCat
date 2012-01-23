@@ -21,7 +21,7 @@ class Controller(object):
     self.cursor = None
     self.category_container = None
     self.categorise_frames = False
-
+    self.video_image = None
     self.show_eyes = [False, False, False] # [left_eye, right_eye, mean_eye]
 
     self.video_str = video_str
@@ -86,9 +86,11 @@ class Controller(object):
     return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
     cv.Copy(fr, return_frame)
     cv.CvtColor(return_frame, return_frame, cv.CV_BGR2RGB)
+    self.video_image = return_frame
     video_str = return_frame.tostring()
     self.current_frame.value = frame
     self.video_str.value = video_str
+    
 
   def categorise(self, shortcut):
     self.category_container.categorise(self.clock.frame, shortcut)
@@ -122,6 +124,21 @@ class Controller(object):
     cv.ResetImageROI(image)
     return image
 
+  def exportVideo(self, input_file, output_file):
+    """ export the overlayed video to a new video file with the VideoWriter"""
+    # TODO: add codec support for this
+    self.seek(0)
+    frame_size = (self.getVideoWidth(), self.getVideoHeight())
+    vidfps = self.getVideoFrameRate() 
+    codec = cv.CV_FOURCC('D','I','V','X')
+    self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
+    
+    for i in range(len(self.eye_movement._looks)-1):
+      self.seek(i)
+      self._tick(i)
+      self.video_writer.addFrame(self.video_image)
+    self.video_writer.releaseWriter()
+    
   def play(self):
     if not self.clock.running: self.clock.run()
 
@@ -168,7 +185,8 @@ class Controller(object):
     return self.video_reader.width
   def getVideoFrameCount(self):
     return self.video_reader.frame_count
-
+  def getVideoFrameRate(self):
+    return self.video_reader.fps
   def getFix(self):
     return self.eye_movement.fixations(None)
 
