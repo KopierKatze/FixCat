@@ -5,13 +5,14 @@ from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
 from Config import Config
+from Savable import Savable, SaveController, SaveControllerError
 
 try:
   from cv2 import cv
 except ImportError:
   import cv
 
-class Controller(object):
+class Controller(Savable):
   """this class connects all the in- and output classes together and provides a
   clean interface for the connection to the gui"""
   def __init__(self, video_str, current_frame):
@@ -79,6 +80,36 @@ class Controller(object):
     self.category_container = CategoryContainer(objects)
 
     self.show_eyes = [False, False, True] # show mean eye
+
+  def save_project(self, saved_filepath):
+    sc = SaveController()
+
+    sc.addSavable('eye_movement', self.eye_movement)
+    sc.addSavable('category_container', self.category_container)
+    sc.addSavable('video_reader', self.video_reader)
+    sc.addSavable('clock', self.clock)
+    sc.addSavable('controller', self)
+
+    sc.saveToFile(saved_filepath)
+
+  def load_project(self, saved_filepath):
+    sc = SaveController()
+
+    sc.loadFromFile(saved_filepath)
+
+    controller_state = sc.getSavedState('controller')
+    self.show_eyes = controller_state['show_eyes']
+    self.categorise_frames = controller_state['categorise_frames']
+    
+    self.eye_movement = EyeMovement(saved_state=sc.getSavedState('eye_movement'))
+    self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
+    self.clock = Clock(saved_state=sc.getSavedState('clock'))
+    self.clock.register(self._tick)
+    self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
+    self.seek(self.clock.frame)
+
+  def getState(self):
+    return {'show_eyes':self.show_eyes, 'categorise_frames':self.categorise_frames}
 
   def _tick(self, frame):
     """will populate current image to gui.

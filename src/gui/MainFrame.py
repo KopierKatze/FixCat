@@ -59,7 +59,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
-        self.Bind(wx.EVT_MENU, self.OnAbout, menuSave)
+        self.Bind(wx.EVT_MENU, self.OnSave, menuSave)
         self.Bind(wx.EVT_MENU, self.OnExport, exportVideo)
         self.Bind(wx.EVT_MENU, self.OnCategoryExport, category_export)
 
@@ -198,6 +198,14 @@ class MainFrame(wx.Frame):
 
     def newProject(self, video_filepath, eyemovement_filepath, categorise_frames):
       self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames)
+      self._loadProjectInfo()
+
+
+    def loadProject(self, filepath):
+      self.controller.load_project(filepath)
+      self._loadProjectInfo()
+
+    def _loadProjectInfo(self):
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
@@ -358,7 +366,15 @@ class MainFrame(wx.Frame):
 
     def OnEditCategory(self, e):
         CategoryFrame(self, wx.ID_ANY, self.controller).Show()
-        
+
+    def OnSave(self, event):
+      file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
+      if file_dialog.ShowModal() == wx.ID_OK:
+	path = file_dialog.GetPath()
+	if not "." in path:
+	  path += ".pyps"
+	self.controller.save_project(path)
+
     def OnExport(self, e):
       self.autoreload = True
       self.loadImage()

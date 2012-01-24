@@ -108,7 +108,13 @@ class OpenDialog(wx.Dialog):
       try:
 	self.parent.newProject(self.video_filepath, self.eyedata_filepath, False)
       except:
-	pass
-        # error show
+	raise
+      else:
+	self.Destroy()
+    else:
+      try:
+	self.parent.loadProject(self.saved_filepath)
+      except:
+	raise
       else:
 	self.Destroy()

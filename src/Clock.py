@@ -1,26 +1,32 @@
+from Savable import Savable
+
 import threading
 from thread import start_new_thread
 from time import time, sleep
 
-class Clock(object):
+class Clock(Savable):
   """a clock!
      ticks in a specific interval. will call functions registered with
      'register()' on every tick. informs those funtions about current time
      in seconds.
      the time passed within one interval can be altered by a multiplicator."""
-  def __init__(self, total_frames, fps):
+  def __init__(self, total_frames=None, fps=None, saved_state={}):
     """creates clock with interval(time in the real world that passes between
     two ticks) and end_of_time(duration of video)"""
-    
-    self._frame = 0.0 # is not always a round number! do to the multiplicator
+    assert not(total_frames is None and fps is None and saved_state == {})
+
+    self._frame = saved_state.get('_frame', 0.0) # is not always a round number! do to the multiplicator
     self.running = False # initializing with False, True in run()
     self.registered = []
-    self.multiplicator = 1.0
-    self.total_frames = total_frames
+    self.multiplicator = saved_state.get('multiplocator', 1.0)
+    self.total_frames = saved_state.get('total_frames', total_frames)
     try:
-      self.interval = 1.0/fps
+      self.interval = 1.0/saved_state.get('fps', fps)
     except ZeroDivisionError:
       self.interval = 1.0/30.0
+
+  def getState(self):
+    return {'_frame':self._frame, 'total_frames':self.total_frames, 'fps':1.0/self.interval, 'multiplicator': self.multiplicator}
 
   @property
   def frame(self):

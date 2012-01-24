@@ -1,3 +1,5 @@
+from Savable import Savable
+
 from threading import Thread
 from time import sleep, time
 try:
@@ -5,28 +7,29 @@ try:
 except ImportError:
   import cv
 
-class VideoReader(object):
+class VideoReader(Savable):
     """provides a image-by-image access to a video file"""
   
-    def __init__(self, filepath):
+    def __init__(self, filepath=None, saved_state={}):
         """open the video file at filepath.
         will raise VideoOpenError on failure"""
+        self.filepath = saved_state.get('filepath', filepath)
 
-        if filepath is not None and filepath is not '':
-            self.reader = cv.CaptureFromFile(filepath)
-            # have to check if codec is available!
-            self.frame_count = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT))
-            self.fps = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
-            self.duration = self.frame_count * self.fps
-            self.height = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_HEIGHT))
-            self.width = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_WIDTH))
-            self.cache = dict() # maps frame number to frame ressource
-            self._last_frame = 0
-            self.prefetcher = VideoPrefetcher(self)
-            self.prefetcher.daemon = True
-            #self.prefetcher.start()
-        else:
-            raise ReaderError('invalid filepath')
+	self.reader = cv.CaptureFromFile(self.filepath)
+	# have to check if codec is available!
+	self.frame_count = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT))
+	self.fps = cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FPS)
+	self.duration = self.frame_count * self.fps
+	self.height = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_HEIGHT))
+	self.width = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_WIDTH))
+	self.cache = dict() # maps frame number to frame ressource
+	self._last_frame = 0
+	self.prefetcher = VideoPrefetcher(self)
+	self.prefetcher.daemon = True
+	#self.prefetcher.start()
+
+    def getState(self):
+      return {'filepath':self.filepath}
 
     def frame(self, frame_number):
         """returns the image that you would see when playing the video at second

@@ -1,6 +1,8 @@
+from Savable import Savable
+
 import re
 
-class EyeMovement(object):
+class EyeMovement(Savable):
   number = r'([ 0-9]{5}.[0-9])'
   eye_look = r'(([0-9]+)\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t.)'
   saccade = r'(SSACC (L|R)  ([0-9]+))'
@@ -10,20 +12,23 @@ class EyeMovement(object):
   end = r'(END\t([0-9]+) \tSAMPLES\tEVENTS\tRES\t([ 0-9]{4}.[0-9]{2})\t([ 0-9]{4}.[0-9]{2}))'
   frame = r'(MSG\t([0-9]+) VFRAME ([0-9]+) ([a-zA-Z0-9]+.avi))'
   
-  def __init__(self, filename=None, saved_state=None):
+  def __init__(self, filename=None, saved_state={}):
     assert filename or saved_state, "No data for EyeMovement provided!"
     assert filename and not saved_state or saved_state and not filename, "filename and saved_state provided! Don't know which to take."
 
-    self._status_left = [] # 'fixated', 'saccade', 'blink' or None; indexed by frame
-    self._status_right = [] #  -- " --
-    self._status_mean = [] #  -- " --
+    self._status_left = saved_state.get('left', []) # 'fixated', 'saccade', 'blink' or None; indexed by frame
+    self._status_right = saved_state.get('right', []) #  -- " --
+    self._status_mean = saved_state.get('mean', []) #  -- " --
 
-    self._looks = [] # (left, right); indexed by frame
+    self._looks = saved_state.get('looks', []) # (left, right); indexed by frame
 
     if filename:
       #checks
       self._parseFile(filename)
-  
+
+  def getState(self):
+    return {'left':self._status_left, 'right':self._status_right, 'mean':self._status_mean, 'looks':self._looks}
+
   def _parseFile(self, filename):
     """
     SAMPLES EVENTS keyword

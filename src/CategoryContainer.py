@@ -1,5 +1,7 @@
-class CategoryContainer(object):
-  def __init__(self, indices):
+from Savable import Savable
+
+class CategoryContainer(Savable):
+  def __init__(self, indices=None, saved_state={}):
     """
     ``indices`` is a dict mapping a tuple (begin frame number, end frame number)
     to indices of the object which are categoriesed.
@@ -7,18 +9,23 @@ class CategoryContainer(object):
     Frames are indexed by their number (of occurrence in the video). So in the
     case of categoriesed frames this mapping maps (1,1) to 1, (2,2) to 2, (i,i) to i ...
     """
+    assert not (indices is None and saved_state == {})
 
-    self.indices = indices
+    self.indices = saved_state.get('indices', indices)
     # used to iterate in order over all object under categorisation
     self.start_end_frames = self.indices.keys()
     self.start_end_frames.sort()
     # index to category
-    self.categorisations = {}
-    for index in self.indices.keys():
-      self.categorisations[index] = None
+    self.categorisations = saved_state.get('categorisations', {})
+    if not indices is None:
+      for index in self.indices.keys():
+	self.categorisations[index] = None
 
     # keyboard shortcut to category name
-    self.categories = {68:'HALLO WELT!'}
+    self.categories = saved_state.get('categories', {68:'hello world'})
+
+  def getState(self):
+    return {'categories':self.categories, 'categorisations':self.categorisations, 'indices':self.indices}
 
   def export(self, filepath):
     f = open(filepath, "wb")
