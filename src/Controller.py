@@ -97,10 +97,11 @@ class Controller(Savable):
 
     sc.loadFromFile(saved_filepath)
 
+    self.cursor = Cursor()
     controller_state = sc.getSavedState('controller')
     self.show_eyes = controller_state['show_eyes']
     self.categorise_frames = controller_state['categorise_frames']
-    
+
     self.eye_movement = EyeMovement(saved_state=sc.getSavedState('eye_movement'))
     self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
     self.clock = Clock(saved_state=sc.getSavedState('clock'))
@@ -119,10 +120,9 @@ class Controller(Savable):
     cv.Copy(fr, return_frame)
     cv.CvtColor(return_frame, return_frame, cv.CV_BGR2RGB)
     self.video_image = return_frame
-    video_str = return_frame.tostring()
     self.current_frame.value = frame
+    video_str = return_frame.tostring()
     self.video_str.value = video_str
-    
 
   def categorise(self, shortcut):
     try:
@@ -169,21 +169,20 @@ class Controller(Savable):
     cv.ResetImageROI(image)
     return image
 
-  def exportVideo(self, input_file, output_file):
+  def exportVideo(self, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
     # TODO: add codec support for this 
     self.seek(0)
     frame_size = (self.getVideoWidth(), self.getVideoHeight())
-    vidfps = self.getVideoFrameRate() 
+    vidfps = self.video_reader.fps
     codec = cv.CV_FOURCC('D','I','V','X')
     self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
-    
+
     for i in range(len(self.eye_movement._looks)-1):
       self.seek(i)
-      self._tick(i)
       self.video_writer.addFrame(self.video_image)
     self.video_writer.releaseWriter()
-    
+
   def play(self):
     if not self.clock.running: self.clock.run()
 

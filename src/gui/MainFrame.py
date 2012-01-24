@@ -17,13 +17,13 @@ class MainFrame(wx.Frame):
         self.InitUI()
         self.Centre()
         self.Maximize()
-        self.Show(True)
-        self.dirname=""
+        self.Show()
 
         self.video_str = video_str
         self.current_frame = current_frame
 
         self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
+        self.reloadTimer.Stop()
         self.autoreload = False
 
         self.playing = False
@@ -375,11 +375,16 @@ class MainFrame(wx.Frame):
 	  path += ".pyps"
 	self.controller.save_project(path)
 
-    def OnExport(self, e):
-      self.autoreload = True
-      self.loadImage()
-      self.controller.exportVideo('../example/overlayed_video.avi', '../example/output.avi')
-      self.autoreload = False
+    def OnExport(self, event):
+      file_dialog = wx.FileDialog(self, "Video exportieren", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI Datei (*.avi)|*.avi")
+      if file_dialog.ShowModal() == wx.ID_OK:
+	path = file_dialog.GetPath()
+	if not "." in path:
+	  path += ".avi"
+	self.autoreload = True
+	self.loadImage()
+	self.controller.exportVideo(path)
+	self.autoreload = False
 
         
 if __name__ == '__main__':
