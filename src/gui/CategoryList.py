@@ -2,7 +2,7 @@ import wx
 
 class CategoryList(wx.ListCtrl):
   def __init__(self, parent, id, seek_func=None):
-    wx.ListCtrl.__init__(self, parent, id, size=(100,300), style=wx.LC_REPORT|wx.SUNKEN_BORDER)
+    wx.ListCtrl.__init__(self, parent, id, size=(200, -1), style=wx.LC_REPORT|wx.SUNKEN_BORDER)
 
     self.InsertColumn(0, "Index")
     self.InsertColumn(1, "Kategorie")

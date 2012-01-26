@@ -115,7 +115,7 @@ class Controller(Savable):
     self.clock = Clock(saved_state=sc.getSavedState('clock'))
     self.clock.register(self._clock_tick)
     self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
-    
+
     self.produceCurrentImage()
 
   def getState(self):
@@ -214,33 +214,27 @@ class Controller(Savable):
       self.seek(frame)
       self.video_writer.addFrame(self.video_image)
     self.video_writer.releaseWriter()
-
+# -----------  PLAYBACK CONTROLL ----
   def play(self):
     if not self.clock.running: self.clock.run()
-
   def pause(self):
     if self.clock.running: self.clock.stop()
-
   def seek(self, frame):
     self.clock.seek(frame)
 # -----------  FRAME JUMPING ----
   def nextFrame(self):
     """jump one frame into the future"""
     self.seek(self.clock.frame + 1)
-
   def prevFrame(self):
     """jump one frame into the past"""
     self.seek(self.clock.frame - 1)
-
   def jumpToNextUncategorisedFixation(self):
     frame = self.eye_movement.nextNotCategorisedIndex(self.clock.frame)
     self.seek(frame)
-  
   def nextFixation(self):
     '''jump to next fixation'''
     frame = self.eye_movement.nextFixationFrame(self.clock.frame, self.categorising_eye_is_left)
     self.seek(frame)
-
   def prevFixation(self):
     '''jump to prev fixation'''
     frame = self.eye_movement.prevFixationFrame(self.clock.frame, self.categorising_eye_is_left)
@@ -263,8 +257,6 @@ class Controller(Savable):
     return self.video_reader.frame_count
   def getVideoFrameRate(self):
     return self.video_reader.fps
-  def getFix(self):
-    return self.eye_movement.fixations(None)
 
 if __name__ == '__main__':
   from multiprocessing import Process, Value
