@@ -62,7 +62,6 @@ class EyeMovement(Savable):
       frame = frame_re.match(line)
       if frame:
 	current_frame = int(frame.groups()[2])
-	current_frame -= 1 # cvs frames start at 0 eyelinks frames at 1
 	
       # we index by frames... so everything bevor a frame indication is thrown away!
       if current_frame == None:
@@ -163,26 +162,30 @@ class EyeMovement(Savable):
 	# otherwise take new state and maximum index (see _calculateMeanStatus)
 	self._status_mean.append(inference)
 
+  def _getListTupleItem(self, list, list_index, tuple_index):
+    try:
+      return list[list_index][tuple_index]
+    # happens if eye info is None -> no status for this frame
+    except TypeError:
+      return None
+    # if frame is not in the list -> video longer than eye status
+    except IndexError:
+      return None
+
   def statusLeftEyeAt(self, frame):
-    return self._status_left[frame][1]
+    return self._getListTupleItem(self._status_left, frame, 1)
 
   def statusRightEyeAt(self, frame):
-    return self._status_right[frame][1]
+    return self._getListTupleItem(self._status_right, frame, 1)
 
   def meanStatusAt(self, frame):
-    return self._status_mean[frame][1]
+    return self._getListTupleItem(self._status_mean, frame, 1)
 
   def rightLookAt(self, frame):
-    try:
-      return self._looks[frame][1]
-    except TypeError:
-      return None
+    return self._getListTupleItem(self._looks, frame, 1)
 
   def leftLookAt(self, frame):
-    try:
-      return self._looks[frame][0]
-    except TypeError:
-      return None
+    return self._getListTupleItem(self._looks, frame, 0)
 
   def meanLookAt(self, frame):
     l = self.leftLookAt(frame)

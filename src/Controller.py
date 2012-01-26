@@ -141,33 +141,49 @@ class Controller(Savable):
     self.category_container.export(filepath)
 
   def overlayedFrame(self, frame, left, right, mean):
+    # retrieve original image from video file
     image = self.video_reader.frame(frame)
+    # add cursors as neede
+    if left:
+      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(frame)), self.eye_movement.leftLookAt(frame))
+    if right:
+      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(frame)), self.eye_movement.rightLookAt(frame))
+    if mean:
+      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.meanStatusAt(frame)), self.eye_movement.meanLookAt(frame))
 
-    left_look = self.eye_movement.leftLookAt(frame)
-    right_look = self.eye_movement.rightLookAt(frame)
-    mean_look = self.eye_movement.meanLookAt(frame)
-    # TODO: this try-except block is really bad taste! only for the show today
-    try:
-      if left and right_look[0] < image.width and right_look[1] < image.height:
-	left_cursor = self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(frame))
-	cv.SetImageROI(image, (int(left_look[0]), int(left_look[1]), left_cursor.width, left_cursor.height))
-	cv.Add(image, left_cursor, image)
-
-      if right and left_look[0] < image.width and left_look[1] < image.height:
-	right_cursor = self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(frame))
-	cv.SetImageROI(image, (int(right_look[0]), int(right_look[1]), right_cursor.width, right_cursor.height))
-	cv.Add(image, right_cursor, image)
-
-
-      if mean and mean_look[0] < image.width and mean_look[1] < image.height:
-	mean_cursor = self.cursor.cursorFor(self.eye_movement.meanStatusAt(frame))
-	cv.SetImageROI(image, (int(mean_look[0]), int(mean_look[1]), mean_cursor.width, mean_cursor.height))
-	cv.Add(image, mean_cursor, image)
-    except Exception:
-      pass
-
-    cv.ResetImageROI(image)
     return image
+
+  def _addCursorToImage(self, image, cursor, position):
+    # in case that we don't have information about the position or cursor end now
+    if position is None or cursor is None: return
+
+    cursor_left_upper_corner = (int(position[0]-cursor.width/2), int(position[1]-cursor.height/2))
+    cursor_right_lower_corner = (cursor_left_upper_corner[0]+cursor.width, cursor_left_upper_corner[1]+cursor.height)
+    cursorROI = [0, 0, cursor.width, cursor.height]
+    imageROI = [cursor_left_upper_corner[0], cursor_left_upper_corner[1], cursor.width, cursor.height]
+    if cursor_right_lower_corner[0] <= 0 or cursor_right_lower_corner[1] < 0 or \
+     cursor_left_upper_corner[0] > image.width or cursor_left_upper_corner[1] > image.height:
+      # cursor out of image
+      return
+    if cursor_left_upper_corner[0] < 0:
+      cursorROI[0] = - cursor_left_upper_corner[0]
+      imageROI[0] = 0
+    if cursor_left_upper_corner[1] < 0:
+      cursorROI[1] = - cursor_left_upper_corner[1]
+      imageROI[1] = 0
+    if cursor_right_lower_corner[0] > image.width:
+      cursorROI[2] = cursor.width - (cursor_right_lower_corner[0] - image.width)
+      if cursorROI[2] == 0: return # width of cursor would be zero
+      imageROI[2] = image.width
+    if cursor_right_lower_corner[1] > image.height:
+      cursorROI[3] = cursor.height - (cursor_right_lower_corner[1] - image.height)
+      if cursorROI[3] == 0: return # height of cursor would be zero
+      imageROI[3] = image.height
+
+    cv.SetImageROI(cursor, tuple(cursorROI))
+    cv.SetImageROI(image, tuple(imageROI))
+    cv.Add(image, cursor, image)
+    cv.ResetImageROI(image)
 
   def exportVideo(self, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
@@ -178,8 +194,8 @@ class Controller(Savable):
     codec = cv.CV_FOURCC('D','I','V','X')
     self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
 
-    for i in range(len(self.eye_movement._looks)-1):
-      self.seek(i)
+    for frame in xrange(self.video_reader.frame_count):
+      self.seek(frame)
       self.video_writer.addFrame(self.video_image)
     self.video_writer.releaseWriter()
 
