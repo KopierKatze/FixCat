@@ -33,9 +33,31 @@ class MainFrame(wx.Frame):
 
         self.config = Config()
 
+        self.save_file = None
+        asm = self.config.get('general', 'autosave_minutes')
+        if asm is None:
+	  self.autosave_timer = wx.CallLater(10, lambda: None)
+	  self.autosave_timer.Restart = lambda: None
+	else:
+	  self.autosave_timer = wx.CallLater(asm*60*1000, self.autosave)
+	  # activated on project load
+	  self.autosave_timer.Stop()
+
+    def autosave(self):
+        if self.save_file is None:
+	    d = wx.MessageDialog(self, "Hi, ich wuerde jetzt das aktuelle Projekt speichern. Kann das aber nicht tun, weil es noch nicht gepspeichert wurde. Soll es jetzt gepspeichert werden? (Ich werde nicht wieder damit nerven)", style=wx.YES_NO)
+	    if d.ShowModal() == wx.ID_YES:
+	      self.OnSave()
+	    d.Destroy()
+	else:
+	    self.statusBar.SetFields(['Automatisches Speichern...'])
+	    self.controller.save_project(self.save_file)
+	    self.autosave_timer.Restart()
+	    self.statusBar.SetFields([''])
+
     def InitMenu(self):
         # menubar elements
-        statusBar = self.CreateStatusBar()
+        self.statusBar = self.CreateStatusBar()
 
         fileMenu = wx.Menu()
         menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Oeffnen")
@@ -201,11 +223,13 @@ class MainFrame(wx.Frame):
 
     def newProject(self, video_filepath, eyemovement_filepath, categorise_frames):
       self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames)
+      self.save_file = None
       self._loadProjectInfo()
 
 
     def loadProject(self, filepath):
       self.controller.load_project(filepath)
+      self.save_file = filepath
       self._loadProjectInfo()
 
     def _loadProjectInfo(self):
@@ -217,6 +241,9 @@ class MainFrame(wx.Frame):
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
       self.category_list.FillInCategorisations(self.controller.getCategorisations())
       self.loadImage()
+
+      # start autosave timer
+      self.autosave_timer.Restart()
 
     def controllerIO(self):
       if self.controller is None: return False
@@ -371,13 +398,15 @@ class MainFrame(wx.Frame):
     def OnEditCategory(self, e):
         CategoryFrame(self, wx.ID_ANY, self.controller).Show()
 
-    def OnSave(self, event):
+    def OnSave(self, event=None):
       file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
 	  path += ".pyps"
 	self.controller.save_project(path)
+	self.save_file = path
+	self.autosave_timer.Restart()
 
     def OnExport(self, event):
       file_dialog = wx.FileDialog(self, "Video exportieren", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI Datei (*.avi)|*.avi")
@@ -401,7 +430,7 @@ class MainFrame(wx.Frame):
 	self.autoreload = False
 	progress_dialog.Destroy()
 
-        
+
 if __name__ == '__main__':
   
     app = wx.App()
