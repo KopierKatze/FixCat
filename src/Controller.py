@@ -1,6 +1,5 @@
 from CategoryContainer import CategoryContainer, CategoryContainerError
 from Clock import Clock
-from Cursor import Cursor
 from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
@@ -19,7 +18,7 @@ class Controller(Savable):
     self.video_reader = None
     self.eye_movement = None
     self.clock = None
-    self.cursor = None
+    self.cursors = []
     self.category_container = None
     self.categorise_frames = False
     self.video_image = None
@@ -36,15 +35,15 @@ class Controller(Savable):
   def leftEyeStatus(self, show):
     self.show_eyes[0] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def rightEyeStatus(self, show):
     self.show_eyes[1] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def meanEyeStatus(self, show):
     self.show_eyes[2] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def getEyeStatus(self):
     return self.show_eyes
 
@@ -54,22 +53,28 @@ class Controller(Savable):
     return bool(self.video_reader) and \
 	   bool(self.eye_movement) and \
 	   bool(self.clock) and \
-	   bool(self.cursor) and \
+	   bool(self.cursors) and \
 	   bool(self.category_container)
+
+  def createCursorDict(self):
+    self.cursors = {None:None,
+		    'fixated':self.config.get('cursors','fixated'),
+		    'saccade':self.config.get('cursors','saccade'),
+		    'blink':self.config.get('cursors','blink')}
 
   def new_project(self, video_file, eye_movement_file, categorise_frames=False):
     """create a new project.
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
     """
-    self.cursor = Cursor()
-    
+    self.createCursorDict()
+
     self.categorise_frames = categorise_frames
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
     self.clock = Clock(self.video_reader.duration, self.video_reader.fps)
-    self.clock.register(self._tick)
-    
+    self.clock.register(self._clock_tick)
+
     if self.categorise_frames:
       objects = {}
       for frame in xrange(int(self.video_reader.frame_count)):
@@ -80,6 +85,9 @@ class Controller(Savable):
     self.category_container = CategoryContainer(objects)
 
     self.show_eyes = [False, False, True] # show mean eye
+
+    # seek to zero so we'll have a picture
+    self.produceCurrentImage()
 
   def save_project(self, saved_filepath):
     sc = SaveController()
@@ -97,7 +105,7 @@ class Controller(Savable):
 
     sc.loadFromFile(saved_filepath)
 
-    self.cursor = Cursor()
+    self.createCursorDict()
     controller_state = sc.getSavedState('controller')
     self.show_eyes = controller_state['show_eyes']
     self.categorise_frames = controller_state['categorise_frames']
@@ -105,16 +113,21 @@ class Controller(Savable):
     self.eye_movement = EyeMovement(saved_state=sc.getSavedState('eye_movement'))
     self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
     self.clock = Clock(saved_state=sc.getSavedState('clock'))
-    self.clock.register(self._tick)
+    self.clock.register(self._clock_tick)
     self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
-    self.seek(self.clock.frame)
+
+    self.produceCurrentImage()
 
   def getState(self):
     return {'show_eyes':self.show_eyes, 'categorise_frames':self.categorise_frames}
 
-  def _tick(self, frame):
+  def _clock_tick(self, frame):
+    self.produceCurrentImage()
+
+  def produceCurrentImage(self):
     """will populate current image to gui.
     have a look at Clock class for more information."""
+    frame = self.clock.frame
     fr = self.overlayedFrame(frame, self.show_eyes[0], self.show_eyes[1], self.show_eyes[2])
     return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
     cv.Copy(fr, return_frame)
@@ -139,20 +152,20 @@ class Controller(Savable):
 
   def exportCategorisations(self, filepath):
     self.category_container.export(filepath)
-  
+
   def getCategories(self):
     return self.category_container.categories
-  
+
   def overlayedFrame(self, frame, left, right, mean):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
     # add cursors as neede
     if left:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(frame)), self.eye_movement.leftLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusLeftEyeAt(frame)], self.eye_movement.leftLookAt(frame))
     if right:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(frame)), self.eye_movement.rightLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusRightEyeAt(frame)], self.eye_movement.rightLookAt(frame))
     if mean:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.meanStatusAt(frame)), self.eye_movement.meanLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.meanStatusAt(frame)], self.eye_movement.meanLookAt(frame))
 
     return image
 
@@ -201,33 +214,27 @@ class Controller(Savable):
       self.seek(frame)
       self.video_writer.addFrame(self.video_image)
     self.video_writer.releaseWriter()
-
+# -----------  PLAYBACK CONTROLL ----
   def play(self):
     if not self.clock.running: self.clock.run()
-
   def pause(self):
     if self.clock.running: self.clock.stop()
-
   def seek(self, frame):
     self.clock.seek(frame)
 # -----------  FRAME JUMPING ----
   def nextFrame(self):
     """jump one frame into the future"""
     self.seek(self.clock.frame + 1)
-
   def prevFrame(self):
     """jump one frame into the past"""
     self.seek(self.clock.frame - 1)
-
   def jumpToNextUncategorisedFixation(self):
     frame = self.eye_movement.nextNotCategorisedIndex(self.clock.frame)
     self.seek(frame)
-  
   def nextFixation(self):
     '''jump to next fixation'''
     frame = self.eye_movement.nextFixationFrame(self.clock.frame, self.categorising_eye_is_left)
     self.seek(frame)
-
   def prevFixation(self):
     '''jump to prev fixation'''
     frame = self.eye_movement.prevFixationFrame(self.clock.frame, self.categorising_eye_is_left)
@@ -250,8 +257,6 @@ class Controller(Savable):
     return self.video_reader.frame_count
   def getVideoFrameRate(self):
     return self.video_reader.fps
-  def getFix(self):
-    return self.eye_movement.fixations(None)
 
 if __name__ == '__main__':
   from multiprocessing import Process, Value

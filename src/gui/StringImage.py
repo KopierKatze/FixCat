@@ -1,9 +1,9 @@
 import wx
 
-class StringImage(wx.Panel):
+class StringImage(wx.Window):
     def __init__(self, parent, id):
-        wx.Panel.__init__(self, parent, id)
-        
+        wx.Window.__init__(self, parent, id)
+
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self._PrepareImage)
 

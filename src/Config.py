@@ -16,6 +16,8 @@ categories_and_attributes = {
     ['play/pause', 'prev_frame', 'next_frame', 'next_fixation', 'prev_fixation', 'faster', 'slower'],
   'cursors':
     ['blink', 'fixated', 'saccade'],
+  'general':
+    ['autosave_minutes'],
 }
 
 class Config(object):
@@ -101,11 +103,24 @@ class Config(object):
 	return None
       # if none of the above found the correct key not valid
       raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
-    if category == 'cursors':
+    elif category == 'cursors':
       try:
-	cv.LoadImage(self.raw[category][attr])
+	return cv.LoadImage(self.raw[category][attr])
       except IOError, e:
 	raise ConfigError('Konnte Cursor fuer %s nicht oeffnen (%s) (Pfad: %s).' % (attr, e.message, self.raw[category][attr]))
+    elif category == 'general':
+      if attr == 'autosave_minutes':
+	if self.raw[category][attr] is None:
+	  return None
+	else:
+	  try:
+	    val = float(self.raw[category][attr])
+	    if val == 0:
+	      return None
+	    else:
+	      return val
+	  except TypeError:
+	    raise ConfigError('Die Angabe der Zeit zwischen dem automatischem Speichern muss entweder 0 o. null sein (deaktiviert) oder eine Zahl, nicht %s' % self.raw[category][attr])
     else:
       return self.raw[category][attr]
 
@@ -131,6 +146,9 @@ default_config_raw = {
     'fixated': 'standard_cursors/fixation.png',
     'saccade': 'standard_cursors/saccade.png',
   },
+'general': {
+    'autosave_minutes' : 5,
+  }
 }
 default_config = json.dumps(default_config_raw, indent=4)
 

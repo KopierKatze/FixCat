@@ -33,10 +33,30 @@ class MainFrame(wx.Frame):
 
         self.config = Config()
 
+        self.save_file = None
+        asm = self.config.get('general', 'autosave_minutes')
+        if asm is None:
+	  self.autosave_timer = wx.CallLater(10, lambda: None)
+	  self.autosave_timer.Restart = lambda: None
+	else:
+	  self.autosave_timer = wx.CallLater(asm*60*1000, self.autosave)
+	  # activated on project load
+	  self.autosave_timer.Stop()
+
+    def autosave(self):
+        if self.save_file is None:
+	    d = wx.MessageDialog(self, "Hi, ich wuerde jetzt das aktuelle Projekt speichern. Kann das aber nicht tun, weil es noch nicht gepspeichert wurde. Soll es jetzt gepspeichert werden? (Ich werde nicht wieder damit nerven)", style=wx.YES_NO)
+	    if d.ShowModal() == wx.ID_YES:
+	      self.OnSave()
+	    d.Destroy()
+	else:
+	    self.statusBar.SetFields(['Automatisches Speichern...'])
+	    self.controller.save_project(self.save_file)
+	    self.autosave_timer.Restart()
+	    self.statusBar.SetFields([''])
+
     def InitMenu(self):
         # menubar elements
-        statusBar = self.CreateStatusBar()
-
         fileMenu = wx.Menu()
         menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Oeffnen")
         menuAbout = fileMenu.Append(wx.ID_ABOUT, "About", "Ueber pyPsy")
@@ -68,30 +88,30 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnEditCategory, categoryEdit)
 
 
-    def InitUIVideoControlls(self):
-        self.videocontrollspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
-        self.slider1 = wx.Slider(self.videocontrollspanel, wx.ID_ANY, 0, 0, 1000)
+    def InitUIControlls(self):
+        self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
+        self.slider1 = wx.Slider(self.controllspanel, wx.ID_ANY, 0, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
-        pause = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Pause")
+        pause = wx.Button(self.controllspanel, wx.ID_ANY, "Pause")
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
-        play  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Play")
+        play  = wx.Button(self.controllspanel, wx.ID_ANY, "Play")
         self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
-        next  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Next F")
+        next  = wx.Button(self.controllspanel, wx.ID_ANY, "Next F")
         self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
-        prev  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "Prev F")
+        prev  = wx.Button(self.controllspanel, wx.ID_ANY, "Prev F")
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
-        slower  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "90%")
+        slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
         self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
-        normal  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "100%")
+        normal  = wx.Button(self.controllspanel, wx.ID_ANY, "100%")
         self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
-        faster  = wx.Button(self.videocontrollspanel, wx.ID_ANY, "110%")
+        faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
         self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
 
-        self.left_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "linkes Auge")
+        self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "linkes Auge")
         self.Bind(wx.EVT_CHECKBOX, self.OnLeftEyeCheckbox, self.left_eye)
-        self.right_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "rechtes Auge")
+        self.right_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "rechtes Auge")
         self.Bind(wx.EVT_CHECKBOX, self.OnRightEyeCheckbox, self.right_eye)
-        self.mean_eye = wx.CheckBox(self.videocontrollspanel, wx.ID_ANY, "gemittelt")
+        self.mean_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "gemittelt")
         self.Bind(wx.EVT_CHECKBOX, self.OnMeanEyeCheckbox, self.mean_eye)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -113,7 +133,7 @@ class MainFrame(wx.Frame):
 
         vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
         vbox.Add(hbox2, 1, wx.EXPAND)
-        self.videocontrollspanel.SetSizer(vbox)
+        self.controllspanel.SetSizer(vbox)
 
     def seek(self, frame):
       self.controller.seek(frame)
@@ -121,69 +141,35 @@ class MainFrame(wx.Frame):
 
     def InitUI(self):
         self.InitMenu()
+        self.statusBar = self.CreateStatusBar()
 
-        # why do we need this? - correct colors in windows 7
+        # correct colors in windows 7
         self.mainpanel = wx.Panel(self, wx.ID_ANY)
 
         # this sizer will locate the widgets
-        contentsizer = wx.BoxSizer(wx.HORIZONTAL)
+        contentsizer = wx.BoxSizer(wx.VERTICAL)
         self.mainpanel.SetSizer(contentsizer)
 
-        # left side: videoimage and video controlls
-        leftsidesizer = wx.BoxSizer(wx.VERTICAL)
-        self.videoimage = StringImage(self.mainpanel, wx.ID_ANY)
-        leftsidesizer.Add(self.videoimage, 1, flag=wx.EXPAND)
-        self.InitUIVideoControlls()
-        leftsidesizer.Add(self.videocontrollspanel, flag=wx.EXPAND | wx.TOP, border=5)
+        # upper side: video image and categorylist
+        uppersizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # add left side to main (horizontal) sizer
-        contentsizer.Add(leftsidesizer, 4, flag=wx.EXPAND)
+        self.videoimage = StringImage(self.mainpanel, wx.ID_ANY)
+        self.category_list = CategoryList(self.mainpanel, wx.ID_ANY, self.seek)
+
+        uppersizer.Add(self.videoimage, 1, flag=wx.RIGHT|wx.EXPAND, border=5)
+        uppersizer.Add(self.category_list, 0, flag=wx.ALIGN_RIGHT|wx.EXPAND)
+
+        contentsizer.Add(uppersizer, 1, flag=wx.EXPAND)
+
+        # lower side: controlls
+        self.InitUIControlls()
+        contentsizer.Add(self.controllspanel, 0, flag=wx.EXPAND|wx.TOP|wx.ALIGN_BOTTOM, border=5)
 
         # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
         # catching key events is a lot more complicated. they are not propagated to parent classes...
         # so we have to get them from the app itself
         wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnKeyPressed)
-
-        # ------ right side of application --------------
-        # ------ categorisation table etc. --------------
-        rightsidesizer = wx.BoxSizer(wx.VERTICAL)
-
-        self.category_list = CategoryList(self.mainpanel, wx.ID_ANY, self.seek)
-        rightsidesizer.Add(self.category_list, flag=wx.EXPAND)
-
-        contentsizer.Add(rightsidesizer, 1)
-        
-        ##sizer boxes for panels
-        #mainbox = wx.BoxSizer(wx.HORIZONTAL)
-        
-        ## ------------------------------ setting size of main window
-        
-        #mainbox.Add(sizer,4, flag=wx.EXPAND)
-        #mainbox.Add(catbox,2,flag=wx.EXPAND)
-
-
-        
-        ## ------------------------------------------------ new category ctrl  
-        #self.categorylist = list(["Tisch", "Monitor", "Maus", "Tastatur"])
-         
-        #catbox = wx.BoxSizer(wx.VERTICAL)
-        #vbox1 = wx.BoxSizer(wx.VERTICAL)
-        #vbox2 = wx.BoxSizer(wx.VERTICAL)
-        #vbox3 = wx.GridSizer(8,2,0,0)
-        #pnl1 = wx.Panel(self.mainpanel, -1)
-        #self.lc = wx.ListCtrl(self.mainpanel, -1, style=wx.LC_REPORT)
-        #self.lc.InsertColumn(0, 'Kategorie')
-        #self.lc.InsertColumn(1, 'Shortcut')
-        #self.lc.SetColumnWidth(0, 150)
-        #self.lc.SetColumnWidth(1, 100)
-        #vbox1.Add(pnl1, 1, wx.EXPAND | wx.ALL, 3)
-        #vbox2.Add(self.lc, 1, wx.EXPAND | wx.ALL, 3)
-        #pnl1.SetSizer(vbox3)
-        #vbox3.Add(wx.Button(pnl1, 12, 'naechste Kategorie'), 0, wx.ALIGN_CENTER| wx.TOP, 15)
-        
-        #catbox.Add(vbox2, 1, wx.EXPAND)
-        #catbox.Add(vbox1, 1, wx.EXPAND)
 
     def setEyeCheckboxStates(self):
       left, right, mean = self.controller.getEyeStatus()
@@ -202,11 +188,12 @@ class MainFrame(wx.Frame):
 
     def newProject(self, video_filepath, eyemovement_filepath, categorise_frames):
       self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames)
+      self.save_file = None
       self._loadProjectInfo()
-
 
     def loadProject(self, filepath):
       self.controller.load_project(filepath)
+      self.save_file = filepath
       self._loadProjectInfo()
 
     def _loadProjectInfo(self):
@@ -218,6 +205,9 @@ class MainFrame(wx.Frame):
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
       self.category_list.FillInCategorisations(self.controller.getCategorisations())
       self.loadImage()
+
+      # start autosave timer
+      self.autosave_timer.Restart()
 
     def controllerIO(self):
       if self.controller is None: return False
@@ -372,13 +362,15 @@ class MainFrame(wx.Frame):
     def OnEditCategory(self, e):
         CategoryDialog(self, wx.ID_ANY, self.controller).ShowModal()
 
-    def OnSave(self, event):
+    def OnSave(self, event=None):
       file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
 	  path += ".pyps"
 	self.controller.save_project(path)
+	self.save_file = path
+	self.autosave_timer.Restart()
 
     def OnExport(self, event):
       file_dialog = wx.FileDialog(self, "Video exportieren", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI Datei (*.avi)|*.avi")
@@ -402,7 +394,7 @@ class MainFrame(wx.Frame):
 	self.autoreload = False
 	progress_dialog.Destroy()
 
-        
+
 if __name__ == '__main__':
   
     app = wx.App()
