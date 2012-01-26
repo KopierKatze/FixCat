@@ -1,14 +1,16 @@
 import wx
+from EditCategoryDialog import EditCategoryDialog
     
-class CategoryFrame(wx.Frame):
+class CategoryDialog(wx.Dialog):
     def __init__(self, parent, id, controller, title='Kategorie Uebersicht'):
         infotext = "In diesem Fenster koennen die Kategorien editiert werden. \nKategorie in der Tabelle aswaehlen und auf Editieren klicken. \nIn dem neuen Dialog koennen dann die Parameter der Kategorie \n- Buchstabe und Name - geaendert werden.\n Mit Hilfe des Buchstabes wird Tastenkombination fuer die Kategorie festgelegt."
-        wx.Frame.__init__(self, parent, id, title, size=(600,600))
+        wx.Dialog.__init__(self, parent, id, title, size=(600,600))
         self.Center()
         # get dict from controler
-        categories = parent.controller.getCategoryContainer().categories
+        categories = parent.controller.getCategories()
         self.category = None
-        self.shortcut = None         
+        self.shortcut = None  
+        self.parent = parent
         mainbox  = wx.BoxSizer(wx.VERTICAL)
         tablebox = wx.BoxSizer(wx.HORIZONTAL)
         textbox = wx.BoxSizer(wx.VERTICAL)
@@ -21,14 +23,16 @@ class CategoryFrame(wx.Frame):
         self.lc.SetColumnWidth(0, 100)
         self.lc.SetColumnWidth(1, 80)
         # ---------------------------------- fill category table
-        #num_items = self.lc.GetItemCount()
-        for category, shortcut in categories: #.iteritems():
+        num_items = self.lc.GetItemCount()
+        for shortcut, category in categories.iteritems(): #.iteritems():
             num_items = self.lc.GetItemCount()
             self.category = category
-            self.shortcut = shortcut
+            print self.category
+            self.shortcut = str(shortcut)
+            print self.shortcut
             self.lc.InsertStringItem(num_items, self.category)
             self.lc.SetStringItem(num_items, 1, self.shortcut)
-        # -----------------------------------
+        # -----------------------------------	
         
         tablebox.Add(self.lc, 4, wx.EXPAND)
         tablebox.Add(wx.Button(self, 1, 'Bearbeiten'), 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER)
@@ -48,19 +52,15 @@ class CategoryFrame(wx.Frame):
        self.Close()
        
     def OnEdit(self, event):
-        index = self.lc.GetFocusedItem()
-        cat = self.lc.GetItem(index, 0).GetText()
-        short = self.lc.GetItem(index, 1).GetText()
-        dlg = wx.TextEntryDialog(self, 'Shortcut fuer Kategorie ' + cat + ' aendern', 
-            'Kategorie editieren')
-        
-        if dlg.ShowModal() == wx.ID_OK:
-            new_shortc = dlg.GetValue()
-            self.lc.SetStringItem(index, 1, new_shortc)
-        dlg.Destroy()
-        
-    def OnCloseWindow(self, event):
-         self.Destroy()
+      index = self.lc.GetFocusedItem()
+      cat = self.lc.GetItem(index, 0).GetText()
+      short = self.lc.GetItem(index, 1).GetText()
+      print cat
+      edit_dlg = EditCategoryDialog(self, cat, short)
+      edit_dlg.ShowModal()
+	
+    #def OnCloseWindow(self, event):
+         #self.Destroy()
 
 if __name__ == "__main__":       
     class MyApp(wx.App):
