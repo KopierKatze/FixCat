@@ -6,6 +6,7 @@ from gui.OpenDialog import OpenDialog
 from Config import Config
 
 import wx
+import threading # used for video export
 
 class MainFrame(wx.Frame):
     def __init__(self, video_str, current_frame, controller):
@@ -21,6 +22,8 @@ class MainFrame(wx.Frame):
 
         self.video_str = video_str
         self.current_frame = current_frame
+
+        self.frames_total = 0 # used for video export progress bar
 
         self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
         self.reloadTimer.Stop()
@@ -209,6 +212,7 @@ class MainFrame(wx.Frame):
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
       self.slider1.SetMax(self.controller.getVideoFrameCount())
+      self.frames_total = self.controller.getVideoFrameCount()
       self.setEyeCheckboxStates()
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
       self.category_list.FillInCategorisations(self.controller.getCategorisations())
@@ -381,10 +385,21 @@ class MainFrame(wx.Frame):
 	path = file_dialog.GetPath()
 	if not "." in path:
 	  path += ".avi"
+
+	progress_dialog = wx.ProgressDialog('Video Export', 'Exportiere Video...', parent=self, maximum=self.frames_total,
+	  style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
+	# show progress by displaying the current frame
 	self.autoreload = True
 	self.loadImage()
-	self.controller.exportVideo(path)
+	waiting_thread = threading.Thread()
+	waiting_thread.run = lambda: self.controller.exportVideo(path)
+	waiting_thread.start()
+	while waiting_thread.isAlive():
+	  wx.MilliSleep(500)
+	  progress_dialog.Update(self.current_frame.value)
+	# stop reloading frame
 	self.autoreload = False
+	progress_dialog.Destroy()
 
         
 if __name__ == '__main__':
