@@ -105,6 +105,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
         faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
         self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
+        next_uncategorised = wx.Button(self.controllspanel, wx.ID_ANY, "Naechstest unkatigorisierte")
+        self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
 
         self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "linkes Auge")
         self.Bind(wx.EVT_CHECKBOX, self.OnLeftEyeCheckbox, self.left_eye)
@@ -126,6 +128,7 @@ class MainFrame(wx.Frame):
         hbox2.Add(self.right_eye)
         hbox2.Add(self.mean_eye)
         hbox2.Add((150, wx.ID_ANY), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
+        hbox2.Add(next_uncategorised)
         hbox2.Add(slower)
         hbox2.Add(normal)
         hbox2.Add(faster)
@@ -314,12 +317,16 @@ class MainFrame(wx.Frame):
       if not self.controllerIO(): return event
 
       self.controller.fasterPlayback()
-      
+
     def OnSliderScroll(self, event):
       """ check whether contoller is ready"""
       if not self.controllerIO(): return event
 
       self.seek(self.slider1.GetValue())
+
+    def OnNextUncategorisedObject(self,event):
+      self.controller.jumpToNextUncategorisedObject()
+      self.loadImage()
 
     # ---------------- PLAYBACK CONTROLL END ----------
     # ---------------- SHOWING EYE STATUS CONTROLLS ---

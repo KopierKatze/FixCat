@@ -76,13 +76,10 @@ class CategoryContainer(Savable):
     return d
 
   def nextNotCategorisedIndex(self, current_frame):
-    i = 0
-    while self.start_end_frames[i][0] < current_frame:
-      i += 1
-
-    while i < len(self.start_end_frames):
-      if self.categorisations[self.start_end_frames[i]] == None:
-	return self.start_end_frames[i][0]
+    for start_frame, end_frame in self.start_end_frames:
+      if start_frame > current_frame:
+	if self.categorisations[(start_frame, end_frame)] == None:
+	  return start_frame
     return None
 
 class CategoryContainerError(Exception):

@@ -228,8 +228,8 @@ class Controller(Savable):
   def prevFrame(self):
     """jump one frame into the past"""
     self.seek(self.clock.frame - 1)
-  def jumpToNextUncategorisedFixation(self):
-    frame = self.eye_movement.nextNotCategorisedIndex(self.clock.frame)
+  def jumpToNextUncategorisedObject(self):
+    frame = self.category_container.nextNotCategorisedIndex(self.clock.frame)
     self.seek(frame)
   def nextFixation(self):
     '''jump to next fixation'''
