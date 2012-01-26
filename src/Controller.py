@@ -139,7 +139,10 @@ class Controller(Savable):
 
   def exportCategorisations(self, filepath):
     self.category_container.export(filepath)
-
+  
+  def getCategories(self):
+    return self.category_container.categories
+  
   def overlayedFrame(self, frame, left, right, mean):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
