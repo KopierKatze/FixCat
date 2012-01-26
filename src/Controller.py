@@ -35,15 +35,15 @@ class Controller(Savable):
   def leftEyeStatus(self, show):
     self.show_eyes[0] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def rightEyeStatus(self, show):
     self.show_eyes[1] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def meanEyeStatus(self, show):
     self.show_eyes[2] = bool(show)
     # reproduce the current image to show or exclude this eye
-    self._tick(self.clock.frame)
+    self.produceCurrentImage()
   def getEyeStatus(self):
     return self.show_eyes
 
@@ -67,14 +67,14 @@ class Controller(Savable):
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
     """
     self.createCursorDict()
-    
+
     self.categorise_frames = categorise_frames
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
     self.clock = Clock(self.video_reader.duration, self.video_reader.fps)
-    self.clock.register(self._tick)
-    
+    self.clock.register(self._clock_tick)
+
     if self.categorise_frames:
       objects = {}
       for frame in xrange(int(self.video_reader.frame_count)):
@@ -85,6 +85,9 @@ class Controller(Savable):
     self.category_container = CategoryContainer(objects)
 
     self.show_eyes = [False, False, True] # show mean eye
+
+    # seek to zero so we'll have a picture
+    self.produceCurrentImage()
 
   def save_project(self, saved_filepath):
     sc = SaveController()
@@ -110,16 +113,21 @@ class Controller(Savable):
     self.eye_movement = EyeMovement(saved_state=sc.getSavedState('eye_movement'))
     self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
     self.clock = Clock(saved_state=sc.getSavedState('clock'))
-    self.clock.register(self._tick)
+    self.clock.register(self._clock_tick)
     self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
-    self.seek(self.clock.frame)
+    
+    self.produceCurrentImage()
 
   def getState(self):
     return {'show_eyes':self.show_eyes, 'categorise_frames':self.categorise_frames}
 
-  def _tick(self, frame):
+  def _clock_tick(self, frame):
+    self.produceCurrentImage()
+
+  def produceCurrentImage(self):
     """will populate current image to gui.
     have a look at Clock class for more information."""
+    frame = self.clock.frame
     fr = self.overlayedFrame(frame, self.show_eyes[0], self.show_eyes[1], self.show_eyes[2])
     return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
     cv.Copy(fr, return_frame)
@@ -144,10 +152,10 @@ class Controller(Savable):
 
   def exportCategorisations(self, filepath):
     self.category_container.export(filepath)
-  
+
   def getCategories(self):
     return self.category_container.categories
-  
+
   def overlayedFrame(self, frame, left, right, mean):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
