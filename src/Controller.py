@@ -1,6 +1,5 @@
 from CategoryContainer import CategoryContainer, CategoryContainerError
 from Clock import Clock
-from Cursor import Cursor
 from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
@@ -19,7 +18,7 @@ class Controller(Savable):
     self.video_reader = None
     self.eye_movement = None
     self.clock = None
-    self.cursor = None
+    self.cursors = []
     self.category_container = None
     self.categorise_frames = False
     self.video_image = None
@@ -54,14 +53,20 @@ class Controller(Savable):
     return bool(self.video_reader) and \
 	   bool(self.eye_movement) and \
 	   bool(self.clock) and \
-	   bool(self.cursor) and \
+	   bool(self.cursors) and \
 	   bool(self.category_container)
+
+  def createCursorDict(self):
+    self.cursors = {None:None,
+		    'fixated':self.config.get('cursors','fixated'),
+		    'saccade':self.config.get('cursors','saccade'),
+		    'blink':self.config.get('cursors','blink')}
 
   def new_project(self, video_file, eye_movement_file, categorise_frames=False):
     """create a new project.
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
     """
-    self.cursor = Cursor()
+    self.createCursorDict()
     
     self.categorise_frames = categorise_frames
     self.eye_movement = EyeMovement(eye_movement_file)
@@ -97,7 +102,7 @@ class Controller(Savable):
 
     sc.loadFromFile(saved_filepath)
 
-    self.cursor = Cursor()
+    self.createCursorDict()
     controller_state = sc.getSavedState('controller')
     self.show_eyes = controller_state['show_eyes']
     self.categorise_frames = controller_state['categorise_frames']
@@ -145,11 +150,11 @@ class Controller(Savable):
     image = self.video_reader.frame(frame)
     # add cursors as neede
     if left:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusLeftEyeAt(frame)), self.eye_movement.leftLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusLeftEyeAt(frame)], self.eye_movement.leftLookAt(frame))
     if right:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.statusRightEyeAt(frame)), self.eye_movement.rightLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusRightEyeAt(frame)], self.eye_movement.rightLookAt(frame))
     if mean:
-      self._addCursorToImage(image, self.cursor.cursorFor(self.eye_movement.meanStatusAt(frame)), self.eye_movement.meanLookAt(frame))
+      self._addCursorToImage(image, self.cursors[self.eye_movement.meanStatusAt(frame)], self.eye_movement.meanLookAt(frame))
 
     return image
 

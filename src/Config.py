@@ -105,7 +105,7 @@ class Config(object):
       raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
     elif category == 'cursors':
       try:
-	cv.LoadImage(self.raw[category][attr])
+	return cv.LoadImage(self.raw[category][attr])
       except IOError, e:
 	raise ConfigError('Konnte Cursor fuer %s nicht oeffnen (%s) (Pfad: %s).' % (attr, e.message, self.raw[category][attr]))
     elif category == 'general':
