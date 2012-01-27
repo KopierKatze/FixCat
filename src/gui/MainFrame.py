@@ -65,7 +65,7 @@ class MainFrame(wx.Frame):
         menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Schliessen")
 
         categoryMenu = wx.Menu()
-        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Category", "Kategorie editieren")
+        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Kategorie", "Kategorie editieren")
 
         tempMenu = wx.Menu()
         exportVideo = tempMenu.Append(wx.ID_ANY, "Video Menu", "Video Exportieren")
@@ -75,7 +75,7 @@ class MainFrame(wx.Frame):
 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
-        menuBar.Append(categoryMenu, "Category")
+        menuBar.Append(categoryMenu, "Kategorie")
         menuBar.Append(tempMenu, "Video Exportieren")
         self.SetMenuBar(menuBar)
 
@@ -85,6 +85,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnSave, menuSave)
         self.Bind(wx.EVT_MENU, self.OnExport, exportVideo)
         self.Bind(wx.EVT_MENU, self.OnCategoryExport, category_export)
+        self.Bind(wx.EVT_MENU, self.OnEditCategory, categoryEdit)
 
 
     def InitUIControlls(self):
@@ -366,7 +367,7 @@ class MainFrame(wx.Frame):
       open_dialog.Show()
 
     def OnEditCategory(self, e):
-        CategoryFrame(self, wx.ID_ANY, self.controller).Show()
+        CategoryDialog(self, wx.ID_ANY, self.controller).ShowModal()
 
     def OnSave(self, event=None):
       file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
