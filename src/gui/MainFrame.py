@@ -1,4 +1,4 @@
-from gui.CategoryFrame import CategoryFrame
+from gui.CategoryDialog import CategoryDialog
 from gui.StringImage import StringImage
 from gui.CategoryList import CategoryList
 from gui.OpenDialog import OpenDialog
