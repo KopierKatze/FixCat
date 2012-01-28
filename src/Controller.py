@@ -155,7 +155,13 @@ class Controller(Savable):
 
   def getCategories(self):
     return self.category_container.categories
-
+    
+  def editCategory(self, old_shortcut, new_shortcut, category_name):
+    self.category_container.editCategory(old_shortcut, new_shortcut, category_name)
+  
+  def getCategoryContainer(self):
+    return self.category_container
+    
   def overlayedFrame(self, frame, left, right, mean):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
