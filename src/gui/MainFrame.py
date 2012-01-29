@@ -31,6 +31,8 @@ class MainFrame(wx.Frame):
 
         self.playing = False
 
+        self.loopthrough_categorykey = None
+
         self.config = Config()
 
         self.save_file = None
@@ -270,18 +272,24 @@ class MainFrame(wx.Frame):
 	  self.OnPlay()
       else:
 	# try to categorise the current frame to the category which may belong tho key_code
-	return_info = self.controller.categorise(key_code)
-        if return_info:
-	  index, category = return_info
-	  self.category_list.Update(index, category)
-	  # load Image so category_list will jump to categorised frame
-	  self.category_list.MarkFrame(self.current_frame.value)
+	self.categorise(key_code)
+
+
+    def categorise(self, key_code, overwrite=True):
+      if key_code is None: return
+      if not overwrite and not self.controller.getCategoryOfFrame(self.current_frame.value) is None: return
+      return_info = self.controller.categorise(key_code)
+      if return_info:
+	index, category = return_info
+	self.category_list.Update(index, category)
+	# load Image so category_list will jump to categorised frame
+	self.category_list.MarkFrame(self.current_frame.value)
+	
+	self.loopthrough_categorykey = key_code
 
     # ---------------- PLAYBACK CONTROLL --------------
-    
     def OnPlay(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
+      self.loopthrough_categorykey = None
 
       self.playing = True
       self.controller.play()
@@ -289,8 +297,7 @@ class MainFrame(wx.Frame):
       self.loadImage()
 
     def OnPause(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
+      self.loopthrough_categorykey = None
 
       self.playing = False
       self.controller.pause()
@@ -298,58 +305,42 @@ class MainFrame(wx.Frame):
       self.loadImage()
 
     def OnNextFrame(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.nextFrame()
       self.loadImage()
+      self.categorise(self.loopthrough_categorykey, False)
 
     def OnPrevFrame(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.prevFrame()
       self.loadImage()
+      self.categorise(self.loopthrough_categorykey, False)
 
     def OnNextFixation(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.nextFixation()
       self.loadImage()
+      self.categorise(self.loopthrough_categorykey, False)
 
     def OnPrevFixation(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.prevFixation()
       self.loadImage()
+      self.categorise(self.loopthrough_categorykey, False)
 
     def OnSlower(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.slowerPlayback()
 
     def OnNormal(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.normalPlayback()
 
     def OnFaster(self, event=None):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
-
       self.controller.fasterPlayback()
 
     def OnSliderScroll(self, event):
-      """ check whether contoller is ready"""
-      if not self.controllerIO(): return event
+      self.loopthrough_categorykey = None
 
       self.seek(self.slider1.GetValue())
 
     def OnNextUncategorisedObject(self,event):
+      self.loopthrough_categorykey = None
+
       self.controller.jumpToNextUncategorisedObject()
       self.loadImage()
 

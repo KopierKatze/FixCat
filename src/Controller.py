@@ -166,6 +166,9 @@ class Controller(Savable):
   def importCategories(self, filepath):
     self.category_container.importCategories(filepath)
 
+  def getCategoryOfFrame(self, frame):
+    return self.category_container.getCategoryOfFrame(frame)
+
   def overlayedFrame(self, frame, left, right, mean):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
