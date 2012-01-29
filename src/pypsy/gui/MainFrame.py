@@ -1,9 +1,9 @@
-from gui.CategoryDialog import CategoryDialog
-from gui.StringImage import StringImage
-from gui.CategoryList import CategoryList
-from gui.OpenDialog import OpenDialog
+from CategoryDialog import CategoryDialog
+from StringImage import StringImage
+from CategoryList import CategoryList
+from OpenDialog import OpenDialog
 
-from Config import Config
+from pypsy.Config import Config
 
 import wx
 import threading # used for video export

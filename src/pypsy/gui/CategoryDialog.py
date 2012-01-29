@@ -1,6 +1,6 @@
 import wx
 from EditCategoryDialog import EditCategoryDialog
-from Helper import KeyCodeToHumanReadable
+from pypsy.Helper import KeyCodeToHumanReadable
 
 class CategoryDialog(wx.Dialog):
     def __init__(self, parent, id, title='Kategorie Uebersicht'):
@@ -41,10 +41,10 @@ class CategoryDialog(wx.Dialog):
 
       btnbox.Add(wx.Button(self, 3, 'Neu'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
-      
+
       btnbox.Add(wx.Button(self, 4, 'Loeschen'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
-      
+
       btnbox.Add(wx.Button(self, 5, 'Import'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnImport, id=5)
 

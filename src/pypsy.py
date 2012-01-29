@@ -6,10 +6,10 @@ from multiprocessing.managers import SyncManager
 
 import wx
 
-from Controller import Controller
-from gui.MainFrame import MainFrame
+from pypsy.Controller import Controller
+from pypsy.gui.MainFrame import MainFrame
 
-import Config
+from pypsy import Config
 
 
 myController = None

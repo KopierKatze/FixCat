@@ -1,6 +1,6 @@
 import wx
 
-from Helper import KeyCodeToHumanReadable
+from pypsy.Helper import KeyCodeToHumanReadable
 
 class EditCategoryDialog(wx.Dialog):
   def __init__(self, parent, editCategoryFunction, category_name='', category_shortcut=None):
