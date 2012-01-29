@@ -43,6 +43,8 @@ class MainFrame(wx.Frame):
 	  # activated on project load
 	  self.autosave_timer.Stop()
 
+	self.OnOpen()
+
     def autosave(self):
         if self.save_file is None:
 	    d = wx.MessageDialog(self, "Hi, ich wuerde jetzt das aktuelle Projekt speichern. Kann das aber nicht tun, weil es noch nicht gepspeichert wurde. Soll es jetzt gepspeichert werden? (Ich werde nicht wieder damit nerven)", style=wx.YES_NO)
@@ -189,8 +191,8 @@ class MainFrame(wx.Frame):
       if self.autoreload:
 	self.reloadTimer.Restart()
 
-    def newProject(self, video_filepath, eyemovement_filepath, categorise_frames):
-      self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames)
+    def newProject(self, video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left):
+      self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left)
       self.save_file = None
       self._loadProjectInfo()
 
@@ -362,9 +364,9 @@ class MainFrame(wx.Frame):
         #wx.CallAfter(self.controller.pause ()) doesn't work
         self.Close(True)
 
-    def OnOpen(self, event):
+    def OnOpen(self, event=None):
       open_dialog = OpenDialog(self)
-      open_dialog.Show()
+      open_dialog.ShowModal()
 
     def OnEditCategory(self, e):
         CategoryDialog(self, wx.ID_ANY, self.controller).ShowModal()

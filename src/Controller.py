@@ -62,13 +62,14 @@ class Controller(Savable):
 		    'saccade':self.config.get('cursors','saccade'),
 		    'blink':self.config.get('cursors','blink')}
 
-  def new_project(self, video_file, eye_movement_file, categorise_frames=False):
+  def new_project(self, video_file, eye_movement_file, categorise_frames=False, categorising_eye_is_left=None):
     """create a new project.
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
     """
     self.createCursorDict()
 
     self.categorise_frames = categorise_frames
+    self.categorising_eye_is_left = categorising_eye_is_left
     self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
 
