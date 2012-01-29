@@ -45,6 +45,8 @@ class MainFrame(wx.Frame):
 
 	self.OnOpen()
 
+	self.ActivateMouseAndKeyCatching()
+
     def autosave(self):
         if self.save_file is None:
 	    d = wx.MessageDialog(self, "Hi, ich wuerde jetzt das aktuelle Projekt speichern. Kann das aber nicht tun, weil es noch nicht gepspeichert wurde. Soll es jetzt gepspeichert werden? (Ich werde nicht wieder damit nerven)", style=wx.YES_NO)
@@ -170,11 +172,19 @@ class MainFrame(wx.Frame):
         self.InitUIControlls()
         contentsizer.Add(self.controllspanel, 0, flag=wx.EXPAND|wx.TOP|wx.ALIGN_BOTTOM, border=5)
 
+    def ActivateMouseAndKeyCatching(self):
         # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
         # catching key events is a lot more complicated. they are not propagated to parent classes...
         # so we have to get them from the app itself
         wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnKeyPressed)
+
+    def DeactivateMouseAndKeyCatching(self):
+        # ------ global mouse and key events ------------
+        self.Bind(wx.EVT_MOUSEWHEEL, None)
+        # catching key events is a lot more complicated. they are not propagated to parent classes...
+        # so we have to get them from the app itself
+        wx.GetApp().Bind(wx.EVT_KEY_DOWN, None)
 
     def setEyeCheckboxStates(self):
       left, right, mean = self.controller.getEyeStatus()
@@ -208,11 +218,23 @@ class MainFrame(wx.Frame):
       self.frames_total = self.controller.getVideoFrameCount()
       self.setEyeCheckboxStates()
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
-      self.category_list.FillInCategorisations(self.controller.getCategorisations())
+      self.loadCategorisationInToList()
       self.loadImage()
 
       # start autosave timer
       self.autosave_timer.Restart()
+
+    def loadCategorisationInToList(self):
+      self.category_list.FillInCategorisations(self.controller.getCategorisations())
+
+    def getCategories(self):
+      return self.controller.getCategories()
+
+    def editCategory(self, old_shortcut, new_shortcut, category_name):
+      return self.controller.editCategory(old_shortcut, new_shortcut, category_name)
+
+    def importCategories(self, filepath):
+      self.controller.importCategories(filepath)
 
     def controllerIO(self):
       if self.controller is None: return False
@@ -369,7 +391,7 @@ class MainFrame(wx.Frame):
       open_dialog.ShowModal()
 
     def OnEditCategory(self, e):
-        CategoryDialog(self, wx.ID_ANY, self.controller).ShowModal()
+        CategoryDialog(self, wx.ID_ANY).ShowModal()
 
     def OnSave(self, event=None):
       file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")

@@ -1,4 +1,4 @@
-from Savable import Savable
+from Savable import Savable, SaveController
 
 class CategoryContainer(Savable):
   def __init__(self, indices=None, saved_state={}):
@@ -22,7 +22,7 @@ class CategoryContainer(Savable):
 	self.categorisations[index] = None
 
     # keyboard shortcut to category name
-    self.categories = saved_state.get('categories', {68:'hello world'})
+    self.categories = saved_state.get('categories', {})
 
   def getState(self):
     return {'categories':self.categories, 'categorisations':self.categorisations, 'indices':self.indices}
@@ -35,21 +35,24 @@ class CategoryContainer(Savable):
       f.write('%s, %s, %s, %s\n' %(start_frame, end_frame, self.indices[(start_frame, end_frame)], self.categories.get(self.categorisations[(start_frame, end_frame)], "-")))
     f.close()
 
+  def importCategories(self, filepath):
+    pass
+
   def editCategory(self, old_shortcut, new_shortcut, category_name):
-    if not new_shortcut is None and new_shortcut in self.categories.keys(): raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
+    if not new_shortcut is None and new_shortcut in self.categories.keys() and new_shortcut != old_shortcut: raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
     if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Fehler: Das zu loeschende Tastenkuerzel ist nicht vorhanden.')
-    if category_name is None or len(category_name) < 1: raise CategoryContainerError('Bitte Namen der Kategorie angeben.')
+    if not new_shortcut is None and (category_name is None or len(category_name) < 1): raise CategoryContainerError('Bitte Namen der Kategorie angeben.')
 
     if not new_shortcut is None:
       self.categories[new_shortcut] = category_name
 
-      if not old_shortcut is None:
+      if new_shortcut != old_shortcut and not old_shortcut is None:
 	# move already categoriesed objects to new shortcut
 	for index in self.categorisations.keys():
 	  if self.categorisations[index] == old_shortcut:
 	    self.categorisations[index] = new_shortcut
 
-    if not old_shortcut is None:
+    if new_shortcut != old_shortcut and not old_shortcut is None:
       del self.categories[old_shortcut]
       for index in self.categorisations.keys():
 	if self.categorisations[index] == old_shortcut:
