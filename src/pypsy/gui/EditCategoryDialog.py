@@ -1,6 +1,7 @@
 import wx
 
 from pypsy.Helper import KeyCodeToHumanReadable
+from pypsy.CategoryContainer import CategoryContainer
 
 class EditCategoryDialog(wx.Dialog):
   def __init__(self, parent, editCategoryFunction, category_name='', category_shortcut=None):
@@ -66,8 +67,12 @@ class EditCategoryDialog(wx.Dialog):
 
   def OnSave(self, event):
     self.category_name = self.category_name_text.GetValue()
-    self.editCategoryFunction(self.old_shortcut, self.new_shortcut, self.category_name)
-    self.Destroy()
+    try:
+      self.editCategoryFunction(self.old_shortcut, self.new_shortcut, self.category_name)
+    except CategoryContainerError, e:
+      pass #TODO error message
+    else:
+      self.Destroy()
 
   def OnCancel(self, event):
       self.Destroy()

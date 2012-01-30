@@ -63,15 +63,14 @@ class CategoryDialog(wx.Dialog):
 
     def OnImport(self, event):
       confirm_dialog = wx.MessageDialog(self, 
-	'Dieser Vorgang ueberschreibt alle bisher eingegebenen Kategorien und Kategoriesierungen! Wirklich fortfahren?',
+	'Dieser Vorgang ueberschreibt alle bisher eingegebenen Kategorien und Kategoriesierungen! Wollen sie wirklich fortfahren?',
 	'Kategorien importieren', wx.OK | wx.CANCEL)
-      
+
       if confirm_dialog.ShowModal() == wx.ID_OK:
 	file_dialog = wx.FileDialog(self, 'Gespeichertes Projekt waehlen', style=wx.FD_OPEN, wildcard='PYPS-Datei (*.pyps)|*.pyps')
 	if file_dialog.ShowModal() == wx.ID_OK:
 	  self.MainFrame.importCategories(file_dialog.GetPath())
-      confirm_dialog.Destroy()
-      
+
     def OnClose(self, event):
       self.MainFrame.loadCategorisationInToList()
       self.Destroy()
