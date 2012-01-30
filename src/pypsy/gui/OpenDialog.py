@@ -1,4 +1,6 @@
 import wx
+from pypsy.VideoReader import ReaderError
+from pypsy.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
   def __init__(self, parent):
@@ -145,8 +147,12 @@ class OpenDialog(wx.Dialog):
     if self.new_save == 'NEW':
       try:
 	self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.frame_categorisation, self.left_eye_categorisation)
-      except:
-	raise
+      except ReaderError as e: 
+	error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Videodatei: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+	error_dlg.ShowModal()
+      except EyeMovementError as e:
+	error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Augendaten: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+	error_dlg.ShowModal()
       else:
 	self.Destroy()
     else:
