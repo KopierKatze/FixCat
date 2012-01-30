@@ -45,7 +45,7 @@ class MainFrame(wx.Frame):
 	  # activated on project load
 	  self.autosave_timer.Stop()
 
-	self.OnOpen()
+	self.OnOpen(bootstrap_phase=True)
 
 	self.ActivateMouseAndKeyCatching()
 
@@ -377,8 +377,8 @@ class MainFrame(wx.Frame):
         #wx.CallAfter(self.controller.pause ()) doesn't work
         self.Close(True)
 
-    def OnOpen(self, event=None):
-      open_dialog = OpenDialog(self)
+    def OnOpen(self, event=None, bootstrap_phase=False):
+      open_dialog = OpenDialog(self, bootstrap_phase)
       open_dialog.ShowModal()
 
     def OnEditCategory(self, e):

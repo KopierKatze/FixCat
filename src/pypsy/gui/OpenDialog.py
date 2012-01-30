@@ -3,8 +3,10 @@ from pypsy.VideoReader import ReaderError
 from pypsy.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
-  def __init__(self, parent):
+  def __init__(self, parent, bootstrap_phase=False):
     wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen")
+
+    self.bootstrap_phase = bootstrap_phase
 
     self.parent = parent
 
@@ -144,24 +146,21 @@ class OpenDialog(wx.Dialog):
       self.saved_filepath = q
 
   def OnLoad(self, event):
-    if self.new_save == 'NEW':
-      try:
-	self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.frame_categorisation, self.left_eye_categorisation)
-      except ReaderError as e: 
-	error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Videodatei: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
-	error_dlg.ShowModal()
-      except EyeMovementError as e:
-	error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Augendaten: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
-	error_dlg.ShowModal()
+    try:
+      if self.new_save == 'NEW':
+        self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.frame_categorisation, self.left_eye_categorisation)
       else:
-	self.Destroy()
+        self.parent.loadProject(self.saved_filepath)
+    except ReaderError as e: 
+      error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Videodatei: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg.ShowModal()
+    except EyeMovementError as e:
+      error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Augendaten: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg.ShowModal()
     else:
-      try:
-	self.parent.loadProject(self.saved_filepath)
-      except:
-	raise
-      else:
-	self.Destroy()
+      self.Destroy()
 
   def OnCancel(self, event):
+    if self.bootstrap_phase:
+      raise SystemExit()
     self.Destroy()

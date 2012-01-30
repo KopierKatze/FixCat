@@ -1,7 +1,4 @@
 #!/usr/bin/python
-
-from cv2 import cv
-
 from multiprocessing import Process, freeze_support
 from multiprocessing.sharedctypes import Array, Value
 from multiprocessing.managers import SyncManager
