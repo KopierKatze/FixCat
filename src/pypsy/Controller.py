@@ -70,8 +70,8 @@ class Controller(Savable):
 
     self.categorise_frames = categorise_frames
     self.categorising_eye_is_left = categorising_eye_is_left
-    self.eye_movement = EyeMovement(eye_movement_file)
     self.video_reader = VideoReader(video_file)
+    self.eye_movement = EyeMovement(eye_movement_file)
 
     self.clock = Clock(self.video_reader.duration, self.video_reader.fps)
     self.clock.register(self._clock_tick)

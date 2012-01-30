@@ -1,5 +1,5 @@
 from Savable import Savable
-
+import os.path
 import re
 
 class EyeMovement(Savable):
@@ -13,8 +13,8 @@ class EyeMovement(Savable):
   frame = r'(MSG\t([0-9]+) VFRAME ([0-9]+) ([a-zA-Z0-9]+.avi))'
   
   def __init__(self, filename=None, saved_state={}):
-    assert filename or saved_state, "No data for EyeMovement provided!"
-    assert filename and not saved_state or saved_state and not filename, "filename and saved_state provided! Don't know which to take."
+    if filename is None and saved_state=={}: raise EyeMovementError("Keine EDF-Datei mit Augendaten ausgewaehlt.")
+    if saved_state and not filename is None: raise ("Es sind bereits Augendaten geladen.")
 
     self._status_left = saved_state.get('left', []) # 'fixated', 'saccade', 'blink' or None; indexed by frame
     self._status_right = saved_state.get('right', []) #  -- " --
@@ -24,6 +24,8 @@ class EyeMovement(Savable):
 
     if filename:
       #checks
+      if not os.path.isfile(filename): raise EyeMovementError("Die angegebene Augenbewegungsdatei existiert nicht")
+      if not os.access(filename, os.R_OK): raise EyeMovementError("Auf die angegebene Augenbewegungsdatei kann nicht zugegriffen werden (keine Leseberechtigung).")
       self._parseFile(filename)
 
   def getState(self):

@@ -2,6 +2,7 @@ from Savable import Savable
 
 from threading import Thread
 from time import sleep, time
+import os.path
 try:
   from cv2 import cv
 except ImportError:
@@ -13,12 +14,15 @@ class VideoReader(Savable):
     def __init__(self, filepath=None, saved_state={}):
         """open the video file at filepath.
         will raise VideoOpenError on failure"""
+        if saved_state=={} and (filepath is None or filepath == ''): raise ReaderError('Es wurde keine Videodatei ausgewaehlt.')
+        if saved_state and not filepath is None: raise ReaderError('Es ist bereits ein Dateiname fuer die Videodatei ausgewaehlt.')
         self.filepath = saved_state.get('filepath', filepath)
-
+	
+	if not os.path.isfile(filepath): raise ReaderError('Die angegebene Videodatei existiert nicht.')
+	if not os.access(filepath, os.R_OK): raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
 	self.reader = cv.CaptureFromFile(self.filepath)
 	# have to check if codec is available!
 	test_frame = cv.QueryFrame(self.reader)
-	print dir(test_frame)
 	if test_frame is None or test_frame.width == 0 or test_frame.height == 0:
 	  raise ReaderError('Konnte Video nicht oeffnen. Codec nicht vorhanden oder Video defekt.')
 	self.frame_count = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_COUNT))
@@ -26,6 +30,7 @@ class VideoReader(Savable):
 	self.duration = self.frame_count * self.fps
 	self.height = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_HEIGHT))
 	self.width = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_WIDTH))
+	
     def getState(self):
       return {'filepath':self.filepath}
 
@@ -39,7 +44,7 @@ class VideoReader(Savable):
 	  cv.Copy(frame, return_frame)
 	  return return_frame
         else:
-          return ReaderError("second should be between")
+          return ReaderError("Die Nummer des Frames muss zwischen 0 und der Gesamtzahl von Frames liegen.")
 
     def releaseReader(self):
         """closes VideoReader after use """
