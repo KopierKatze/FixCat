@@ -46,9 +46,10 @@ class CategoryContainer(Savable):
 
   def editCategory(self, old_shortcut, new_shortcut, category_name):
     if not new_shortcut is None and new_shortcut in self.categories.keys() and new_shortcut != old_shortcut: raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
-    if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Fehler: Das zu loeschende Tastenkuerzel ist nicht vorhanden.')
+    if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Das zu loeschende Tastenkuerzel ist nicht vorhanden.')
     if not new_shortcut is None and (category_name is None or len(category_name) < 1): raise CategoryContainerError('Bitte Namen der Kategorie angeben.')
-
+    if category_name in self.categories.values(): raise CategoryContainerError('Dieser Name fuer eine Kategorie existiert bereits.') 
+    
     if not new_shortcut is None:
       self.categories[new_shortcut] = category_name
 

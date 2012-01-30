@@ -1,7 +1,7 @@
 import wx
 
 from pypsy.Helper import KeyCodeToHumanReadable
-from pypsy.CategoryContainer import CategoryContainer
+from pypsy.CategoryContainer import CategoryContainerError
 
 class EditCategoryDialog(wx.Dialog):
   def __init__(self, parent, editCategoryFunction, category_name='', category_shortcut=None):
@@ -56,6 +56,7 @@ class EditCategoryDialog(wx.Dialog):
     self.Bind(wx.EVT_BUTTON, self.OnCancel, cancel_btn)
 
   def OnNewShortcutSelectionFirstPhase(self, event):
+    self.new_shortcut = None
     self.shortcut_button.SetLabel('...')
     wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnNewShortcutSelectionSecondPhase)
 
@@ -70,7 +71,8 @@ class EditCategoryDialog(wx.Dialog):
     try:
       self.editCategoryFunction(self.old_shortcut, self.new_shortcut, self.category_name)
     except CategoryContainerError, e:
-      pass #TODO error message
+      error_dlg = wx.MessageDialog(self, 'Fehler beim Speichern der Kategorie: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg.ShowModal()
     else:
       self.Destroy()
 
