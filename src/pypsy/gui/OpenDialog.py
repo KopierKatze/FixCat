@@ -4,7 +4,7 @@ from pypsy.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
   def __init__(self, parent, bootstrap_phase=False):
-    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen")
+    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen", size=(430,270))
 
     self.bootstrap_phase = bootstrap_phase
 
@@ -19,6 +19,8 @@ class OpenDialog(wx.Dialog):
     self.saved_filepath = None
 
     self.InitUI()
+
+    self.Center()
 
   def InitUI(self):
     mainpanel = wx.Panel(self, wx.ID_ANY)
@@ -56,6 +58,9 @@ class OpenDialog(wx.Dialog):
     self.saved_button = wx.Button(mainpanel, wx.ID_ANY, "Durchsuchen")
     saved_project_box.Add(self.saved_button, 0)
     mainpanel_sizer.Add(saved_project_box, 0, wx.EXPAND)
+
+    line = wx.StaticLine(mainpanel, wx.ID_ANY, size=(20,-1), style=wx.LI_HORIZONTAL)
+    mainpanel_sizer.Add(line, 0, wx.EXPAND|wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.BOTTOM, 10)
 
     btnsizer = wx.StdDialogButtonSizer()
     load_btn = wx.Button(mainpanel, wx.ID_OK)
