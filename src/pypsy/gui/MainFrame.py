@@ -420,6 +420,7 @@ class MainFrame(wx.Frame):
 	  path += ".pyps"
 	self.controller.save_project(path)
 	self.save_file = path
+        self.needs_save = False
 	self.autosave_timer.Restart()
 
     def OnExport(self, event):
