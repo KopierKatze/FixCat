@@ -14,12 +14,13 @@ class VideoReader(Savable):
     def __init__(self, filepath=None, saved_state={}):
         """open the video file at filepath.
         will raise VideoOpenError on failure"""
+
         if saved_state=={} and (filepath is None or filepath == ''): raise ReaderError('Es wurde keine Videodatei ausgewaehlt.')
         if saved_state and not filepath is None: raise ReaderError('Es ist bereits ein Dateiname fuer die Videodatei ausgewaehlt.')
         self.filepath = saved_state.get('filepath', filepath)
-	
-	if not os.path.isfile(filepath): raise ReaderError('Die angegebene Videodatei existiert nicht.')
-	if not os.access(filepath, os.R_OK): raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
+
+	if not os.path.isfile(self.filepath): raise ReaderError('Die angegebene Videodatei existiert nicht.')
+	if not os.access(self.filepath, os.R_OK): raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
 	self.reader = cv.CaptureFromFile(self.filepath)
 	# have to check if codec is available!
 	test_frame = cv.QueryFrame(self.reader)
