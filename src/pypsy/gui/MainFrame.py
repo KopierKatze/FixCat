@@ -33,6 +33,8 @@ class MainFrame(wx.Frame):
 
         self.loopthrough_categorykey = None
 
+        self.needs_save = False
+
         self.config = Config()
 
         self.save_file = None
@@ -57,7 +59,7 @@ class MainFrame(wx.Frame):
 	    d.Destroy()
 	else:
 	    self.statusBar.SetFields(['Automatisches Speichern...'])
-	    self.controller.save_project(self.save_file)
+	    self.controller.save_project(self.save_file+".autosave")
 	    self.autosave_timer.Restart()
 	    self.statusBar.SetFields([''])
 
@@ -185,6 +187,8 @@ class MainFrame(wx.Frame):
         # lower side: controlls
         self.InitUIControlls()
         contentsizer.Add(self.controllspanel, 0, flag=wx.EXPAND|wx.TOP|wx.ALIGN_BOTTOM, border=5)
+
+        self.Bind(wx.EVT_CLOSE, self.OnExit)
 	
     def ActivateMouseAndKeyCatching(self):
         # ------ global mouse and key events ------------
@@ -218,11 +222,13 @@ class MainFrame(wx.Frame):
     def newProject(self, video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left):
       self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left)
       self.save_file = None
+      self.needs_save = False
       self._loadProjectInfo()
 
     def loadProject(self, filepath):
       self.controller.load_project(filepath)
       self.save_file = filepath
+      self.needs_save = False
       self._loadProjectInfo()
 
     def _loadProjectInfo(self):
@@ -245,9 +251,11 @@ class MainFrame(wx.Frame):
       return self.controller.getCategories()
 
     def editCategory(self, old_shortcut, new_shortcut, category_name):
+      self.needs_save = True
       return self.controller.editCategory(old_shortcut, new_shortcut, category_name)
 
     def importCategories(self, filepath):
+      self.needs_save = True
       self.controller.importCategories(filepath)
 
     def controllerIO(self):
@@ -292,6 +300,7 @@ class MainFrame(wx.Frame):
       if not overwrite and not self.controller.getCategoryOfFrame(self.current_frame.value) is None: return
       return_info = self.controller.categorise(key_code)
       if return_info:
+        self.needs_save = True
 	index, category = return_info
 	self.category_list.Update(index, category)
 	# load Image so category_list will jump to categorised frame
@@ -385,11 +394,18 @@ class MainFrame(wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
+    def SaveAsk(self):
+        if self.needs_save:
+          dlg = wx.MessageDialog(self, "Es sind nicht gespeicherte Aenderungen vorhanden. Sollen sie jetzt gepeichert werden?", "Speicher?", wx.YES_NO|wx.ICON_QUESTION)
+          if dlg.ShowModal() == wx.ID_YES:
+            self.OnSave()
+ 
     def OnExit(self, e):
-        #wx.CallAfter(self.controller.pause ()) doesn't work
-        self.Close(True)
+        self.SaveAsk()
+        self.Destroy()
 
     def OnOpen(self, event=None, bootstrap_phase=False):
+      self.SaveAsk()
       open_dialog = OpenDialog(self, bootstrap_phase)
       open_dialog.ShowModal()
 
