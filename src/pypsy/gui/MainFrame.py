@@ -95,16 +95,28 @@ class MainFrame(wx.Frame):
 
 
     def InitUIControlls(self):
+	# fetch bitmaps of bitmapbuttons
+	playfile = "pypsy/gui/buttons/play.png"
+	pausefile = "pypsy/gui/buttons/pause.png"
+	nextfile = "pypsy/gui/buttons/n_frame.png"
+	prevfile = "pypsy/gui/buttons/p_frame.png"
+	next_uncatfile = "pypsy/gui/buttons/next_uncat.png"
+	play_bmp = wx.Image(playfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	pause_bmp = wx.Image(pausefile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	next_f_bmp = wx.Image(nextfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	prev_f_bmp = wx.Image(prevfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	next_uncat_bmp = wx.Image(next_uncatfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	
         self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
         self.slider1 = wx.Slider(self.controllspanel, wx.ID_ANY, 0, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
-        pause = wx.Button(self.controllspanel, wx.ID_ANY, "Pause")
+        pause = wx.BitmapButton(self.controllspanel, -1, pause_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
-        play  = wx.Button(self.controllspanel, wx.ID_ANY, "Play")
+        play = wx.BitmapButton(self.controllspanel, -1, play_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
-        next  = wx.Button(self.controllspanel, wx.ID_ANY, "Next F")
+        next = wx.BitmapButton(self.controllspanel, -1, next_f_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
-        prev  = wx.Button(self.controllspanel, wx.ID_ANY, "Prev F")
+        prev = wx.BitmapButton(self.controllspanel, -1, prev_f_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
         slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
         self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
@@ -112,7 +124,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
         faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
         self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
-        next_uncategorised = wx.Button(self.controllspanel, wx.ID_ANY, "Naechstest unkatigorisierte")
+        next_uncategorised = wx.BitmapButton(self.controllspanel, -1, next_uncat_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
 
         self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "linkes Auge")
@@ -129,8 +141,8 @@ class MainFrame(wx.Frame):
         hbox1.Add(self.slider1, 1)
         hbox2.Add(pause)
         hbox2.Add(play, flag=wx.RIGHT, border=5)
-        hbox2.Add(next, flag=wx.LEFT, border=5)
-        hbox2.Add(prev)
+        hbox2.Add(prev, flag=wx.LEFT, border=5)
+        hbox2.Add(next)
         hbox2.Add(self.left_eye)
         hbox2.Add(self.right_eye)
         hbox2.Add(self.mean_eye)
@@ -173,7 +185,7 @@ class MainFrame(wx.Frame):
         # lower side: controlls
         self.InitUIControlls()
         contentsizer.Add(self.controllspanel, 0, flag=wx.EXPAND|wx.TOP|wx.ALIGN_BOTTOM, border=5)
-
+	
     def ActivateMouseAndKeyCatching(self):
         # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
@@ -369,7 +381,7 @@ class MainFrame(wx.Frame):
         self.controller.exportCategorisations(path)
     #------------------------------------------- menu items     
     def OnAbout(self, e):
-        dlg = wx.MessageDialog(self, "<slipsum>", "about eyepy", wx.OK)
+        dlg = wx.MessageDialog(self, "PyPsy ist ein Tool, das bei der Verarbeitung von Eyetracking-Daten hilft.", "Ueber PyPsy", wx.OK)
         dlg.ShowModal()
         dlg.Destroy()
 
