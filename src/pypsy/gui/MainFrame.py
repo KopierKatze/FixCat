@@ -64,25 +64,25 @@ class MainFrame(wx.Frame):
     def InitMenu(self):
         # menubar elements
         fileMenu = wx.Menu()
-        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Oeffnen")
-        menuAbout = fileMenu.Append(wx.ID_ABOUT, "About", "Ueber pyPsy")
-        menuSave = fileMenu.Append(wx.ID_SAVE, '&Save', "Speichern")
+        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Oeffnen", "Oeffnen")
+        menuAbout = fileMenu.Append(wx.ID_ABOUT, "Ueber", "Ueber pyPsy")
+        menuSave = fileMenu.Append(wx.ID_SAVE, '&Speichern', "Speichern")
         fileMenu.AppendSeparator()
-        menuExit = fileMenu.Append(wx.ID_EXIT, "E&xit" , "Schliessen")
+        menuExit = fileMenu.Append(wx.ID_EXIT, "Beenden" , "Schliessen")
 
         categoryMenu = wx.Menu()
-        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Kategorie", "Kategorie editieren")
+        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Kategorien verwalten")
 
         tempMenu = wx.Menu()
-        exportVideo = tempMenu.Append(wx.ID_ANY, "Video Menu", "Video Exportieren")
+        exportVideo = tempMenu.Append(wx.ID_ANY, "Export", "Video als AVI-Datei exportieren")
 
-        category_export = categoryMenu.Append(wx.ID_ANY, "Export", "Kategorisierungen exportieren")
+        category_export = categoryMenu.Append(wx.ID_ANY, "Kategoriesierungen exportieren", "Kategorisierungen als CSV-Datei exportieren")
 
 
         menuBar = wx.MenuBar()
-        menuBar.Append(fileMenu, "&File")
+        menuBar.Append(fileMenu, "Datei")
         menuBar.Append(categoryMenu, "Kategorie")
-        menuBar.Append(tempMenu, "Video Exportieren")
+        menuBar.Append(tempMenu, "Video")
         self.SetMenuBar(menuBar)
 
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
