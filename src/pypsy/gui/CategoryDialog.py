@@ -5,7 +5,7 @@ from pypsy.Helper import KeyCodeToHumanReadable
 class CategoryDialog(wx.Dialog):
     def __init__(self, parent, id, title='Kategorie Uebersicht'):
         self.infotext = "In diesem Fenster koennen die Kategorien editiert werden. \nKategorie in der Tabelle aswaehlen und auf Editieren klicken. \nIn dem neuen Dialog koennen dann die Parameter der Kategorie \n- Buchstabe und Name - geaendert werden.\n Mit Hilfe des Buchstabes wird Tastenkombination fuer die Kategorie festgelegt."
-        wx.Dialog.__init__(self, parent, id, title, size=(600,600))
+        wx.Dialog.__init__(self, parent, id, title, size=(400,300))
         self.Center()
         # get dict from controller
         self.MainFrame = parent
@@ -36,11 +36,11 @@ class CategoryDialog(wx.Dialog):
 
       tablebox.Add(self.lc, 4, wx.EXPAND)
 
-      btnbox.Add(wx.Button(self, 1, 'Bearbeiten'), 0, wx.ALIGN_CENTER)
-      self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
-
       btnbox.Add(wx.Button(self, 3, 'Neu'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
+
+      btnbox.Add(wx.Button(self, 1, 'Bearbeiten'), 0, wx.ALIGN_CENTER)
+      self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
 
       btnbox.Add(wx.Button(self, 4, 'Loeschen'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
@@ -64,9 +64,9 @@ class CategoryDialog(wx.Dialog):
     def OnImport(self, event):
       confirm_dialog = wx.MessageDialog(self, 
 	'Dieser Vorgang ueberschreibt alle bisher eingegebenen Kategorien und Kategoriesierungen! Wollen sie wirklich fortfahren?',
-	'Kategorien importieren', wx.OK | wx.CANCEL)
+	'Kategorien importieren', wx.YES_NO)
 
-      if confirm_dialog.ShowModal() == wx.ID_OK:
+      if confirm_dialog.ShowModal() == wx.ID_YES:
 	file_dialog = wx.FileDialog(self, 'Gespeichertes Projekt waehlen', style=wx.FD_OPEN, wildcard='PYPS-Datei (*.pyps)|*.pyps')
 	if file_dialog.ShowModal() == wx.ID_OK:
 	  self.MainFrame.importCategories(file_dialog.GetPath())
@@ -94,6 +94,12 @@ class CategoryDialog(wx.Dialog):
       self.FillCategoryTable()
 
     def OnDelete(self, event):
+      confirm_dialog = wx.MessageDialog(self, 
+	'Die Kategorie sowie alle Kategorisierungen dieser Kategorie werden geloescht wenn sie fortfahren! Dieser Vorgang kann nicht rueckgaengig gemacht werden! Wollen sie wirklich fortfahren?',
+	'Kategorie loeschen', wx.YES_NO)
+
+      if confirm_dialog.ShowModal() != wx.ID_YES:
+        return
       index = self.lc.GetFocusedItem()
       short = self.lc.GetItemData(index)
 
