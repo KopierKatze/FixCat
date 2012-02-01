@@ -108,8 +108,8 @@ class MainFrame(wx.Frame):
 	next_uncat_bmp = wx.Image(next_uncatfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 	
         self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
-        self.slider1 = wx.Slider(self.controllspanel, wx.ID_ANY, 0, 0, 1000)
-        self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider1)
+        self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 0, 0, 1000)
+        self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider)
         pause = wx.BitmapButton(self.controllspanel, -1, pause_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
         play = wx.BitmapButton(self.controllspanel, -1, play_bmp)
@@ -127,32 +127,32 @@ class MainFrame(wx.Frame):
         next_uncategorised = wx.BitmapButton(self.controllspanel, -1, next_uncat_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
 
-        self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "linkes Auge")
+        self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "L")
         self.Bind(wx.EVT_CHECKBOX, self.OnLeftEyeCheckbox, self.left_eye)
-        self.right_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "rechtes Auge")
+        self.right_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "R")
         self.Bind(wx.EVT_CHECKBOX, self.OnRightEyeCheckbox, self.right_eye)
-        self.mean_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "gemittelt")
+        self.mean_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "M")
         self.Bind(wx.EVT_CHECKBOX, self.OnMeanEyeCheckbox, self.mean_eye)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        hbox1.Add(self.slider1, 1)
+        hbox1.Add(self.slider, 1)
+        hbox2.Add(prev)
+        hbox2.Add(play)
         hbox2.Add(pause)
-        hbox2.Add(play, flag=wx.RIGHT, border=5)
-        hbox2.Add(prev, flag=wx.LEFT, border=5)
         hbox2.Add(next)
-        hbox2.Add(self.left_eye)
+        hbox2.Add(next_uncategorised)
+        hbox2.Add(self.left_eye, flag=wx.LEFT, border=15)
         hbox2.Add(self.right_eye)
         hbox2.Add(self.mean_eye)
-        hbox2.Add((150, wx.ID_ANY), 1, flag=wx.EXPAND | wx.ALIGN_RIGHT)
-        hbox2.Add(next_uncategorised)
+        hbox2.Add((150, wx.ID_ANY), 1)
         hbox2.Add(slower)
         hbox2.Add(normal)
         hbox2.Add(faster)
 
-        vbox.Add(hbox1, 2, wx.EXPAND | wx.BOTTOM, 10)
+        vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox2, 1, wx.EXPAND)
         self.controllspanel.SetSizer(vbox)
 
@@ -209,7 +209,7 @@ class MainFrame(wx.Frame):
     def loadImage(self):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
       self.videoimage.SetImage(image_str)
-      self.slider1.SetValue(self.current_frame.value)
+      self.slider.SetValue(self.current_frame.value)
       self.category_list.MarkFrame(self.current_frame.value)
 
       if self.autoreload:
@@ -228,7 +228,7 @@ class MainFrame(wx.Frame):
     def _loadProjectInfo(self):
       self.video_str_length = self.controller.getVideoStrLength()
       self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
-      self.slider1.SetMax(self.controller.getVideoFrameCount())
+      self.slider.SetMax(self.controller.getVideoFrameCount())
       self.frames_total = self.controller.getVideoFrameCount()
       self.setEyeCheckboxStates()
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
@@ -348,7 +348,7 @@ class MainFrame(wx.Frame):
     def OnSliderScroll(self, event):
       self.loopthrough_categorykey = None
 
-      self.seek(self.slider1.GetValue())
+      self.seek(self.slider.GetValue())
 
     def OnNextUncategorisedObject(self,event):
       self.loopthrough_categorykey = None
