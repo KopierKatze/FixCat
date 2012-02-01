@@ -4,6 +4,7 @@ from CategoryList import CategoryList
 from OpenDialog import OpenDialog
 
 from pypsy.Config import Config
+from pypsy.CategoryContainer import CategoryContainerError
 
 import wx
 import threading # used for video export
@@ -298,7 +299,12 @@ class MainFrame(wx.Frame):
     def categorise(self, key_code, overwrite=True):
       if key_code is None: return
       if not overwrite and not self.controller.getCategoryOfFrame(self.current_frame.value) is None: return
-      return_info = self.controller.categorise(key_code)
+      try:
+        return_info = self.controller.categorise(key_code)
+      except CategoryContainerError:
+        # the category container will raise an error when the keycode is not assigned
+        # and as we forward nearly all pressed keys this would be quite annoying
+        return_info = False
       if return_info:
         self.needs_save = True
 	index, category = return_info
