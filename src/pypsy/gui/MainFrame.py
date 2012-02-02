@@ -2,6 +2,7 @@ from CategoryDialog import CategoryDialog
 from StringImage import StringImage
 from CategoryList import CategoryList
 from OpenDialog import OpenDialog
+import button_images
 
 from pypsy.Config import Config
 from pypsy.CategoryContainer import CategoryContainerError
@@ -98,20 +99,14 @@ class MainFrame(wx.Frame):
 
 
     def InitUIControlls(self):
-	# fetch bitmaps of bitmapbuttons
-	playfile = "pypsy/gui/buttons/play.png"
-	pausefile = "pypsy/gui/buttons/pause.png"
-	nextfile = "pypsy/gui/buttons/n_frame.png"
-	prevfile = "pypsy/gui/buttons/p_frame.png"
-	next_uncatfile = "pypsy/gui/buttons/next_uncat.png"
-	play_bmp = wx.Image(playfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-	pause_bmp = wx.Image(pausefile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-	next_f_bmp = wx.Image(nextfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-	prev_f_bmp = wx.Image(prevfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-	next_uncat_bmp = wx.Image(next_uncatfile, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+	play_bmp = button_images.getplayBitmap()
+	pause_bmp = button_images.getpauseBitmap()
+	next_f_bmp = button_images.getn_frameBitmap()
+	prev_f_bmp = button_images.getp_frameBitmap()
+	next_uncat_bmp = button_images.getnext_uncatBitmap()
 	
         self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
-        self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 0, 0, 1000)
+        self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 1, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider)
         pause = wx.BitmapButton(self.controllspanel, -1, pause_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
