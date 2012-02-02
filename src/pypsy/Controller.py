@@ -85,7 +85,12 @@ class Controller(Savable):
 
     self.category_container = CategoryContainer(objects)
 
-    self.show_eyes = [False, False, True] # show mean eye
+    if categorising_eye_is_left == True:
+      self.show_eyes = [True, False, False]
+    elif categorising_eye_is_left == False:
+      self.show_eyes = [False, True, False]
+    else:
+      self.show_eyes = [False, False, True]
 
     # seek to zero so we'll have a picture
     self.produceCurrentImage()
