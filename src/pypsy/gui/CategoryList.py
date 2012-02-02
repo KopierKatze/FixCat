@@ -6,6 +6,8 @@ class CategoryList(wx.ListCtrl):
 
     self.InsertColumn(0, "Index")
     self.InsertColumn(1, "Kategorie")
+    self.SetColumnWidth(0, 60)
+    self.SetColumnWidth(1, 135)
 
     self.order = []
 

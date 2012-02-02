@@ -4,7 +4,6 @@ from pypsy.Helper import KeyCodeToHumanReadable
 
 class CategoryDialog(wx.Dialog):
     def __init__(self, parent, id, title='Kategorie Uebersicht'):
-        self.infotext = "In diesem Fenster koennen die Kategorien editiert werden. \nKategorie in der Tabelle aswaehlen und auf Editieren klicken. \nIn dem neuen Dialog koennen dann die Parameter der Kategorie \n- Buchstabe und Name - geaendert werden.\n Mit Hilfe des Buchstabes wird Tastenkombination fuer die Kategorie festgelegt."
         wx.Dialog.__init__(self, parent, id, title, size=(400,300))
         self.Center()
         # get dict from controller
@@ -24,13 +23,13 @@ class CategoryDialog(wx.Dialog):
       btnbox = wx.BoxSizer(wx.VERTICAL)
       textbox = wx.BoxSizer(wx.VERTICAL)
 
-      textpnl = wx.Panel(self, -1, style=wx.SUNKEN_BORDER)
+      textpnl = wx.Panel(self, -1)
 
       self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
       self.lc.InsertColumn(0, 'Kategorie')
       self.lc.InsertColumn(1, 'Shortcut')
-      self.lc.SetColumnWidth(0, 100)
-      self.lc.SetColumnWidth(1, 80)
+      self.lc.SetColumnWidth(0, 140)
+      self.lc.SetColumnWidth(1, 100)
 
       self.FillCategoryTable()
 
@@ -50,13 +49,11 @@ class CategoryDialog(wx.Dialog):
 
       tablebox.Add(btnbox, 1, flag=wx.EXPAND)
 
-      info = wx.StaticText(textpnl, -1, self.infotext,(50,10), style=wx.ALIGN_CENTER)
-      textbox.Add(textpnl, 3, wx.EXPAND | wx.ALL)
       textbox.Add(wx.Button(self, 2, 'Schliessen'), 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
 
       mainbox.Add(tablebox, 3, flag=wx.EXPAND)
-      mainbox.Add(textbox, 1, flag=wx.EXPAND)
+      mainbox.Add(textbox, 0, flag=wx.EXPAND)
       self.SetSizer(mainbox)
 
       self.Bind(wx.EVT_CLOSE, self.OnClose)
