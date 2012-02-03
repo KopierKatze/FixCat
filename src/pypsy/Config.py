@@ -15,7 +15,7 @@ categories_and_attributes = {
   'keyboard_shortcuts':
     ['play/pause', 'prev_frame', 'next_frame', 'next_fixation', 'prev_fixation', 'faster', 'slower'],
   'cursors':
-    ['blink', 'fixated', 'saccade'],
+    ['blink_left', 'fixated_left', 'saccade_left', 'blink_right', 'fixated_right', 'saccade_right', 'blink_mean', 'fixated_mean', 'saccade_mean'],
   'general':
     ['autosave_minutes'],
 }
@@ -142,9 +142,15 @@ default_config_raw = {
   },
 'cursors': {
     '__comment': 'Path of pictures used as cursors for the different eye states. (supported filetypes: http://opencv.willowgarage.com/documentation/python/highgui_reading_and_writing_images_and_video.html#loadimage )',
-    'blink': 'standard_cursors/blinking.png',
-    'fixated': 'standard_cursors/fixation.png',
-    'saccade': 'standard_cursors/saccade.png',
+    'blink_left': 'cursors/blinking.png',
+    'fixated_left': 'cursors/fixation.png',
+    'saccade_left': 'cursors/saccade.png',
+    'blink_right': 'cursors/blinking.png',
+    'fixated_right': 'cursors/fixation.png',
+    'saccade_right': 'cursors/saccade.png',
+    'blink_mean': 'cursors/blinking.png',
+    'fixated_mean': 'cursors/fixation.png',
+    'saccade_mean': 'cursors/saccade.png',
   },
 'general': {
     'autosave_minutes' : 5,

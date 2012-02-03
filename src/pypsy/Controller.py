@@ -58,9 +58,16 @@ class Controller(Savable):
 
   def createCursorDict(self):
     self.cursors = {None:None,
-		    'fixated':self.config.get('cursors','fixated'),
-		    'saccade':self.config.get('cursors','saccade'),
-		    'blink':self.config.get('cursors','blink')}
+      'fixated_left':self.config.get('cursors','fixated_left'),
+      'saccade_left':self.config.get('cursors','saccade_left'),
+      'blink_left':self.config.get('cursors','blink_left'),
+      'fixated_right':self.config.get('cursors','fixated_right'),
+      'saccade_right':self.config.get('cursors','saccade_right'),
+      'blink_right':self.config.get('cursors','blink_right'),
+      'fixated_mean':self.config.get('cursors','fixated_mean'),
+      'saccade_mean':self.config.get('cursors','saccade_mean'),
+      'blink_mean':self.config.get('cursors','blink_mean'),
+    }
 
   def new_project(self, video_file, eye_movement_file, categorise_frames=False, categorising_eye_is_left=None):
     """create a new project.
@@ -178,12 +185,12 @@ class Controller(Savable):
     # retrieve original image from video file
     image = self.video_reader.frame(frame)
     # add cursors as neede
-    if left:
-      self._addCursorToImage(image, self.cursors[self.eye_movement.statusLeftEyeAt(frame)], self.eye_movement.leftLookAt(frame))
-    if right:
-      self._addCursorToImage(image, self.cursors[self.eye_movement.statusRightEyeAt(frame)], self.eye_movement.rightLookAt(frame))
-    if mean:
-      self._addCursorToImage(image, self.cursors[self.eye_movement.meanStatusAt(frame)], self.eye_movement.meanLookAt(frame))
+    if left and not self.eye_movement.statusLeftEyeAt(frame) is None:
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusLeftEyeAt(frame)+'_left'], self.eye_movement.leftLookAt(frame))
+    if right and not self.eye_movement.statusRightEyeAt(frame) is None:
+      self._addCursorToImage(image, self.cursors[self.eye_movement.statusRightEyeAt(frame)+'_right'], self.eye_movement.rightLookAt(frame))
+    if mean and not self.eye_movement.meanStatusAt(frame) is None:
+      self._addCursorToImage(image, self.cursors[self.eye_movement.meanStatusAt(frame)+'_mean'], self.eye_movement.meanLookAt(frame))
 
     return image
 
