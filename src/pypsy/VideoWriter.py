@@ -14,10 +14,13 @@ class VideoWriter(object):
     self.size = size
     self.width = size[0]
     self.height = size[1]
+    
     if filepath is None:
         raise WriterError("please select a valid file")
     if codec is None:
-        codec = cv.CV_FOURCC('X', 'V', 'I', 'D')
+        codec = cv.CV_FOURCC('D', 'I', 'V', 'X')
+    codec = cv.CV_FOURCC(str(codec[0]), str(codec[1]), str(codec[2]), str(codec[3]))
+
     if fps is None or fps < 1:
         raise WriterError("please set fps >= 1")
     if self.width is None or self.height is None or self.width < 1 or self.height <1:
@@ -40,11 +43,10 @@ class VideoWriter(object):
   @classmethod
   def codecs(cls):
     """returns a dict that maps codec to human readable codec name"""
-    # wie viele?? s. fourcc.org
-    codec = dict([(CV_FOURCC('D', 'I', 'B') , 'uncompressed RGB'), 
-        (CV_FOURCC('F', 'F', 'D', 'S') , 'ffdshow'), 
-        (CV_FOURCC('X', 'V', 'I', 'D') , 'XVID Mpeg4'), 
-        (CV_FOURCC('D', 'I', 'V', 'X') , 'DivX')])
+    codec = dict([(cv.CV_FOURCC('D', 'I', 'B') , 'uncompressed RGB'), 
+        (cv.CV_FOURCC('F', 'F', 'D', 'S') , 'ffdshow'), 
+        (cv.CV_FOURCC('X', 'V', 'I', 'D') , 'Xvid'), 
+        (cv.CV_FOURCC('D', 'I', 'V', 'X') , 'DivX')])
     
   def releaseWriter(self):
     """closes VideoWriter after use """ 

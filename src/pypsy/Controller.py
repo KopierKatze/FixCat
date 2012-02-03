@@ -31,6 +31,7 @@ class Controller(Savable):
     shared memory, so no latent ipc is needed"""
 
     self.config = Config()
+    
 
   def leftEyeStatus(self, show):
     self.show_eyes[0] = bool(show)
@@ -61,6 +62,9 @@ class Controller(Savable):
 		    'fixated':self.config.get('cursors','fixated'),
 		    'saccade':self.config.get('cursors','saccade'),
 		    'blink':self.config.get('cursors','blink')}
+  
+  def getDefinedCodec(self):
+   return self.config.get('codec', 'user_defined_codec')
 
   def new_project(self, video_file, eye_movement_file, categorise_frames=False, categorising_eye_is_left=None):
     """create a new project.
@@ -221,13 +225,12 @@ class Controller(Savable):
 
   def exportVideo(self, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
-    # TODO: add codec support for this 
     self.seek(0)
+    codec = self.getDefinedCodec()
     frame_size = (self.getVideoWidth(), self.getVideoHeight())
     vidfps = self.video_reader.fps
-    codec = cv.CV_FOURCC('D','I','V','X')
     self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
-
+    
     for frame in xrange(self.video_reader.frame_count):
       self.seek(frame)
       self.video_writer.addFrame(self.video_image)

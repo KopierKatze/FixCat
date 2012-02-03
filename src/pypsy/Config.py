@@ -18,6 +18,8 @@ categories_and_attributes = {
     ['blink', 'fixated', 'saccade'],
   'general':
     ['autosave_minutes'],
+  'codec':
+    ['user_defined_codec'],
 }
 
 class Config(object):
