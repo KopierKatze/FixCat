@@ -103,11 +103,6 @@ class ClockWorker(threading.Thread):
         self.c = Clock
 
     def run(self):
-      prof = cProfile.Profile()
-      prof.runctx('l()', {}, {'l':self.run1})
-      prof.print_stats('time')
-
-    def run1(self):
         target = self.c.interval
         actual = self.c.interval
         sleeptime = self.c.interval
