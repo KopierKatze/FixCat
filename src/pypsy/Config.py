@@ -121,6 +121,11 @@ class Config(object):
 	      return val
 	  except TypeError:
 	    raise ConfigError('Die Angabe der Zeit zwischen dem automatischem Speichern muss entweder 0 o. null sein (deaktiviert) oder eine Zahl, nicht %s' % self.raw[category][attr])
+      elif attr == 'video_export_codec':
+        if not (type(self.raw[category][attr]) == unicode and len(self.raw[category][attr]) == 4):
+          raise ConfigError('Der video export Codec muss im FOURCC Format als String angegeben sein! (Bsp.: "DIVX")')
+        else:
+          return str(self.raw[category][attr])
     return self.raw[category][attr]
 
 class ConfigError(Exception):

@@ -18,7 +18,7 @@ class VideoWriter(object):
     if filepath is None:
         raise WriterError("please select a valid file")
 
-    codec = cv.CV_FOURCC(str(codec[0]), str(codec[1]), str(codec[2]), str(codec[3]))
+    codec = cv.CV_FOURCC(codec[0], codec[1], codec[2], codec[3])
 
     if fps is None or fps < 1:
         raise WriterError("please set fps >= 1")
