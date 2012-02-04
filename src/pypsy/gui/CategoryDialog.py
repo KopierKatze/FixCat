@@ -67,6 +67,7 @@ class CategoryDialog(wx.Dialog):
 	file_dialog = wx.FileDialog(self, 'Gespeichertes Projekt waehlen', style=wx.FD_OPEN, wildcard='PYPS-Datei (*.pyps)|*.pyps')
 	if file_dialog.ShowModal() == wx.ID_OK:
 	  self.MainFrame.importCategories(file_dialog.GetPath())
+      self.FillCategoryTable()
 
     def OnClose(self, event):
       self.MainFrame.loadCategorisationInToList()

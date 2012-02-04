@@ -36,7 +36,17 @@ class CategoryContainer(Savable):
     f.close()
 
   def importCategories(self, filepath):
-    pass
+    sc = SaveController()
+    sc.loadFromFile(filepath)
+
+    saved_state = sc.getSavedState('category_container')
+
+    # load saved categories
+    self.categories = saved_state['categories']
+
+    # delete all categorisations
+    for key in self.categorisations.keys():
+      self.categorisations[key] = None
 
   def getCategoryOfFrame(self, frame):
     for start_frame, end_frame in self.start_end_frames:
