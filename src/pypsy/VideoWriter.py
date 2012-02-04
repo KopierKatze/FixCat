@@ -5,7 +5,7 @@ except ImportError:
 
 class VideoWriter(object):
   """creates a new video file where one can add frames to"""
-  def __init__(self, filepath, size, fps, codec=None):
+  def __init__(self, filepath, size, fps, codec):
     """creates video file with the given properties.
     codec should be one of the codecs yielded by codecs().
 
@@ -17,8 +17,7 @@ class VideoWriter(object):
     
     if filepath is None:
         raise WriterError("please select a valid file")
-    if codec is None:
-        codec = cv.CV_FOURCC('D', 'I', 'V', 'X')
+
     codec = cv.CV_FOURCC(str(codec[0]), str(codec[1]), str(codec[2]), str(codec[3]))
 
     if fps is None or fps < 1:
