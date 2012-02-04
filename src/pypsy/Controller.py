@@ -1,5 +1,5 @@
 from CategoryContainer import CategoryContainer, CategoryContainerError
-from Clock import Clock
+from Clock import Clock, ClockError
 from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
@@ -81,7 +81,7 @@ class Controller(Savable):
     self.video_reader = VideoReader(video_file)
     self.eye_movement = EyeMovement(eye_movement_file)
 
-    self.clock = Clock(self.video_reader.duration, self.video_reader.fps)
+    self.clock = Clock(self.video_reader.frame_count, self.video_reader.fps)
     self.clock.register(self._clock_tick)
 
     if self.categorise_frames:
@@ -253,7 +253,11 @@ class Controller(Savable):
   def pause(self):
     if self.clock.running: self.clock.stop()
   def seek(self, frame):
-    self.clock.seek(frame)
+    try:
+      self.clock.seek(frame)
+    except ClockError:
+      # seeked to a frame out of video
+      pass
 # -----------  FRAME JUMPING ----
   def nextFrame(self):
     """jump one frame into the future"""
