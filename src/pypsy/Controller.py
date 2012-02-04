@@ -35,6 +35,20 @@ class Controller(Savable):
   def isClockRunning(self):
    return self.clock.running  
 
+  def categorisationEye(self):
+    if self.categorising_eye_is_left == True:
+      return 'left'
+    elif self.categorising_eye_is_left == False:
+      return 'right'
+    else:
+      return 'mean'
+
+  def categorisationObjects(self):
+    if self.categorise_frames == False:
+      return 'fixations'
+    else:
+      return 'frames'
+
   def leftEyeStatus(self, show):
     self.show_eyes[0] = bool(show)
     # reproduce the current image to show or exclude this eye

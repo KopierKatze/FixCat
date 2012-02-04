@@ -26,6 +26,7 @@ class MainFrame(wx.Frame):
         self.current_frame = current_frame
 
         self.frames_total = 0 # used for video export progress bar
+        self.fps = 30 # used for time indicator in statusbar
 
         self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
         self.reloadTimer.Stop()
@@ -159,7 +160,8 @@ class MainFrame(wx.Frame):
 
     def InitUI(self):
         self.InitMenu()
-        self.statusBar = self.CreateStatusBar()
+        self.statusBar = self.CreateStatusBar(3)
+        self.statusBar.SetStatusWidths([-4,-1,150])
 
         # correct colors in windows 7
         self.mainpanel = wx.Panel(self, wx.ID_ANY)
@@ -208,8 +210,14 @@ class MainFrame(wx.Frame):
     def loadImage(self):
       image_str = self.video_str.get_obj().raw[:self.video_str_length]
       self.videoimage.SetImage(image_str)
+
       self.slider.SetValue(self.current_frame.value)
+
       self.category_list.MarkFrame(self.current_frame.value)
+
+      current_time = round(self.current_frame.value/self.fps)
+      total_time = round(self.frames_total/self.fps)
+      self.statusBar.SetStatusText('%i:%02i/%i:%02i (%i/%i)'%(current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
 
       if self.controller.isClockRunning():
 	self.reloadTimer.Restart()
@@ -228,13 +236,31 @@ class MainFrame(wx.Frame):
 
     def _loadProjectInfo(self):
       self.video_str_length = self.controller.getVideoStrLength()
-      self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
-      self.slider.SetMax(self.controller.getVideoFrameCount())
       self.frames_total = self.controller.getVideoFrameCount()
+      self.fps = self.controller.getVideoFrameRate()
+      
+      self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
+
+      self.slider.SetMax(self.controller.getVideoFrameCount())
+
       self.setEyeCheckboxStates()
+      
       self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
       self.loadCategorisationInToList()
+
       self.loadImage()
+
+      if self.controller.categorisationEye() == 'left':
+        status_text = "Linkes Auge|"
+      elif self.controller.categorisationEye() == 'right':
+        status_text = "Rechtes Auge|"
+      else:
+        status_text = "Gemittelt|"
+      if self.controller.categorisationObjects() == 'frames':
+        status_text += "Frames"
+      else:
+        status_text += "Fixationen"
+      self.statusBar.SetStatusText(status_text, 1)
 
       # start autosave timer
       self.autosave_timer.Restart()
