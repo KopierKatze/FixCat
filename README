@@ -1,2 +1,39 @@
 project for the psychology faculty. 
 making data produced by eye-tracking device more accessible to the people working with it. will be written in python. more details to follow.
+
+
+INSTALL
+=======
+
+Windows:
+-------
+
+1.) install Python 2.7
+2.) install python package Numpy
+3.) install python package wxPython
+4.) install python package OpenCV
+ - download opencv superpack
+ - copy the python package of the superpack
+   into your python site-packages directory (e.g. C:\Python27\Lib\site-packages)
+ - copy opencv dlls of the superpack
+   to your python executable (e.g. C:\Python27)
+ - the location the specified files changes between opencv releases, so you have to find them on your own
+
+Linux:
+------
+
+Same procedure as in windows but using your package manager will make things easy.
+
+Ubuntu (should be the same in other Debian flavored distros):
+  sudo apt-get install python python-wxversion python-opencv
+
+BUILD DISTRIBUTION
+==================
+
+prerequire: python package py2exe installed
+
+change into src directory and execute
+
+  python setup.py py2exe
+
+maybe you have to use 'c:\Python27\python.exe' instead of just 'python'
