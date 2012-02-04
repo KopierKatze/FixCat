@@ -146,18 +146,19 @@ default_config_raw = {
   },
 'cursors': {
     '__comment': 'Path of pictures used as cursors for the different eye states. (supported filetypes: http://opencv.willowgarage.com/documentation/python/highgui_reading_and_writing_images_and_video.html#loadimage )',
-    'blink_left': 'cursors/blinking.png',
-    'fixated_left': 'cursors/fixation.png',
-    'saccade_left': 'cursors/saccade.png',
-    'blink_right': 'cursors/blinking.png',
-    'fixated_right': 'cursors/fixation.png',
-    'saccade_right': 'cursors/saccade.png',
-    'blink_mean': 'cursors/blinking.png',
-    'fixated_mean': 'cursors/fixation.png',
-    'saccade_mean': 'cursors/saccade.png',
+    'blink_left': 'cursors/blinking_left.png',
+    'fixated_left': 'cursors/fixation_left.png',
+    'saccade_left': 'cursors/saccade_left.png',
+    'blink_right': 'cursors/blinking_right.png',
+    'fixated_right': 'cursors/fixation_right.png',
+    'saccade_right': 'cursors/saccade_right.png',
+    'blink_mean': 'cursors/blinking_mean.png',
+    'fixated_mean': 'cursors/fixation_mean.png',
+    'saccade_mean': 'cursors/saccade_mean.png',
   },
 'general': {
     'autosave_minutes' : 5,
+    "__comment": "Please only edit this, if you know which codecs you have installed. For more information about fourcc please see http://www.fourcc.org/codecs.php",
     'video_export_codec' : 'DIVX',
   }
 }
