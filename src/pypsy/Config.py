@@ -156,6 +156,10 @@ default_config_raw = {
   },
 'general': {
     'autosave_minutes' : 5,
+  },
+"codec": {
+    "__comment": "Please only edit this, if you know which codecs you have installed. For more information about fourcc please see http://www.fourcc.org/codecs.php",
+    "user_defined_codec": "DIVX"
   }
 }
 default_config = json.dumps(default_config_raw, indent=4)
