@@ -79,21 +79,15 @@ class Clock(Savable):
       return
 
     if frame < 0 or frame > self.total_frames:
-      self.stop()
+      if self.running: self.stop()
       raise ClockError("seek error: frame out of scope")
 
     self._frame = frame
     for function in self.registered:
-	#thread = threading.Thread()
-	#thread.run = lambda: function(self.frame)
-	#thread.daemon = True
-	#thread.start()
 	function(self.frame)
 
 class ClockError(Exception):
     pass
-
-import cProfile
     
 class ClockWorker(threading.Thread):
     def __init__(self, Clock):
