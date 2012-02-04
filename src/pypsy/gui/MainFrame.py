@@ -29,7 +29,6 @@ class MainFrame(wx.Frame):
 
         self.reloadTimer = wx.CallLater(1.0/35.0*1000, self.loadImage)
         self.reloadTimer.Stop()
-        self.autoreload = False
 
         self.playing = False
 
@@ -212,7 +211,7 @@ class MainFrame(wx.Frame):
       self.slider.SetValue(self.current_frame.value)
       self.category_list.MarkFrame(self.current_frame.value)
 
-      if self.autoreload:
+      if self.controller.isClockRunning():
 	self.reloadTimer.Restart()
 
     def newProject(self, video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left):
@@ -315,7 +314,6 @@ class MainFrame(wx.Frame):
 
       self.playing = True
       self.controller.play()
-      self.autoreload = True
       self.loadImage()
 
     def OnPause(self, event=None):
@@ -323,7 +321,6 @@ class MainFrame(wx.Frame):
 
       self.playing = False
       self.controller.pause()
-      self.autoreload = False
       self.loadImage()
 
     def OnNextFrame(self, event=None):
@@ -434,17 +431,14 @@ class MainFrame(wx.Frame):
 	progress_dialog = wx.ProgressDialog('Video Export', 'Exportiere Video...', parent=self, maximum=self.frames_total,
 	  style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
 	# show progress by displaying the current frame
-	self.autoreload = True
-	self.loadImage()
 	waiting_thread = threading.Thread()
 	waiting_thread.run = lambda: self.controller.exportVideo(path)
 	waiting_thread.start()
 	while waiting_thread.isAlive():
-	  wx.MilliSleep(500)
-	  progress_dialog.Update(self.current_frame.value)
-	# stop reloading frame
-	self.autoreload = False
+	  wx.MilliSleep(900)
+          progress_dialog.Update(self.current_frame.value)
 	progress_dialog.Destroy()
+        self.loadImage()
 
 
 if __name__ == '__main__':

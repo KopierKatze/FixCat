@@ -31,7 +31,9 @@ class Controller(Savable):
     shared memory, so no latent ipc is needed"""
 
     self.config = Config()
-    
+  
+  def isClockRunning(self):
+   return self.clock.running  
 
   def leftEyeStatus(self, show):
     self.show_eyes[0] = bool(show)
@@ -237,16 +239,20 @@ class Controller(Savable):
 
   def exportVideo(self, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
-    self.seek(0)
     frame_size = (self.getVideoWidth(), self.getVideoHeight())
     vidfps = self.video_reader.fps
     codec = self.config.get('general', 'video_export_codec')
-    self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
+    video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
+    # you have to be sure _clock_tick is called before this function
+    # otherwise video offset of one frame
+    
+    self.pause()
+    self.seek(0)
     
     for frame in xrange(self.video_reader.frame_count):
       self.seek(frame)
-      self.video_writer.addFrame(self.video_image)
-    self.video_writer.releaseWriter()
+      video_writer.addFrame(self.video_image) 
+    video_writer.releaseWriter()
 # -----------  PLAYBACK CONTROLL ----
   def play(self):
     if not self.clock.running: self.clock.run()

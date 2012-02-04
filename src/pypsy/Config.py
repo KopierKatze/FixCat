@@ -121,8 +121,7 @@ class Config(object):
 	      return val
 	  except TypeError:
 	    raise ConfigError('Die Angabe der Zeit zwischen dem automatischem Speichern muss entweder 0 o. null sein (deaktiviert) oder eine Zahl, nicht %s' % self.raw[category][attr])
-    else:
-      return self.raw[category][attr]
+    return self.raw[category][attr]
 
 class ConfigError(Exception):
   pass
