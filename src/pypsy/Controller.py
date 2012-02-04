@@ -70,9 +70,6 @@ class Controller(Savable):
       'blink_mean':self.config.get('cursors','blink_mean'),
     }
   
-  def getDefinedCodec(self):
-   return self.config.get('codec', 'user_defined_codec')
-
   def new_project(self, video_file, eye_movement_file, categorise_frames=False, categorising_eye_is_left=None):
     """create a new project.
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
@@ -208,23 +205,31 @@ class Controller(Savable):
     imageROI = [cursor_left_upper_corner[0], cursor_left_upper_corner[1], cursor.width, cursor.height]
     if cursor_right_lower_corner[0] <= 0 or cursor_right_lower_corner[1] < 0 or \
      cursor_left_upper_corner[0] > image.width or cursor_left_upper_corner[1] > image.height:
+      #print "cursor is out of image"
       # cursor out of image
       return
     if cursor_left_upper_corner[0] < 0:
+      #print "left upper edge of cursor is left of image border"
       cursorROI[0] = - cursor_left_upper_corner[0]
+      cursorROI[2] -= cursorROI[0]
       imageROI[0] = 0
     if cursor_left_upper_corner[1] < 0:
+      #print "left upper edge of cursor is above image border"
       cursorROI[1] = - cursor_left_upper_corner[1]
+      cursorROI[3] -= cursorROI[1]
       imageROI[1] = 0
     if cursor_right_lower_corner[0] > image.width:
+      #print "right lower edge of cursor is right of image"
       cursorROI[2] = cursor.width - (cursor_right_lower_corner[0] - image.width)
       if cursorROI[2] == 0: return # width of cursor would be zero
-      imageROI[2] = image.width
     if cursor_right_lower_corner[1] > image.height:
+      #print "right lower edge of cursor is below image"
       cursorROI[3] = cursor.height - (cursor_right_lower_corner[1] - image.height)
       if cursorROI[3] == 0: return # height of cursor would be zero
-      imageROI[3] = image.height
 
+    imageROI[2] = cursorROI[2]
+    imageROI[3] = cursorROI[3]
+    
     cv.SetImageROI(cursor, tuple(cursorROI))
     cv.SetImageROI(image, tuple(imageROI))
     cv.Add(image, cursor, image)
@@ -233,9 +238,9 @@ class Controller(Savable):
   def exportVideo(self, output_file):
     """ export the overlayed video to a new video file with the VideoWriter"""
     self.seek(0)
-    codec = self.getDefinedCodec()
     frame_size = (self.getVideoWidth(), self.getVideoHeight())
     vidfps = self.video_reader.fps
+    codec = self.config.get('general', 'video_export_codec')
     self.video_writer = VideoWriter(output_file, frame_size, vidfps, codec)
     
     for frame in xrange(self.video_reader.frame_count):

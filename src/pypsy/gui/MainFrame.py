@@ -61,7 +61,7 @@ class MainFrame(wx.Frame):
 	    d.Destroy()
 	else:
 	    self.statusBar.SetFields(['Automatisches Speichern...'])
-	    self.controller.save_project(self.save_file+".autosave")
+	    self.controller.save_project(self.save_file+"_autosave")
 	    self.autosave_timer.Restart()
 	    self.statusBar.SetFields([''])
 

@@ -144,7 +144,7 @@ class OpenDialog(wx.Dialog):
       self.eyedata_filepath = q
 
   def OnSelectSaved(self, event):
-    q = self._open_file('Gespeichertes Projekt waehlen', 'PYPS-Datei (*.pyps)|*.pyps')
+    q = self._open_file('Gespeichertes Projekt waehlen', 'PYPS-Datei (*.pyps)|*.pyps|PYPS-AUTOSAVES (*.pyps_autosave)|*.pyps_autosave')
     if not q is None:
       self.saved_text.SetLabel(q)
       self.saved_filepath = q

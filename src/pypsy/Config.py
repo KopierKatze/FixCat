@@ -17,9 +17,7 @@ categories_and_attributes = {
   'cursors':
     ['blink_left', 'fixated_left', 'saccade_left', 'blink_right', 'fixated_right', 'saccade_right', 'blink_mean', 'fixated_mean', 'saccade_mean'],
   'general':
-    ['autosave_minutes'],
-  'codec':
-    ['user_defined_codec'],
+    ['autosave_minutes', 'video_export_codec'],
 }
 
 class Config(object):
@@ -156,6 +154,7 @@ default_config_raw = {
   },
 'general': {
     'autosave_minutes' : 5,
+    'video_export_codec' : 'DIVX',
   }
 }
 default_config = json.dumps(default_config_raw, indent=4)
