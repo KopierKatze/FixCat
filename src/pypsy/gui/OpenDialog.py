@@ -149,15 +149,19 @@ class OpenDialog(wx.Dialog):
       self.saved_text.SetLabel(q)
       self.saved_filepath = q
 
-  def OnLoad(self, event):
+  def OnLoad(self, event=None, overwrite_video_filepath=None):
     try:
       if self.new_save == 'NEW':
         self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.frame_categorisation, self.left_eye_categorisation)
       else:
-        self.parent.loadProject(self.saved_filepath)
+        self.parent.loadProject(self.saved_filepath, overwrite_video_filepath)
     except ReaderError as e: 
       error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Videodatei: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
       error_dlg.ShowModal()
+      if self.new_save == 'SAVE':
+        video_filepath = self._open_file('Video waehlen', 'AVI-Datei (*.avi)|*.avi')
+        if not video_filepath is None:
+          self.OnLoad(overwrite_video_filepath=video_filepath)
     except EyeMovementError as e:
       error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Augendaten: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
       error_dlg.ShowModal()

@@ -228,8 +228,8 @@ class MainFrame(wx.Frame):
       self.needs_save = False
       self._loadProjectInfo()
 
-    def loadProject(self, filepath):
-      self.controller.load_project(filepath)
+    def loadProject(self, filepath, overwrite_video_filepath=None):
+      self.controller.load_project(filepath, overwrite_video_filepath)
       self.save_file = filepath
       self.needs_save = False
       self._loadProjectInfo()

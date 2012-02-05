@@ -130,7 +130,7 @@ class Controller(Savable):
 
     sc.saveToFile(saved_filepath)
 
-  def load_project(self, saved_filepath):
+  def load_project(self, saved_filepath, overwrite_video_filepath=None):
     sc = SaveController()
 
     sc.loadFromFile(saved_filepath)
@@ -141,7 +141,10 @@ class Controller(Savable):
     self.categorise_frames = controller_state['categorise_frames']
 
     self.eye_movement = EyeMovement(saved_state=sc.getSavedState('eye_movement'))
-    self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
+    if overwrite_video_filepath is None:
+      self.video_reader = VideoReader(saved_state=sc.getSavedState('video_reader'))
+    else:
+      self.video_reader = VideoReader(overwrite_video_filepath)
     self.clock = Clock(saved_state=sc.getSavedState('clock'))
     self.clock.register(self._clock_tick)
     self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
