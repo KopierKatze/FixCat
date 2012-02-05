@@ -245,9 +245,19 @@ class Controller(Savable):
 
     imageROI[2] = cursorROI[2]
     imageROI[3] = cursorROI[3]
-    
+      
     cv.SetImageROI(cursor, tuple(cursorROI))
+
+    cursorMask = cv.CreateImage((cursorROI[2], cursorROI[3]), cv.IPL_DEPTH_8U, 1)
+    for row in xrange(cursorROI[3]):
+      for col in xrange(cursorROI[2]):
+        if cursor[row, col] != (0,0,0):
+          cursorMask[row,col] = 1
+        else:
+          cursorMask[row,col] = 0
+
     cv.SetImageROI(image, tuple(imageROI))
+    cv.SubS(image, cv.Scalar(101, 101, 101), image, cursorMask)
     cv.Add(image, cursor, image)
     cv.ResetImageROI(image)
 
