@@ -67,7 +67,7 @@ class CategoryDialog(wx.Dialog):
 	file_dialog = wx.FileDialog(self, 'Gespeichertes Projekt waehlen', style=wx.FD_OPEN, wildcard='PYPS-Datei (*.pyps)|*.pyps')
 	if file_dialog.ShowModal() == wx.ID_OK:
 	  self.MainFrame.importCategories(file_dialog.GetPath())
-      self.FillCategoryTable()
+	  self.FillCategoryTable()
 
     def OnClose(self, event):
       self.MainFrame.loadCategorisationInToList()
@@ -79,7 +79,7 @@ class CategoryDialog(wx.Dialog):
       short = self.lc.GetItemData(index)
       
       # in case there are no categories
-      if cat == '': return
+      if cat == '' or self.lc.GetItem(index, 0) is None: return
       
       edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
       edit_dlg.ShowModal()
@@ -97,7 +97,7 @@ class CategoryDialog(wx.Dialog):
     def OnDelete(self, event):
       # in case there are no categories
       index = self.lc.GetFocusedItem()
-      if self.lc.GetItem(index, 0).GetText() == '': return
+      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetItem(index, 0) is None: return
       confirm_dialog = wx.MessageDialog(self, 
 	'Die Kategorie sowie alle Kategorisierungen dieser Kategorie werden geloescht wenn sie fortfahren! Dieser Vorgang kann nicht rueckgaengig gemacht werden! Wollen sie wirklich fortfahren?',
 	'Kategorie loeschen', wx.YES_NO)
