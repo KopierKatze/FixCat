@@ -79,7 +79,7 @@ class CategoryDialog(wx.Dialog):
       short = self.lc.GetItemData(index)
       
       # in case there are no categories
-      if cat == '' or self.lc.GetFocusedItem() is None: return
+      if cat == '' or self.lc.GetFirstSelected() is None: return
       
       edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
       edit_dlg.ShowModal()
@@ -97,7 +97,7 @@ class CategoryDialog(wx.Dialog):
     def OnDelete(self, event):
       # in case there are no categories
       index = self.lc.GetFocusedItem()
-      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetFocusedItem() is None: return
+      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetFirstSelected() is None: return
       confirm_dialog = wx.MessageDialog(self, 
 	'Die Kategorie sowie alle Kategorisierungen dieser Kategorie werden geloescht wenn sie fortfahren! Dieser Vorgang kann nicht rueckgaengig gemacht werden! Wollen sie wirklich fortfahren?',
 	'Kategorie loeschen', wx.YES_NO)
