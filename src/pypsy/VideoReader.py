@@ -4,23 +4,33 @@ from threading import Thread
 from time import sleep, time
 import os.path
 try:
-  from cv2 import cv
+    from cv2 import cv
 except ImportError:
-  import cv
+    import cv
 
 class VideoReader(Savable):
-    """provides a image-by-image access to a video file"""
+    """This class provides an image-by-image access to a video file. """
 
     def __init__(self, filepath=None, saved_state={}):
-        """open the video file at filepath.
-        will raise VideoOpenError on failure"""
+        """Opens the video file at `filepath` by using a cv capture.
+        The capture provides access to the frame size and frame count of the video
+        file. 
+        `_determine_frame_count()` is used to precisely figure out the number of 
+        frames of the video file, since the result returned by the capture is not
+        very precise. 
+        
+        If an expected error occurs, a `ReaderError` is thrown."""
 
-        if saved_state=={} and (filepath is None or filepath == ''): raise ReaderError('Es wurde keine Videodatei ausgewaehlt.')
-        if saved_state and not filepath is None: raise ReaderError('Es ist bereits ein Dateiname fuer die Videodatei ausgewaehlt.')
+        if saved_state=={} and (filepath is None or filepath == ''): 
+            raise ReaderError('No video file specified.')
+        if saved_state and not filepath is None: 
+            raise ReaderError('Es ist bereits ein Dateiname fuer die Videodatei ausgewaehlt.')
         self.filepath = saved_state.get('filepath', filepath)
 
-	if not os.path.isfile(self.filepath): raise ReaderError('Die angegebene Videodatei existiert nicht.')
-	if not os.access(self.filepath, os.R_OK): raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
+	if not os.path.isfile(self.filepath): 
+            raise ReaderError('Die angegebene Videodatei existiert nicht.')
+	if not os.access(self.filepath, os.R_OK): 
+            raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
 	self.reader = cv.CaptureFromFile(self.filepath)
 	# have to check if codec is available!
 	test_frame = cv.QueryFrame(self.reader)
@@ -56,24 +66,44 @@ class VideoReader(Savable):
       return current_frame
       
     def frame(self, frame_number):
-        """returns the image that you would see when playing the video at second
-        'second'"""
-        if frame_number is not None and frame_number >= 0 and (not hasattr(self, "frame_count") or frame_number <= self.frame_count):
+        """Returns the IplImage that you would see when accessing the frame of 
+        the video at the specified `frame_number`."""
+        if (frame_number is not None and frame_number >= 0 and 
+            (not hasattr(self, "frame_count") or frame_number <= self.frame_count)):
           cv.SetCaptureProperty(self.reader, cv.CV_CAP_PROP_POS_FRAMES, frame_number)
           frame = cv.QueryFrame(self.reader) #IplImage
 	  return_frame = cv.CreateImage((self.width, self.height), cv.IPL_DEPTH_8U, 3)
           try:
             cv.Copy(frame, return_frame)
           except (TypeError, cv.error):
-            """copy will fail if no video frame was delivered by queryframe"""
+            """Copy will fail if no video frame was delivered by queryframe."""
             raise ReaderError("Es ist ein Problem beim lesen eines Videoframes aufgetreten!")
 	  return return_frame
         else:
           return ReaderError("Die Nummer des Frames muss zwischen 0 und der Gesamtzahl von Frames liegen.")
 
     def releaseReader(self):
-        """closes VideoReader after use """
+        """Closes VideoReader after use. """
         cv.ReleaseCapture(reader)
 
 class ReaderError(Exception):
+    """This error will be thrown in the following methods. 
+        1. A `ReaderError` is thrown in `VideoReader.__init__()` if: 
+            - `VideoReader.__init__.filepath` is None or empty and 
+            `VideoReader.__init__.saved_state` is empty. This means that no new
+            file and no saved state are being opened.
+            - `VideoReader.__init__.saved_state` is not empty and a 
+            `VideoReader.__init__.filepath` for a new file is specified. This means
+            that it is unclear if we start from a saved state or start with a 
+            new video file. 
+            - the file at `VideoReader.__init__.filepath` does not exist or you
+            do not have the rights to read it. 
+            - the codec could not be retrieved from the cv capture or the file 
+            might be broken. 
+        2. A `ReaderError` is thrown in `VideoReader.frame()` if: 
+            - a problem occured during retrieving a frame at the specified 
+            `VideoReader.frame.frame_number`
+            - `VideoReader.frame.frame_number` is not a valid frame number, meaning
+            that it is higher than the total number of frames or smaller than 0
+            """
     pass
