@@ -163,6 +163,10 @@ class OpenDialog(wx.Dialog):
     try:
       if self.new_save == 'NEW':
         self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.trialid_target.GetValue(), self.frame_categorisation, self.left_eye_categorisation)
+        if not self.parent.newProjectPlausible():
+          dlg = wx.MessageDialog(self, 'Are you sure you have selected the right video and eyemovement file? The video has %s frames but the eyemovement file has information for %s frames. Do you want to continue?' % (self.parent.frames_total, self.parent.getMaxFramesOfEyeMovement()), 'Plausibility check', wx.YES_NO | wx.ICON_INFO)
+          if not dlg.ShowModal() == wx.ID_YES:
+            return
       else:
         self.parent.loadProject(self.saved_filepath, overwrite_video_filepath)
     except ReaderError as e: 
