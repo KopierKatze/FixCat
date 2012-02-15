@@ -319,7 +319,11 @@ class MainFrame(wx.Frame):
 	  self.OnPlay()
       else:
 	# try to categorise the current frame to the category which may belong tho key_code
-	self.categorise(key_code)
+	if self.categorise(key_code):
+            if self.controller.categorisationObjects() == 'frames':
+                self.OnNextFrame()
+            else: 
+                self.OnNextFixation()
 
 
     def categorise(self, key_code, overwrite=True):
@@ -331,6 +335,7 @@ class MainFrame(wx.Frame):
         # the category container will raise an error when the keycode is not assigned
         # and as we forward nearly all pressed keys this would be quite annoying
         return_info = False
+        return False
       if return_info:
         self.needs_save = True
 	index, category = return_info
@@ -339,6 +344,8 @@ class MainFrame(wx.Frame):
 	self.category_list.MarkFrame(self.current_frame.value)
 	
 	self.loopthrough_categorykey = key_code
+        return True
+	
 
     # ---------------- PLAYBACK CONTROLL --------------
     def OnPlay(self, event=None):
