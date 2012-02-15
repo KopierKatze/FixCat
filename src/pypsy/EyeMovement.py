@@ -33,8 +33,8 @@ class EyeMovement(Saveable):
 
         A exported edf-file can contain various experiments (trials).
         Specify the wanted trial with `trialid_target`."""
-        if (filepath is None or trialid_target is None) and saved_state=={}: raise EyeMovementError("No eyemovemnt data given.")
-        if saved_state and not (filepath and trialid_target): raise ("Es sind bereits Augendaten geladen.")
+        if (filepath is None or trialid_target is None) and saved_state=={}: raise EyeMovementError("No eyemovement data given.")
+        if saved_state and (filepath and trialid_target): raise EyeMovementError("You gave a saved eyemovement state and a new eyemovement file. Don't know what to do.")
 
         self._status_left = saved_state.get('left', []) # 'fixated', 'saccade', 'blink' or None; indexed by frame
         self._status_right = saved_state.get('right', []) #  -- " --
@@ -134,7 +134,7 @@ class EyeMovement(Saveable):
         # parsing is over!
         if not in_trial:
             # we never reached the target trialid
-            raise EyeMovementError("Couldn't find the given trial id in the eyemovemnt file.")
+            raise EyeMovementError("Couldn't find the given trial id in the eyemovement file.")
         # now complete our containers for faster access of data
         self._looks = self._completeContainer(looks)
         self._status_left = self._completeContainer(status_left)
