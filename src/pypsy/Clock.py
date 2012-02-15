@@ -1,10 +1,10 @@
-from Savable import Savable
+from Saveable import Saveable
 
 import threading
 from thread import start_new_thread
 from time import time, sleep
 
-class Clock(Savable):
+class Clock(Saveable):
   """a clock!
      ticks in a specific interval. will call functions registered with
      'register()' on every tick. informs those funtions about current time

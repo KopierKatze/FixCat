@@ -1,6 +1,6 @@
-from Savable import Savable, SaveController
+from Saveable import Saveable, SaveController
 
-class CategoryContainer(Savable):
+class CategoryContainer(Saveable):
   def __init__(self, indices=None, saved_state={}):
     """
     ``indices`` is a dict mapping a tuple (begin frame number, end frame number)
