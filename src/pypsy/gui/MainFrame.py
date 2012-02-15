@@ -116,12 +116,15 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
         prev = wx.BitmapButton(self.controllspanel, -1, prev_f_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
-        slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
-        self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
-        normal  = wx.Button(self.controllspanel, wx.ID_ANY, "100%")
-        self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
-        faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
-        self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
+        self.speedslider = wx.Slider(self.controllspanel, wx.ID_ANY, 100, 10, 1000)
+        self.Bind(wx.EVT_SCROLL, self.OnSpeedSliderScroll, self.speedslider)
+        
+        #slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
+        #self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
+        #normal  = wx.Button(self.controllspanel, wx.ID_ANY, "100%")
+        #self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
+        #faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
+        #self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
         next_uncategorised = wx.BitmapButton(self.controllspanel, -1, next_uncat_bmp)
         self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
 
@@ -146,9 +149,10 @@ class MainFrame(wx.Frame):
         hbox2.Add(self.right_eye)
         hbox2.Add(self.mean_eye)
         hbox2.Add((150, wx.ID_ANY), 1)
-        hbox2.Add(slower)
-        hbox2.Add(normal)
-        hbox2.Add(faster)
+        hbox2.Add(self.speedslider, 1)
+        #hbox2.Add(slower)
+        #hbox2.Add(normal)
+        #hbox2.Add(faster)
 
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox2, 1, wx.EXPAND)
@@ -217,7 +221,8 @@ class MainFrame(wx.Frame):
 
       current_time = round(self.current_frame.value/self.fps)
       total_time = round(self.frames_total/self.fps)
-      self.statusBar.SetStatusText('%i:%02i/%i:%02i (%i/%i)'%(current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
+      speed = self.speedslider.GetValue() * 0.01
+      self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
 
       if self.controller.isClockRunning():
 	self.reloadTimer.Restart()
@@ -395,7 +400,14 @@ class MainFrame(wx.Frame):
       self.loopthrough_categorykey = None
 
       self.seek(self.slider.GetValue())
-
+    
+    def OnSpeedSliderScroll(self, event=None):
+        current_time = round(self.current_frame.value/self.fps)
+        total_time = round(self.frames_total/self.fps)
+        speed = self.speedslider.GetValue() * 0.01
+        self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
+        self.controller.setPlaybackSpeed(speed)
+        
     def OnNextUncategorisedObject(self,event):
       self.loopthrough_categorykey = None
 
