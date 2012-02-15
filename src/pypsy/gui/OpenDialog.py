@@ -1,10 +1,11 @@
 import wx
+import  wx.lib.intctrl
 from pypsy.VideoReader import ReaderError
 from pypsy.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
   def __init__(self, parent, bootstrap_phase=False):
-    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen", size=(430,270))
+    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen", size=(430,310))
 
     self.bootstrap_phase = bootstrap_phase
 
@@ -46,6 +47,15 @@ class OpenDialog(wx.Dialog):
 
     self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Frames oder Fixationen kategorisieren", choices=['Frame', 'Fixationen'])
     sizer.Add(self.frames_rb, 0, wx.LEFT, 25)
+    
+    trialid_box = wx.BoxSizer(wx.HORIZONTAL)
+    self.trialid_text = wx.StaticText(self, wx.ID_ANY, "TrialId angeben...")
+    trialid_box.Add(self.trialid_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
+    self.trialid_target = wx.lib.intctrl.IntCtrl(self)
+    self.trialid_target.SetValue(1)
+    self.trialid_target.SetMin(1)
+    trialid_box.Add(self.trialid_target, 0)
+    sizer.Add(trialid_box, 0, wx.EXPAND)
 
     self.saved_radio = wx.RadioButton(self, wx.ID_ANY, "Gespeichertes Projekt laden")
     sizer.Add(self.saved_radio, 0)
@@ -78,6 +88,8 @@ class OpenDialog(wx.Dialog):
     self.Bind(wx.EVT_RADIOBOX, self.OnCategorisationObjectSelection, self.frames_rb)
 
     self.Bind(wx.EVT_BUTTON, self.OnSelectSaved, self.saved_button)
+    
+    self.Bind(wx.lib.intctrl.EVT_INT, self.OnTrialIdEntered, self.trialid_target)
 
     self.Bind(wx.EVT_BUTTON, self.OnLoad, load_btn)
     self.Bind(wx.EVT_BUTTON, self.OnCancel, cancel_btn)
@@ -148,11 +160,16 @@ class OpenDialog(wx.Dialog):
     if not q is None:
       self.saved_text.SetLabel(q)
       self.saved_filepath = q
+      
+  def OnTrialIdEntered(self, event):
+    if not self.trialid_target.IsInBounds():
+      error_dlg = wx.MessageDialog(self, 'TrialId has to be greater or equal one.', 'Error', wx.OK | wx.ICON_ERROR)
+      error_dlg.ShowModal()
 
   def OnLoad(self, event=None, overwrite_video_filepath=None):
     try:
       if self.new_save == 'NEW':
-        self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.frame_categorisation, self.left_eye_categorisation)
+        self.parent.newProject(self.video_filepath, self.eyedata_filepath, self.trialid_target.GetValue(), self.frame_categorisation, self.left_eye_categorisation)
       else:
         self.parent.loadProject(self.saved_filepath, overwrite_video_filepath)
     except ReaderError as e: 
