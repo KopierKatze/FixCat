@@ -193,6 +193,8 @@ class MainFrame(wx.Frame):
         # catching key events is a lot more complicated. they are not propagated to parent classes...
         # so we have to get them from the app itself
         wx.GetApp().Bind(wx.EVT_KEY_DOWN, self.OnKeyPressed)
+        # to also get arrow key and so on windows:
+        wx.GetApp().Bind(wx.EVT_CHAR_HOOK, self.OnKeyPressed)
 
     def DeactivateMouseAndKeyCatching(self):
         # ------ global mouse and key events ------------
@@ -200,6 +202,7 @@ class MainFrame(wx.Frame):
         # catching key events is a lot more complicated. they are not propagated to parent classes...
         # so we have to get them from the app itself
         wx.GetApp().Bind(wx.EVT_KEY_DOWN, None)
+        wx.GetApp().Bind(wx.EVT_CHAR_HOOK, None)
 
     def setEyeCheckboxStates(self):
       left, right, mean = self.controller.getEyeStatus()
@@ -323,7 +326,8 @@ class MainFrame(wx.Frame):
           self.category_list.Update(to_delete, "-")
       else:
 	# try to categorise the current frame to the category which may belong tho key_code
-	self.categorise(key_code)
+        if event.GetEventType() == wx.EVT_KEY_DOWN:
+          self.categorise(key_code)
 
 
     def categorise(self, key_code, overwrite=True):
