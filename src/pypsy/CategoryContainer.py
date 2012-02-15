@@ -84,6 +84,11 @@ class CategoryContainer(Saveable):
         return (index, self.categories[shortcut])
     return False
 
+  def deleteCategorisation(self, frame):
+    for index in self.start_end_frames:
+      if frame >= index[0] and frame <= index[1]:
+        self.categorisations[index] = None
+
   def listCategories(self):
     return self.categories
 

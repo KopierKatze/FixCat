@@ -151,6 +151,8 @@ class Controller(Saveable):
         self.category_container = CategoryContainer(saved_state=sc.getSavedState('category_container'))
 
         self.produceCurrentImage()
+    def getState(self):
+        return {'show_eyes':self.show_eyes, 'categorise_frames':self.categorise_frames}
 # ----------- CATEGORISATION STUFF ----
     def categorise(self, shortcut):
         try:
@@ -158,6 +160,8 @@ class Controller(Saveable):
         except CategoryContainerError:
             raise
             return False
+    def deleteCategorisation(self, frame):
+        self.category_container.deleteCategorisation(frame)
     def getCategorisations(self):
         return self.category_container.dictOfCategorisations()
     def getCategorisationsOrder(self):

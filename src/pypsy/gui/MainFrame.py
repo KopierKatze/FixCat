@@ -317,6 +317,10 @@ class MainFrame(wx.Frame):
 	  self.OnPause()
 	else:
 	  self.OnPlay()
+      elif key_code == self.config.get('keyboard_shortcuts', 'delete'):
+        for to_delete in self.category_list.GetSelected():
+          self.controller.deleteCategorisation(to_delete[0])
+          self.category_list.Update(to_delete, "-")
       else:
 	# try to categorise the current frame to the category which may belong tho key_code
 	self.categorise(key_code)

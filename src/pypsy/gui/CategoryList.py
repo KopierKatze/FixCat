@@ -42,3 +42,16 @@ class CategoryList(wx.ListCtrl):
 	self.Select(self.order.index((start, end)))
 	self.EnsureVisible(self.order.index((start, end)))
 	break
+
+  def GetSelected(self):
+    list_indices = []
+    sel = self.GetFirstSelected()
+    while sel != -1:
+      list_indices.append(sel)
+      sel = self.GetNextSelected(sel)
+
+    category_indices = []
+    for list_index in list_indices:
+      category_indices.append(self.order[list_index])
+
+    return category_indices

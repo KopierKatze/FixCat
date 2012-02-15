@@ -13,7 +13,7 @@ config_filepath = 'config.json'
 
 categories_and_attributes = {
   'keyboard_shortcuts':
-    ['play/pause', 'prev_frame', 'next_frame', 'next_fixation', 'prev_fixation', 'faster', 'slower'],
+    ['play/pause', 'prev_frame', 'next_frame', 'next_fixation', 'prev_fixation', 'faster', 'slower', 'delete'],
   'cursors':
     ['blink_left', 'fixated_left', 'saccade_left', 'blink_right', 'fixated_right', 'saccade_right', 'blink_mean', 'fixated_mean', 'saccade_mean'],
   'general':
@@ -143,6 +143,7 @@ default_config_raw = {
     'next_fixation': "down",
     'faster': None,
     'slower': None,
+    'delete': 'delete',
   },
 'cursors': {
     '__comment': 'Path of pictures used as cursors for the different eye states. (supported filetypes: http://opencv.willowgarage.com/documentation/python/highgui_reading_and_writing_images_and_video.html#loadimage )',
