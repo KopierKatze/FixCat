@@ -84,7 +84,7 @@ class EyeMovement(Saveable):
         for line in fd:
             if not in_trial:
                 trialid = trialid_re.match(line)
-                if trialid and trialid.groups()[2] == trialid_target:
+                if trialid and trialid.groups()[2] == str(trialid_target):
                     # we reached the first line of our target trial
                     in_trial = False
                 else:
