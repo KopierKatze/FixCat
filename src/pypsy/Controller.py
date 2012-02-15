@@ -82,7 +82,16 @@ class Controller(Saveable):
             bool(self.eye_movement) and \
             bool(self.clock) and \
             bool(self.cursors) and \
-            bool(self.category_container)
+            bool(self.category_container)            
+    def getMaxFramesOfEyeMovement(self):
+        return self.eye_movement.maxFrames()
+    def plausibleCheck(self):
+        percent = float(self.getMaxFramesOfEyeMovement()) / float(self.getVideoFrameCount())
+        print abs(percent-1)
+        if abs(percent - 1) > 0.1:
+            return False
+        else:
+            return True
 # ----------- LOAD/SAVE/NEW PROJECT ----
     def new_project(self, video_file, eye_movement_file, trialid_target, categorise_frames=False, categorising_eye_is_left=None):
         """create a new project.

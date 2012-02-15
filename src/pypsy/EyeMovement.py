@@ -295,6 +295,13 @@ class EyeMovement(Saveable):
         if not current_index is None and not current_start_frame is None:
             result[(current_start_frame, len(status)-1)] = current_index
         return result
+        
+    def maxFrames(self):
+        """Returns maximum length of the containers `looks`, `status_left` and 
+        `status_rigth`. This is used fot the plausibility check for the creation
+        of a new project(does video and eyemovement data belong together?)."""
+        return max(len(looks), len(status_left), len(status_rigth))
+      
 
 
 class EyeMovementError(Exception):
