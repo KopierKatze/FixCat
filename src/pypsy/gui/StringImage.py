@@ -29,7 +29,7 @@ class StringImage(wx.Window):
         self.offseth = 0
         self.offsetw = 0
 
-    def OnPaint(self, event):
+    def OnPaint(self, event=None):
 	"""paint the scaled image onto widget.
 	
 	if there were problems retrieving or scaling the image
@@ -68,6 +68,7 @@ class StringImage(wx.Window):
 	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(imagew_scale, imageh_scale))
         except:
             self.bitmap = None # in case of an error paint black
+        self.OnPaint()
 
     def SetImage(self, image_string):
 	"""set a new image.
