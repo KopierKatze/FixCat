@@ -3,7 +3,7 @@ try:
 except ImportError:
     import pickle
 
-class Savable(object):
+class Saveable(object):
     """This is the parent class for all classes
     which have to save date in order to restore
     the current program state (project).
@@ -33,7 +33,7 @@ class Savable(object):
       raise NotImplementedError('This method should be overwritten in the child.')
 
 class SaveController(object):
-    """This class implements saving of childs of the `Savable` class.
+    """This class implements saving of childs of the `Saveable` class.
 
     Example:
 
@@ -68,7 +68,7 @@ class SaveController(object):
         """Creates state container."""
         self.savable_objects = {}
 
-    def addSavable(self, savable_name, obj):
+    def addSaveable(self, savable_name, obj):
         """Adds the current state of `obj` to this
         SaveController. It will be written to file
         when the `saveToFile` method is invoked.
@@ -78,15 +78,15 @@ class SaveController(object):
         `obj` after you loaded it from file
         (SaveController.getSavedState('savable_name')).
 
-        `obj` has to have a `Savable.getState` method which
+        `obj` has to have a `Saveable.getState` method which
         should return the current state as a python
-        standart object (see Savable class)."""
+        standart object (see `Saveable` class)."""
         if not hasattr(obj, "getState"): raise SaveControllerError('You tried to add a object without ``getState`` method into a SaveController.')
 
         self.savable_objects[savable_name] = obj.getState()
 
     def saveToFile(self, filepath):
-        """Writes the added states (`addSavable()` method) to the
+        """Writes the added states (`addSaveable()` method) to the
         file specified by `filepath` using the python pickle module.
 
         Will raise `SaveControllerError` s on failures."""
@@ -123,14 +123,14 @@ class SaveController(object):
 
         You can use this method to retrieve the saved states
         after loading them from a file with `loadFromFile()`
-        and also directly after adding them with `addSavable()`."""
+        and also directly after adding them with `addSaveable()`."""
         return self.savable_objects[savable_name]
 
 
 class SaveControllerError(Exception):
     """Is raised when:
 
-     - You try to add a Savable with `SaveController.addSavable()` that has to `Savable.getState()` method.
+     - You try to add a Saveable with `SaveController.addSaveable()` that has to `Saveable.getState()` method.
      - On failures while loading `SaveController.loadFromFile()` or saving `SaveController.saveToFile()`
     """
     pass

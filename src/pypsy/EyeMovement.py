@@ -1,8 +1,8 @@
-from Savable import Savable
+from Saveable import Saveable
 import os.path
 import re
 
-class EyeMovement(Savable):
+class EyeMovement(Saveable):
   number = r'([ 0-9]{5}.[0-9])'
   eye_look = r'(([0-9]+)\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t'+number+r'\t.)'
   saccade = r'(SSACC (L|R)  ([0-9]+))'

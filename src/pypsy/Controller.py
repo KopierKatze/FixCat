@@ -4,14 +4,14 @@ from EyeMovement import EyeMovement
 from VideoReader import VideoReader, ReaderError
 from VideoWriter import VideoWriter
 from Config import Config
-from Savable import Savable, SaveController, SaveControllerError
+from Saveable import Saveable, SaveController, SaveControllerError
 
 try:
   from cv2 import cv
 except ImportError:
   import cv
 
-class Controller(Savable):
+class Controller(Saveable):
   """this class connects all the in- and output classes together and provides a
   clean interface for the connection to the gui"""
   def __init__(self, video_str, current_frame):
@@ -122,11 +122,11 @@ class Controller(Savable):
   def save_project(self, saved_filepath):
     sc = SaveController()
 
-    sc.addSavable('eye_movement', self.eye_movement)
-    sc.addSavable('category_container', self.category_container)
-    sc.addSavable('video_reader', self.video_reader)
-    sc.addSavable('clock', self.clock)
-    sc.addSavable('controller', self)
+    sc.addSaveable('eye_movement', self.eye_movement)
+    sc.addSaveable('category_container', self.category_container)
+    sc.addSaveable('video_reader', self.video_reader)
+    sc.addSaveable('clock', self.clock)
+    sc.addSaveable('controller', self)
 
     sc.saveToFile(saved_filepath)
 

@@ -1,4 +1,4 @@
-from Savable import Savable
+from Saveable import Saveable
 
 from threading import Thread
 from time import sleep, time
@@ -8,7 +8,7 @@ try:
 except ImportError:
   import cv
 
-class VideoReader(Savable):
+class VideoReader(Saveable):
     """provides a image-by-image access to a video file"""
 
     def __init__(self, filepath=None, saved_state={}):
