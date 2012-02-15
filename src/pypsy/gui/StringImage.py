@@ -1,7 +1,17 @@
 import wx
 
 class StringImage(wx.Window):
+    """This window/widget will show a image.
+
+    It will resize the image to fit the space provided
+    to this widget.
+
+    The image is expected to be coded as a rgb string with
+    specified width, height and therefore string length.
+
+    This widget uses double buffering to prevent flickering."""
     def __init__(self, parent, id):
+        """Create a new `StringImage`."""
         wx.Window.__init__(self, parent, id)
 
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -64,8 +74,8 @@ class StringImage(wx.Window):
 	the image is a string containing the rgb value of the pixels.
 	
 	to restore a real image out of this string this method needs information
-	about the size of the image which is encoded in ``image_string``.
-	so be sure to give this information with ``SetImageSize`` before calling
+	about the size of the image which is encoded in `image_string`.
+	so be sure to give this information with `SetImageSize` before calling
 	this method.
 	"""
 	try:
@@ -80,9 +90,9 @@ class StringImage(wx.Window):
 	  self.Refresh()
 
     def SetImageSize(self, width, height):
-	"""assigne dimensions of the image encoded in ``image_string`` argument of ``SetImage``.
+	"""assigne dimensions of the image encoded in `image_string` argument of `SetImage`.
 
-	this information is needed to retrieve the image out of the ``image_string``."""
+	this information is needed to retrieve the image out of the `image_string`."""
         self.width = width
         self.height = height
 
