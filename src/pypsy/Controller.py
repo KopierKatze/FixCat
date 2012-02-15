@@ -238,8 +238,7 @@ class Controller(Saveable):
         cv.CvtColor(return_frame, return_frame, cv.CV_BGR2RGB)
         self.video_image = return_frame
         self.current_frame.value = frame
-        video_str = return_frame.tostring()
-        self.video_str.value = video_str
+        self.video_str.value = return_frame.tostring()
 
     def exportVideo(self, output_file):
         """ export the overlayed video to a new video file with the VideoWriter"""
@@ -324,8 +323,8 @@ if __name__ == '__main__':
     import cProfile
     controller = Controller(video_str, current_frame)
     #controller.new_project("../example/t2d1gl_ett0.avi", "../example/t2d1gl.asc", True)
-    #controller.new_project("../example/overlayed_video.avi", "../example/t2d1gl.asc", True)
-    controller.load_project("../example/test.pyps")
+    controller.new_project("../example/overlayed_video.avi", "../example/t2d1gl.asc", 2, True)
+    #controller.load_project("../example/test.pyps")
     #prof = cProfile.Profile()
     #prof.runctx('l()', {}, {'l':a.MainLoop})
     #prof.print_stats('time')
