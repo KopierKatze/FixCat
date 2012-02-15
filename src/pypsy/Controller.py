@@ -31,7 +31,7 @@ class Controller(Saveable):
     shared memory, so no latent ipc is needed"""
 
     self.config = Config()
-  
+
   def isClockRunning(self):
    return self.clock.running  
 
@@ -85,8 +85,8 @@ class Controller(Saveable):
       'saccade_mean':self.config.get('cursors','saccade_mean'),
       'blink_mean':self.config.get('cursors','blink_mean'),
     }
-  
-  def new_project(self, video_file, eye_movement_file, categorise_frames=False, categorising_eye_is_left=None):
+
+  def new_project(self, video_file, eye_movement_file, trialid_target, categorise_frames=False, categorising_eye_is_left=None):
     """create a new project.
     you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
     """
@@ -95,7 +95,7 @@ class Controller(Saveable):
     self.categorise_frames = categorise_frames
     self.categorising_eye_is_left = categorising_eye_is_left
     self.video_reader = VideoReader(video_file)
-    self.eye_movement = EyeMovement(eye_movement_file)
+    self.eye_movement = EyeMovement(eye_movement_file, trialid_target)
 
     self.clock = Clock(self.video_reader.frame_count, self.video_reader.fps)
     self.clock.register(self._clock_tick)

@@ -222,8 +222,8 @@ class MainFrame(wx.Frame):
       if self.controller.isClockRunning():
 	self.reloadTimer.Restart()
 
-    def newProject(self, video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left):
-      self.controller.new_project(video_filepath, eyemovement_filepath, categorise_frames, categorising_eye_is_left)
+    def newProject(self, video_filepath, eyemovement_filepath, trialid_target, categorise_frames, categorising_eye_is_left):
+      self.controller.new_project(video_filepath, eyemovement_filepath, trialid_target, categorise_frames, categorising_eye_is_left)
       self.save_file = None
       self.needs_save = False
       self._loadProjectInfo()
