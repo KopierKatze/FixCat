@@ -232,7 +232,7 @@ class MainFrame(wx.Frame):
       return self.controller.plausibleCheck()
 
     def getMaxFramesOfEyeMovement(self):
-      return self.getMaxFramesOfEyeMovement()
+      return self.controller.getMaxFramesOfEyeMovement()
 
     def loadProject(self, filepath, overwrite_video_filepath=None):
       self.controller.load_project(filepath, overwrite_video_filepath)

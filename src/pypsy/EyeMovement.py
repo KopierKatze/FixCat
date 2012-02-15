@@ -295,9 +295,9 @@ class EyeMovement(Saveable):
         
     def maxFrames(self):
         """Returns maximum length of the containers `looks`, `status_left` and 
-        `status_rigth`. This is used fot the plausibility check for the creation
+        `status_right`. This is used fot the plausibility check for the creation
         of a new project(does video and eyemovement data belong together?)."""
-        return max(len(looks), len(status_left), len(status_rigth))
+        return max(len(self._looks), len(self._status_left), len(self._status_right))
       
 
 

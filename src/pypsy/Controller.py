@@ -87,8 +87,7 @@ class Controller(Saveable):
         return self.eye_movement.maxFrames()
     def plausibleCheck(self):
         percent = float(self.getMaxFramesOfEyeMovement()) / float(self.getVideoFrameCount())
-        print abs(percent-1)
-        if abs(percent - 1) > 0.1:
+        if abs(percent - 1) > 0.0083: #about one second per 2 minutes difference
             return False
         else:
             return True
