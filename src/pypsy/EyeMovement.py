@@ -69,9 +69,6 @@ class EyeMovement(Saveable):
         status_left = {}
         status_rigth = {}
 
-        # set start time to None, before anything can be added we have to know the starttime!
-        starttime = None
-
         # open file
         fd = open(filepath)
 
@@ -86,7 +83,7 @@ class EyeMovement(Saveable):
                 trialid = trialid_re.match(line)
                 if trialid and trialid.groups()[2] == str(trialid_target):
                     # we reached the first line of our target trial
-                    in_trial = False
+                    in_trial = True
                 else:
                     # we are not yet at our target trial -> jump to next line
                     continue
@@ -175,11 +172,11 @@ class EyeMovement(Saveable):
         for frame in xrange(max(len(self._status_left), len(self._status_right))):
             # shouldn't be needed as we complete them until the last frame
             # but safety first
-            if frame > len(self._status_left):
+            if frame >= len(self._status_left):
                 left = (0,None)
             else:
                 left = self._status_left[frame]
-            if frame > len(self._status_right):
+            if frame >= len(self._status_right):
                 right = (0,None)
             else:
                 right = self._status_right[frame]

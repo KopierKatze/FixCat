@@ -228,6 +228,12 @@ class MainFrame(wx.Frame):
       self.needs_save = False
       self._loadProjectInfo()
 
+    def newProjectPlausible(self):
+      return self.controller.plausibleCheck()
+
+    def getMaxFramesOfEyeMovement(self):
+      return self.getMaxFramesOfEyeMovement()
+
     def loadProject(self, filepath, overwrite_video_filepath=None):
       self.controller.load_project(filepath, overwrite_video_filepath)
       self.save_file = filepath
