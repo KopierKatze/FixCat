@@ -46,7 +46,7 @@ class Clock(Saveable):
        time of clock will be altered within one interval with value of
        interval * multi
     """
-    if(multi != 0):
+    if(multi != 0.0):
         self.multiplicator = float(multi)
     else:
         raise ClockError("multiplicator may not be 0")

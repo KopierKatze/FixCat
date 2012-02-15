@@ -302,6 +302,8 @@ class Controller(Saveable):
         self.clock.setMultiplicator(1.0)
     def fasterPlayback(self):
         self.clock.setMultiplicator(self.clock.multiplicator * 1.1)
+    def setPlaybackSpeed(self, speed):
+        self.clock.setMultiplicator(self.clock.multiplicator * speed)
 # --------------- VIDEO INFORMATION -----
     def getVideoStrLength(self):
         return len(self.video_reader.frame(0).tostring())
