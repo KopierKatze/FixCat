@@ -68,7 +68,7 @@ class StringImage(wx.Window):
 	    self.bitmap = wx.BitmapFromImage(self.original_image.Scale(imagew_scale, imageh_scale))
         except:
             self.bitmap = None # in case of an error paint black
-        self.OnPaint()
+        self.Refresh()
 
     def SetImage(self, image_string):
 	"""set a new image.
