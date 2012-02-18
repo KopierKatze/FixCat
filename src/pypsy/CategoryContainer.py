@@ -30,7 +30,7 @@ class CategoryContainer(Saveable):
   def export(self, filepath):
     f = open(filepath, "wb")
     # header
-    f.write('Startframe, Endframe, Index, Kategorie\n')
+    f.write('Start frame, End frame, Index, Category\n')
     for start_frame, end_frame in self.start_end_frames:
       f.write('%s, %s, %s, %s\n' %(start_frame, end_frame, self.indices[(start_frame, end_frame)], self.categories.get(self.categorisations[(start_frame, end_frame)], "-")))
     f.close()
@@ -55,9 +55,9 @@ class CategoryContainer(Saveable):
     return None
 
   def editCategory(self, old_shortcut, new_shortcut, category_name):
-    if not new_shortcut is None and new_shortcut in self.categories.keys() and new_shortcut != old_shortcut: raise CategoryContainerError('Dieses Tastenkuerzel ist schon vergeben.')
-    if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('Das zu loeschende Tastenkuerzel ist nicht vorhanden.')
-    if not new_shortcut is None and (category_name is None or len(category_name) < 1): raise CategoryContainerError('Bitte Namen der Kategorie angeben.')
+    if not new_shortcut is None and new_shortcut in self.categories.keys() and new_shortcut != old_shortcut: raise CategoryContainerError('This hotkey is already assigned.')
+    if not old_shortcut is None and not old_shortcut in self.categories.keys(): raise CategoryContainerError('The hotkey cannot be deleted, because it does not exist.')
+    if not new_shortcut is None and (category_name is None or len(category_name) < 1): raise CategoryContainerError('Please enter a name for the category.')
     
     if not new_shortcut is None:
       self.categories[new_shortcut] = category_name

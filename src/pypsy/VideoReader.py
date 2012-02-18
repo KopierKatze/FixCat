@@ -24,18 +24,18 @@ class VideoReader(Saveable):
         if saved_state=={} and (filepath is None or filepath == ''): 
             raise ReaderError('No video file specified.')
         if saved_state and not filepath is None: 
-            raise ReaderError('Es ist bereits ein Dateiname fuer die Videodatei ausgewaehlt.')
+            raise ReaderError('A video file has already been defined in the project file.')
         self.filepath = saved_state.get('filepath', filepath)
 
 	if not os.path.isfile(self.filepath): 
-            raise ReaderError('Die angegebene Videodatei existiert nicht.')
+            raise ReaderError('The file you selected does not exist.')
 	if not os.access(self.filepath, os.R_OK): 
-            raise ReaderError('Auf die Videodatei kann nicht zugegriffen werden (keine Leseberechtigung).')
+            raise ReaderError('This file cannot be accessed (no permission to read).')
 	self.reader = cv.CaptureFromFile(self.filepath)
 	# have to check if codec is available!
 	test_frame = cv.QueryFrame(self.reader)
 	if test_frame is None or test_frame.width == 0 or test_frame.height == 0:
-	  raise ReaderError('Konnte Video nicht oeffnen. Codec nicht vorhanden oder Video defekt.')
+	  raise ReaderError('Video file could not be opened. Either the codec could not be retrieved or the file is broken.')
 	self.height = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_HEIGHT))
 	self.width = int(cv.GetCaptureProperty(self.reader, cv.CV_CAP_PROP_FRAME_WIDTH))
 	self.frame_count = self._determine_frame_count()
@@ -77,10 +77,10 @@ class VideoReader(Saveable):
             cv.Copy(frame, return_frame)
           except (TypeError, cv.error):
             """Copy will fail if no video frame was delivered by queryframe."""
-            raise ReaderError("Es ist ein Problem beim lesen eines Videoframes aufgetreten!")
+            raise ReaderError("A problem occured while retrieving a frame.")
 	  return return_frame
         else:
-          return ReaderError("Die Nummer des Frames muss zwischen 0 und der Gesamtzahl von Frames liegen.")
+          return ReaderError("The number of the frame has to be at least 0 and smaller than the amount of frames.")
 
     def releaseReader(self):
         """Closes VideoReader after use. """

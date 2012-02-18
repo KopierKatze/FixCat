@@ -5,7 +5,7 @@ from pypsy.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
   def __init__(self, parent, bootstrap_phase=False):
-    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Projekt laden oder neu beginnen", size=(430,310))
+    wx.Dialog.__init__(self, parent, wx.ID_ANY, "Load existing project or start a new one", size=(430,310))
 
     self.bootstrap_phase = bootstrap_phase
 
@@ -26,30 +26,30 @@ class OpenDialog(wx.Dialog):
   def InitUI(self):
     sizer = wx.BoxSizer(wx.VERTICAL)
 
-    self.new_radio = wx.RadioButton(self, wx.ID_ANY, "Neues Projekt beginnen")
+    self.new_radio = wx.RadioButton(self, wx.ID_ANY, "Start a new project")
     sizer.Add(self.new_radio, 0)
     new_project_video_box = wx.BoxSizer(wx.HORIZONTAL)
-    self.video_text = wx.StaticText(self, wx.ID_ANY, "Video waehlen...")
+    self.video_text = wx.StaticText(self, wx.ID_ANY, "Choose video file...")
     new_project_video_box.Add(self.video_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
-    self.video_button = wx.Button(self, wx.ID_ANY, "Durchsuchen")
+    self.video_button = wx.Button(self, wx.ID_ANY, "Open")
     new_project_video_box.Add(self.video_button, 0, wx.ALIGN_RIGHT)
     sizer.Add(new_project_video_box, 0, wx.EXPAND)
 
     new_project_eyedate_box = wx.BoxSizer(wx.HORIZONTAL)
-    self.eyedata_text = wx.StaticText(self, wx.ID_ANY, "EDF-Datei waehlen...")
+    self.eyedata_text = wx.StaticText(self, wx.ID_ANY, "Choose EDF...")
     new_project_eyedate_box.Add(self.eyedata_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
-    self.eyedata_button = wx.Button(self, wx.ID_ANY, "Durchsuchen")
+    self.eyedata_button = wx.Button(self, wx.ID_ANY, "Open")
     new_project_eyedate_box.Add(self.eyedata_button, 0)
     sizer.Add(new_project_eyedate_box, 0, wx.EXPAND)
 
-    self.eye_rb = wx.RadioBox(self, wx.ID_ANY, "Zu kategorisierendes Auge", choices=['Links', 'Rechts', 'Gemitteltes'])
+    self.eye_rb = wx.RadioBox(self, wx.ID_ANY, "Data of eye you want to categorise", choices=['left', 'right', 'mean'])
     sizer.Add(self.eye_rb, 0, wx.LEFT, 25)
 
-    self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Frames oder Fixationen kategorisieren", choices=['Frame', 'Fixationen'])
+    self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Categorise frames or fixations", choices=['frame', 'fixations'])
     sizer.Add(self.frames_rb, 0, wx.LEFT, 25)
 
     trialid_box = wx.BoxSizer(wx.HORIZONTAL)
-    self.trialid_text = wx.StaticText(self, wx.ID_ANY, "TrialId angeben...")
+    self.trialid_text = wx.StaticText(self, wx.ID_ANY, "Select trial id...")
     trialid_box.Add(self.trialid_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
     self.trialid_target = wx.lib.intctrl.IntCtrl(self, limited=True)
     self.trialid_target.SetValue(1)
@@ -57,12 +57,12 @@ class OpenDialog(wx.Dialog):
     trialid_box.Add(self.trialid_target, 0)
     sizer.Add(trialid_box, 0, wx.EXPAND)
 
-    self.saved_radio = wx.RadioButton(self, wx.ID_ANY, "Gespeichertes Projekt laden")
+    self.saved_radio = wx.RadioButton(self, wx.ID_ANY, "Load an existing project")
     sizer.Add(self.saved_radio, 0)
     saved_project_box = wx.BoxSizer(wx.HORIZONTAL)
-    self.saved_text = wx.StaticText(self, wx.ID_ANY, "Gespeichertes Projekt waehlen...")
+    self.saved_text = wx.StaticText(self, wx.ID_ANY, "Choose existing project...")
     saved_project_box.Add(self.saved_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
-    self.saved_button = wx.Button(self, wx.ID_ANY, "Durchsuchen")
+    self.saved_button = wx.Button(self, wx.ID_ANY, "Open")
     saved_project_box.Add(self.saved_button, 0)
     sizer.Add(saved_project_box, 0, wx.EXPAND)
 
@@ -144,19 +144,19 @@ class OpenDialog(wx.Dialog):
       return None
 
   def OnSelectVideo(self, event):
-    q = self._open_file('Video waehlen', 'AVI-Datei (*.avi)|*.avi')
+    q = self._open_file('Choose video file...', 'AVI file (*.avi)|*.avi')
     if not q is None:
       self.video_text.SetLabel(q)
       self.video_filepath = q
 
   def OnSelectEyedata(self, event):
-    q = self._open_file('Augenbewegungsdaten waehlen', 'ASC-Datei (*.asc)|*.asc')
+    q = self._open_file('Choose edf...', 'ASC file (*.asc)|*.asc')
     if not q is None:
       self.eyedata_text.SetLabel(q)
       self.eyedata_filepath = q
 
   def OnSelectSaved(self, event):
-    q = self._open_file('Gespeichertes Projekt waehlen', 'PYPS-Datei (*.pyps)|*.pyps|PYPS-AUTOSAVES (*.pyps_autosave)|*.pyps_autosave')
+    q = self._open_file('Choose existing project', 'PYPS file (*.pyps)|*.pyps|PYPS-AUTOSAVES (*.pyps_autosave)|*.pyps_autosave')
     if not q is None:
       self.saved_text.SetLabel(q)
       self.saved_filepath = q
@@ -172,14 +172,14 @@ class OpenDialog(wx.Dialog):
       else:
         self.parent.loadProject(self.saved_filepath, overwrite_video_filepath)
     except ReaderError as e: 
-      error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Videodatei: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg = wx.MessageDialog(self, 'Error while loading video file: %s' % e, 'Error', wx.OK | wx.ICON_ERROR)
       error_dlg.ShowModal()
       if self.new_save == 'SAVE':
-        video_filepath = self._open_file('Video waehlen', 'AVI-Datei (*.avi)|*.avi')
+        video_filepath = self._open_file('Choose video file...', 'AVI file (*.avi)|*.avi')
         if not video_filepath is None:
           self.OnLoad(overwrite_video_filepath=video_filepath)
     except EyeMovementError as e:
-      error_dlg = wx.MessageDialog(self, 'Fehler beim Laden der Augendaten: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg = wx.MessageDialog(self, 'Error while loading eyemovement data: %s' % e, 'Error', wx.OK | wx.ICON_ERROR)
       error_dlg.ShowModal()
     else:
       self.Destroy()

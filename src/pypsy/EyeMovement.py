@@ -43,8 +43,8 @@ class EyeMovement(Saveable):
         self._looks = saved_state.get('looks', []) # (left, right); indexed by frame
 
         if filepath and trialid_target:
-            if not os.path.isfile(filepath): raise EyeMovementError("Die angegebene Augenbewegungsdatei existiert nicht")
-            if not os.access(filepath, os.R_OK): raise EyeMovementError("Auf die angegebene Augenbewegungsdatei kann nicht zugegriffen werden (keine Leseberechtigung).")
+            if not os.path.isfile(filepath): raise EyeMovementError("This eyemovement data file does not exist.")
+            if not os.access(filepath, os.R_OK): raise EyeMovementError("This eyemovement data file cannot be accessed (no permission to read).")
             self._parseFile(filepath, trialid_target)
 
     def getState(self):
@@ -236,7 +236,7 @@ class EyeMovement(Saveable):
         elif left is None:
             return self._prev_nextFixationFrame(frame, 1, self.meanStatusAt, len(self._status_mean))
         else:
-            raise Exception("left has to be True, False or None!")
+            raise Exception("Left has to be True, False or None!")
 
     def prevFixationFrame(self, frame, left):
         if left is True:
@@ -246,7 +246,7 @@ class EyeMovement(Saveable):
         elif left is None:
             return self._prev_nextFixationFrame(frame, -1, self.meanStatusAt, len(self._status_mean))
         else:
-            raise Exception("left has to be True, False or None!")
+            raise Exception("Left has to be True, False or None!")
 
     def _prev_nextFixationFrame(self, frame, direction, func, max_frame):
         saw_other_state = False
@@ -270,7 +270,7 @@ class EyeMovement(Saveable):
         elif left is None:
             status = self._status_mean
         else:
-            raise Exception("left has to be True or False or None!")
+            raise Exception("Left has to be True or False or None!")
 
         result = {}
         last_index = None

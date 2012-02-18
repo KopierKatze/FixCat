@@ -37,7 +37,7 @@ class Clock(Saveable):
     f will get the current clock time as one float argument.
     e.g. f(2.3421)"""
     if(function is None):
-        raise ClockError("error during appending function. function may not be null")
+        raise ClockError("Error during appending function. Function to be appended may not be null")
     else:
         self.registered.append(function)
  
@@ -49,7 +49,7 @@ class Clock(Saveable):
     if(multi != 0.0):
         self.multiplicator = float(multi)
     else:
-        raise ClockError("multiplicator may not be 0")
+        raise ClockError("Multiplicator may not be 0")
 
   def run(self): 
     """let the clock tick until end_of_time is reached"""
@@ -58,7 +58,7 @@ class Clock(Saveable):
         worker = ClockWorker(self)
         worker.start()
     else:
-        raise ClockError("clock already running")
+        raise ClockError("Clock already running")
         
 
   def stop(self): 
@@ -66,7 +66,7 @@ class Clock(Saveable):
     if self.running == True:
         self.running = False
     else:
-        raise ClockError("clock already stopped")
+        raise ClockError("Clock already stopped")
 
   def seek(self, frame):
     """set current time of clock to frame
@@ -80,7 +80,7 @@ class Clock(Saveable):
 
     if frame < 0 or frame > self.total_frames:
       if self.running: self.stop()
-      raise ClockError("seek error: frame out of scope")
+      raise ClockError("Seek error: frame out of scope")
 
     self._frame = frame
     for function in self.registered:
