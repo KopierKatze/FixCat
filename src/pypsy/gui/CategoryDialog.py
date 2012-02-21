@@ -3,7 +3,7 @@ from EditCategoryDialog import EditCategoryDialog
 from pypsy.Helper import KeyCodeToHumanReadable
 
 class CategoryDialog(wx.Dialog):
-    def __init__(self, parent, id, title='Kategorie Uebersicht'):
+    def __init__(self, parent, id, title='Category overview'):
         wx.Dialog.__init__(self, parent, id, title, size=(400,300))
         self.Center()
         # get dict from controller
@@ -35,13 +35,13 @@ class CategoryDialog(wx.Dialog):
 
       tablebox.Add(self.lc, 4, wx.EXPAND)
 
-      btnbox.Add(wx.Button(self, 3, 'Neu'), 0, wx.ALIGN_CENTER)
+      btnbox.Add(wx.Button(self, 3, 'New'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
 
-      btnbox.Add(wx.Button(self, 1, 'Bearbeiten'), 0, wx.ALIGN_CENTER)
+      btnbox.Add(wx.Button(self, 1, 'Edit'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
 
-      btnbox.Add(wx.Button(self, 4, 'Loeschen'), 0, wx.ALIGN_CENTER)
+      btnbox.Add(wx.Button(self, 4, 'Delete'), 0, wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
 
       btnbox.Add(wx.Button(self, 5, 'Import'), 0, wx.ALIGN_CENTER)
@@ -49,7 +49,7 @@ class CategoryDialog(wx.Dialog):
 
       tablebox.Add(btnbox, 1, flag=wx.EXPAND)
 
-      textbox.Add(wx.Button(self, 2, 'Schliessen'), 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
+      textbox.Add(wx.Button(self, 2, 'Close'), 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
       self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
 
       mainbox.Add(tablebox, 3, flag=wx.EXPAND)
@@ -60,11 +60,11 @@ class CategoryDialog(wx.Dialog):
 
     def OnImport(self, event):
       confirm_dialog = wx.MessageDialog(self, 
-	'Dieser Vorgang ueberschreibt alle bisher eingegebenen Kategorien und Kategoriesierungen! Wollen sie wirklich fortfahren?',
-	'Kategorien importieren', wx.YES_NO)
+	'This procedure overrides all existing categories and categorisations! This cannot be reverted. Do you want to continue?',
+	'Import categories', wx.YES_NO)
 
       if confirm_dialog.ShowModal() == wx.ID_YES:
-	file_dialog = wx.FileDialog(self, 'Gespeichertes Projekt waehlen', style=wx.FD_OPEN, wildcard='PYPS-Datei (*.pyps)|*.pyps')
+	file_dialog = wx.FileDialog(self, 'Open existing project', style=wx.FD_OPEN, wildcard='PYPS file (*.pyps)|*.pyps')
 	if file_dialog.ShowModal() == wx.ID_OK:
 	  self.MainFrame.importCategories(file_dialog.GetPath())
 	  self.FillCategoryTable()
@@ -79,7 +79,7 @@ class CategoryDialog(wx.Dialog):
       short = self.lc.GetItemData(index)
       
       # in case there are no categories
-      if cat == '' or self.lc.GetFirstSelected() is None: return
+      if cat == '' or index is None: return
       
       edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
       edit_dlg.ShowModal()
@@ -97,10 +97,10 @@ class CategoryDialog(wx.Dialog):
     def OnDelete(self, event):
       # in case there are no categories
       index = self.lc.GetFocusedItem()
-      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetFirstSelected() is None: return
+      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetItem(index, 0) is None: return
       confirm_dialog = wx.MessageDialog(self, 
-	'Die Kategorie sowie alle Kategorisierungen dieser Kategorie werden geloescht wenn sie fortfahren! Dieser Vorgang kann nicht rueckgaengig gemacht werden! Wollen sie wirklich fortfahren?',
-	'Kategorie loeschen', wx.YES_NO)
+	'This category and all of its categorisations will be deleted! This cannot be reverted. Do you want to continue?',
+	'Delete category', wx.YES_NO)
 
       if confirm_dialog.ShowModal() != wx.ID_YES:
         return
@@ -122,7 +122,7 @@ class CategoryDialog(wx.Dialog):
 if __name__ == "__main__":
     class MyApp(wx.App):
         def OnInit(self):
-           frame = CategoryFrame(None, -1, 'Kategorie Uebersicht')
+           frame = CategoryFrame(None, -1, 'Category overview')
            frame.Show(True)
            frame.Centre()
            return True

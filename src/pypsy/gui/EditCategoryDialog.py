@@ -17,11 +17,11 @@ class EditCategoryDialog(wx.Dialog):
   def InitUI(self):
     sizer = wx.BoxSizer(wx.VERTICAL)
 
-    label = wx.StaticText(self, -1, "Kategorie editieren")
+    label = wx.StaticText(self, -1, "Edit categories")
     sizer.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
     box = wx.BoxSizer(wx.HORIZONTAL)
 
-    label = wx.StaticText(self, -1, "Kategorie:")
+    label = wx.StaticText(self, -1, "Category:")
     box.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
     self.category_name_text = wx.TextCtrl(self, -1, self.category_name, size=(80,-1))
     box.Add(self.category_name_text, 1, wx.ALIGN_CENTRE|wx.ALL, 5)
@@ -71,7 +71,7 @@ class EditCategoryDialog(wx.Dialog):
     try:
       self.editCategoryFunction(self.old_shortcut, self.new_shortcut, self.category_name)
     except CategoryContainerError, e:
-      error_dlg = wx.MessageDialog(self, 'Fehler beim Speichern der Kategorie: %s' % e, 'Fehler', wx.OK | wx.ICON_ERROR)
+      error_dlg = wx.MessageDialog(self, 'Error while saving the category: %s' % e, 'Error', wx.OK | wx.ICON_ERROR)
       error_dlg.ShowModal()
     else:
       self.Destroy()

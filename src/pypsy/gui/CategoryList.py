@@ -5,7 +5,7 @@ class CategoryList(wx.ListCtrl):
     wx.ListCtrl.__init__(self, parent, id, size=(200, -1), style=wx.LC_REPORT|wx.SUNKEN_BORDER)
 
     self.InsertColumn(0, "Index")
-    self.InsertColumn(1, "Kategorie")
+    self.InsertColumn(1, "Category")
     self.SetColumnWidth(0, 60)
     self.SetColumnWidth(1, 135)
 

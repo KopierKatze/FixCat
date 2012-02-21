@@ -159,7 +159,7 @@ default_config_raw = {
   },
 'general': {
     'autosave_minutes' : 5,
-    "__comment": "Please only edit this, if you know which codecs you have installed. For more information about fourcc please see http://www.fourcc.org/codecs.php",
+    "__comment": "Please only edit this, if you know which codecs you have installed. The string for the codec is composed of the four letters of the fourcc codec without spaces or other characters. For more information about fourcc please see http://www.fourcc.org/codecs.php",
     'video_export_codec' : 'DIVX',
   }
 }

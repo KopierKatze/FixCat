@@ -55,12 +55,12 @@ class MainFrame(wx.Frame):
 
     def autosave(self):
         if self.save_file is None:
-	    d = wx.MessageDialog(self, "Hi, ich wuerde jetzt das aktuelle Projekt speichern. Kann das aber nicht tun, weil es noch nicht gepspeichert wurde. Soll es jetzt gepspeichert werden? (Ich werde nicht wieder damit nerven)", style=wx.YES_NO)
+	    d = wx.MessageDialog(self, "This is the auto save dialog. You have not yet saved your modified project. Do you want to save the modifications? (This dialog will only show up once)", style=wx.YES_NO)
 	    if d.ShowModal() == wx.ID_YES:
 	      self.OnSave()
 	    d.Destroy()
 	else:
-	    self.statusBar.SetFields(['Automatisches Speichern...'])
+	    self.statusBar.SetFields(['auto save...'])
 	    self.controller.save_project(self.save_file+"_autosave")
 	    self.autosave_timer.Restart()
 	    self.statusBar.SetFields([''])
@@ -68,25 +68,25 @@ class MainFrame(wx.Frame):
     def InitMenu(self):
         # menubar elements
         fileMenu = wx.Menu()
-        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Oeffnen", "Oeffnen")
-        menuAbout = fileMenu.Append(wx.ID_ABOUT, "Ueber", "Ueber pyPsy")
-        menuSave = fileMenu.Append(wx.ID_SAVE, '&Speichern', "Speichern")
+        menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Open")
+        menuAbout = fileMenu.Append(wx.ID_ABOUT, "About", "About PyPsy")
+        menuSave = fileMenu.Append(wx.ID_SAVE, '&Save', "Save")
         fileMenu.AppendSeparator()
-        menuExit = fileMenu.Append(wx.ID_EXIT, "Beenden" , "Schliessen")
+        menuExit = fileMenu.Append(wx.ID_EXIT, "Quit" , "Quit")
 
         categoryMenu = wx.Menu()
-        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Kategorien verwalten")
+        categoryEdit = categoryMenu.Append(wx.ID_ANY, "Manage categories")
 
-        tempMenu = wx.Menu()
-        exportVideo = tempMenu.Append(wx.ID_ANY, "Export", "Video als AVI-Datei exportieren")
+        videoMenu = wx.Menu()
+        exportVideo = videoMenu.Append(wx.ID_ANY, "Export", "Export video data to avi file")
 
-        category_export = categoryMenu.Append(wx.ID_ANY, "Kategoriesierungen exportieren", "Kategorisierungen als CSV-Datei exportieren")
+        category_export = categoryMenu.Append(wx.ID_ANY, "Export categorisations", "Export categorisations to CSV file")
 
 
         menuBar = wx.MenuBar()
-        menuBar.Append(fileMenu, "Datei")
-        menuBar.Append(categoryMenu, "Kategorie")
-        menuBar.Append(tempMenu, "Video")
+        menuBar.Append(fileMenu, "File")
+        menuBar.Append(categoryMenu, "Category")
+        menuBar.Append(videoMenu, "Video")
         self.SetMenuBar(menuBar)
 
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
@@ -119,6 +119,7 @@ class MainFrame(wx.Frame):
         self.speedslider = wx.Slider(self.controllspanel, wx.ID_ANY, 100, 10, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSpeedSliderScroll, self.speedslider)
         
+        self.speed_text = wx.StaticText(self.controllspanel, wx.ID_ANY, "Playback speed")
         #slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
         #self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
         #normal  = wx.Button(self.controllspanel, wx.ID_ANY, "100%")
@@ -149,6 +150,8 @@ class MainFrame(wx.Frame):
         hbox2.Add(self.right_eye)
         hbox2.Add(self.mean_eye)
         hbox2.Add((150, wx.ID_ANY), 1)
+        hbox2.Add(self.speed_text)
+        hbox2.Add((5, wx.ID_ANY))
         hbox2.Add(self.speedslider, 1)
         #hbox2.Add(slower)
         #hbox2.Add(normal)
@@ -265,15 +268,15 @@ class MainFrame(wx.Frame):
       self.loadImage()
 
       if self.controller.categorisationEye() == 'left':
-        status_text = "Linkes Auge|"
+        status_text = "Left eye|"
       elif self.controller.categorisationEye() == 'right':
-        status_text = "Rechtes Auge|"
+        status_text = "Right eye|"
       else:
-        status_text = "Gemittelt|"
+        status_text = "Mean|"
       if self.controller.categorisationObjects() == 'frames':
         status_text += "Frames"
       else:
-        status_text += "Fixationen"
+        status_text += "Fixations"
       self.statusBar.SetStatusText(status_text, 1)
 
       # start autosave timer
@@ -437,7 +440,7 @@ class MainFrame(wx.Frame):
     # ---------------- SHOWING EYE STATUS END --------
 
     def OnCategoryExport(self, event):
-      file_dialog = wx.FileDialog(self, "CSV Export", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV Datei (*.csv)|*.csv")
+      file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
@@ -445,13 +448,13 @@ class MainFrame(wx.Frame):
         self.controller.exportCategorisations(path)
     #------------------------------------------- menu items     
     def OnAbout(self, e):
-        dlg = wx.MessageDialog(self, "PyPsy ist ein Tool, das bei der Verarbeitung von Eyetracking-Daten hilft.", "Ueber PyPsy", wx.OK)
+        dlg = wx.MessageDialog(self, "PyPsy is a tool for processing eyetracking Data.", "About PyPsy", wx.OK)
         dlg.ShowModal()
         dlg.Destroy()
 
     def SaveAsk(self):
         if self.needs_save:
-          dlg = wx.MessageDialog(self, "Es sind nicht gespeicherte Aenderungen vorhanden. Sollen sie jetzt gepeichert werden?", "Speicher?", wx.YES_NO|wx.ICON_QUESTION)
+          dlg = wx.MessageDialog(self, "The project has been modified. Do you want to save your changes?", "Save changes?", wx.YES_NO|wx.ICON_QUESTION)
           if dlg.ShowModal() == wx.ID_YES:
             self.OnSave()
  
@@ -468,7 +471,7 @@ class MainFrame(wx.Frame):
         CategoryDialog(self, wx.ID_ANY).ShowModal()
 
     def OnSave(self, event=None):
-      file_dialog = wx.FileDialog(self, "Projekt speichern", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
+      file_dialog = wx.FileDialog(self, "Save project", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
@@ -479,13 +482,13 @@ class MainFrame(wx.Frame):
 	self.autosave_timer.Restart()
 
     def OnExport(self, event):
-      file_dialog = wx.FileDialog(self, "Video exportieren", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI Datei (*.avi)|*.avi")
+      file_dialog = wx.FileDialog(self, "Export video", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI file (*.avi)|*.avi")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
 	if not "." in path:
 	  path += ".avi"
 
-	progress_dialog = wx.ProgressDialog('Video Export', 'Exportiere Video...', parent=self, maximum=self.frames_total,
+	progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
 	  style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
 	# show progress by displaying the current frame
 	waiting_thread = threading.Thread()
