@@ -11,7 +11,13 @@ import wx
 import threading # used for video export
 
 class MainFrame(wx.Frame):
+    """This class handles the main window of pyPsy."""
     def __init__(self, video_str, current_frame, controller):
+        """In order to manage everythin in the main window, the MainFrame needs 
+        to know the `controller` that handles everything, as well as the number 
+        `current_frame` and a string representation of the video image in 
+        `video_str`. For more information about `video_str`, please see 
+        L{StringImage}."""
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
 
@@ -54,8 +60,9 @@ class MainFrame(wx.Frame):
 	self.ActivateMouseAndKeyCatching()
 
     def autosave(self):
+        """Handles the behaviour of autosave, as well as the dialog that pops up."""
         if self.save_file is None:
-	    d = wx.MessageDialog(self, "This is the auto save dialog. You have not yet saved your modified project. Do you want to save the modifications? (This dialog will only show up once)", style=wx.YES_NO)
+	    d = wx.MessageDialog(self, "This is the auto save dialog. You have not yet saved your modified project. Do you want to save the modifications? This dialog will only show up once.", style=wx.YES_NO)
 	    if d.ShowModal() == wx.ID_YES:
 	      self.OnSave()
 	    d.Destroy()
@@ -66,6 +73,7 @@ class MainFrame(wx.Frame):
 	    self.statusBar.SetFields([''])
 
     def InitMenu(self):
+        """Draws the menu at the top of the window."""
         # menubar elements
         fileMenu = wx.Menu()
         menuOpen = fileMenu.Append(wx.ID_OPEN, "&Open", "Open")
@@ -99,6 +107,9 @@ class MainFrame(wx.Frame):
 
 
     def InitUIControlls(self):
+        """Initializes and draws the buttons and UI elements used for playback
+        control or boxes defining which eyemovement data is used in the overlayed
+        video."""
 	play_bmp = button_images.getplayBitmap()
 	pause_bmp = button_images.getpauseBitmap()
 	next_f_bmp = button_images.getn_frameBitmap()
@@ -162,10 +173,13 @@ class MainFrame(wx.Frame):
         self.controllspanel.SetSizer(vbox)
 
     def seek(self, frame):
-      self.controller.seek(frame)
-      self.loadImage()
+        """Helper function for handling the `slider` events."""
+        self.controller.seek(frame)
+        self.loadImage()
 
     def InitUI(self):
+        """Initializes the different parts of the UI and adds the widget that
+        displays the video."""
         self.InitMenu()
         self.statusBar = self.CreateStatusBar(3)
         self.statusBar.SetStatusWidths([-4,-1,150])
@@ -195,6 +209,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnExit)
 	
     def ActivateMouseAndKeyCatching(self):
+        """Check for mouse or keyboard input of the user."""
         # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMousewheel)
         # catching key events is a lot more complicated. they are not propagated to parent classes...
@@ -204,6 +219,7 @@ class MainFrame(wx.Frame):
         wx.GetApp().Bind(wx.EVT_CHAR_HOOK, self.OnKeyPressed)
 
     def DeactivateMouseAndKeyCatching(self):
+        """Stop checking for mouse or keyboard input of the user."""
         # ------ global mouse and key events ------------
         self.Bind(wx.EVT_MOUSEWHEEL, None)
         # catching key events is a lot more complicated. they are not propagated to parent classes...
@@ -212,153 +228,185 @@ class MainFrame(wx.Frame):
         wx.GetApp().Bind(wx.EVT_CHAR_HOOK, None)
 
     def setEyeCheckboxStates(self):
-      left, right, mean = self.controller.getEyeStatus()
-      self.left_eye.SetValue(left)
-      self.right_eye.SetValue(right)
-      self.mean_eye.SetValue(mean)
+        """Sets the checkboxes for which eyemovement data is currently displayed
+        to what the user chose or to what is stored in the saved state."""
+        left, right, mean = self.controller.getEyeStatus()
+        self.left_eye.SetValue(left)
+        self.right_eye.SetValue(right)
+        self.mean_eye.SetValue(mean)
 
     def loadImage(self):
-      image_str = self.video_str.get_obj().raw[:self.video_str_length]
-      self.videoimage.SetImage(image_str)
+        """Updates the image of the video widget and displays the first
+        frame of the video if a new project is started. This method also handles
+        the status of the video, eg. `current time`, beeing displayed in the 
+        lower right corner of the MainFrame."""
+        image_str = self.video_str.get_obj().raw[:self.video_str_length]
+        self.videoimage.SetImage(image_str)
 
-      self.slider.SetValue(self.current_frame.value)
+        self.slider.SetValue(self.current_frame.value)
 
-      self.category_list.MarkFrame(self.current_frame.value)
+        self.category_list.MarkFrame(self.current_frame.value)
 
-      current_time = round(self.current_frame.value/self.fps)
-      total_time = round(self.frames_total/self.fps)
-      speed = self.speedslider.GetValue() * 0.01
-      self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
+        current_time = round(self.current_frame.value/self.fps)
+        total_time = round(self.frames_total/self.fps)
+        speed = self.speedslider.GetValue() * 0.01
+        self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
 
-      if self.controller.isClockRunning():
-	self.reloadTimer.Restart()
+        if self.controller.isClockRunning():
+            self.reloadTimer.Restart()
 
     def newProject(self, video_filepath, eyemovement_filepath, trialid_target, categorise_frames, categorising_eye_is_left):
-      self.controller.new_project(video_filepath, eyemovement_filepath, trialid_target, categorise_frames, categorising_eye_is_left)
-      self.save_file = None
-      self.needs_save = False
-      self._loadProjectInfo()
+        """Initializes a new project with the input the user set in the OpenDialog."""
+        self.controller.new_project(video_filepath, eyemovement_filepath, trialid_target, categorise_frames, categorising_eye_is_left)
+        self.save_file = None
+        self.needs_save = False
+        self._loadProjectInfo()
 
     def newProjectPlausible(self):
-      return self.controller.plausibleCheck()
+        """This method runs the `Controller.plausibleCheck()` of the `controller`
+        in order to check if the video and the eyemovement data match to a certain
+        degree or not. If this is not the case, the user will see a dialog window 
+        asking, if he wants to continue."""
+        return self.controller.plausibleCheck()
 
     def getMaxFramesOfEyeMovement(self):
-      return self.controller.getMaxFramesOfEyeMovement()
+        """Returns the overall number of frames contained in the trial of the 
+        eyemovement file by using `Controller.getMaxFramesOfEyeMovement()`."""
+        return self.controller.getMaxFramesOfEyeMovement()
 
     def loadProject(self, filepath, overwrite_video_filepath=None):
-      self.controller.load_project(filepath, overwrite_video_filepath)
-      self.save_file = filepath
-      self.needs_save = False
-      self._loadProjectInfo()
+        """Loads an existing project and its data."""
+        self.controller.load_project(filepath, overwrite_video_filepath)
+        self.save_file = filepath
+        self.needs_save = False
+        self._loadProjectInfo()
 
     def _loadProjectInfo(self):
-      self.video_str_length = self.controller.getVideoStrLength()
-      self.frames_total = self.controller.getVideoFrameCount()
-      self.fps = self.controller.getVideoFrameRate()
-      
-      self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
+        """Helper function for `loadProject()` that takes care of resetting the 
+        necessary parts of the UI for the project."""
+        self.video_str_length = self.controller.getVideoStrLength()
+        self.frames_total = self.controller.getVideoFrameCount()
+        self.fps = self.controller.getVideoFrameRate()
+        
+        self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
 
-      self.slider.SetMax(self.controller.getVideoFrameCount())
+        self.slider.SetMax(self.controller.getVideoFrameCount())
 
-      self.setEyeCheckboxStates()
-      
-      self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
-      self.loadCategorisationInToList()
+        self.setEyeCheckboxStates()
+        
+        self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
+        self.loadCategorisationInToList()
 
-      self.loadImage()
+        self.loadImage()
 
-      if self.controller.categorisationEye() == 'left':
-        status_text = "Left eye|"
-      elif self.controller.categorisationEye() == 'right':
-        status_text = "Right eye|"
-      else:
-        status_text = "Mean|"
-      if self.controller.categorisationObjects() == 'frames':
-        status_text += "Frames"
-      else:
-        status_text += "Fixations"
-      self.statusBar.SetStatusText(status_text, 1)
+        if self.controller.categorisationEye() == 'left':
+            status_text = "Left eye|"
+        elif self.controller.categorisationEye() == 'right':
+            status_text = "Right eye|"
+        else:
+            status_text = "Mean|"
+        if self.controller.categorisationObjects() == 'frames':
+            status_text += "Frames"
+        else:
+            status_text += "Fixations"
+        self.statusBar.SetStatusText(status_text, 1)
 
-      # start autosave timer
-      self.autosave_timer.Restart()
+        # start autosave timer
+        self.autosave_timer.Restart()
 
     def loadCategorisationInToList(self):
-      self.category_list.FillInCategorisations(self.controller.getCategorisations())
+        """Loads the list of categorisations from the controller into the widget
+        on the right of the MainFrame, which displays the categorisations made
+        so far."""
+        self.category_list.FillInCategorisations(self.controller.getCategorisations())
 
     def getCategories(self):
-      return self.controller.getCategories()
+        """Gets the categories from the `controller`."""
+        return self.controller.getCategories()
 
     def editCategory(self, old_shortcut, new_shortcut, category_name):
-      self.needs_save = True
-      return self.controller.editCategory(old_shortcut, new_shortcut, category_name)
+        """Called if the user edited a category. Either its `category_name` is 
+        changed or the `old_shortcut` is changed to a `new_shortcut`."""
+        self.needs_save = True
+        return self.controller.editCategory(old_shortcut, new_shortcut, category_name)
 
     def importCategories(self, filepath):
-      self.needs_save = True
-      self.controller.importCategories(filepath)
+        """Imports categories from an existing project into the one currently 
+        opened, by calling `Controller.importCategories()` in the `controller`."""
+        self.needs_save = True
+        self.controller.importCategories(filepath)
 
     def controllerIO(self):
-      if self.controller is None: return False
-      if not self.controller.ready(): return False
-      return True
+        """This method checks if the `controller` is ready for use. Returns
+        False if it is not."""
+        if self.controller is None: return False
+        if not self.controller.ready(): return False
+        return True
 
-    # ----- SHORTCUTS ----
+        # ----- SHORTCUTS ----
     def OnMousewheel(self, event):
-      if event.GetWheelRotation() > 0:
-	self.OnNextFrame(event)
-      else:
-	self.OnPrevFrame(event)
+        """Handles user input from the mouse."""
+        if event.GetWheelRotation() > 0:
+            self.OnNextFrame(event)
+        else:
+            self.OnPrevFrame(event)
 
     def OnKeyPressed(self, event):
-      key_code = event.GetKeyCode()
+        """Handles user input from the keyboard."""
+        key_code = event.GetKeyCode()
 
-      if key_code == self.config.get('keyboard_shortcuts', 'prev_frame'):
-	self.OnPrevFrame()
-      elif key_code == self.config.get('keyboard_shortcuts', 'next_frame'):
-	self.OnNextFrame()
-      elif key_code == self.config.get('keyboard_shortcuts', 'next_fixation'):
-	self.OnNextFixation()
-      elif key_code == self.config.get('keyboard_shortcuts', 'prev_fixation'):
-	self.OnPrevFixation()
-      elif key_code == self.config.get('keyboard_shortcuts', 'faster'):
-	self.OnFaster()
-      elif key_code == self.config.get('keyboard_shortcuts', 'slower'):
-	self.OnSlower()
-      elif key_code == self.config.get('keyboard_shortcuts', 'play/pause'):
-	if self.playing:
-	  self.OnPause()
-	else:
-	  self.OnPlay()
-      elif key_code == self.config.get('keyboard_shortcuts', 'delete'):
-        for to_delete in self.category_list.GetSelected():
-          self.controller.deleteCategorisation(to_delete[0])
-          self.category_list.Update(to_delete, "-")
-      else:
-	# try to categorise the current frame to the category which may belong tho key_code
-	if self.categorise(key_code) and event.GetEventType() == wx.EVT_KEY_DOWN:
-            if self.controller.categorisationObjects() == 'frames':
-                self.OnNextFrame()
-            else: 
-                self.OnNextFixation()
+        if key_code == self.config.get('keyboard_shortcuts', 'prev_frame'):
+            self.OnPrevFrame()
+        elif key_code == self.config.get('keyboard_shortcuts', 'next_frame'):
+            self.OnNextFrame()
+        elif key_code == self.config.get('keyboard_shortcuts', 'next_fixation'):
+            self.OnNextFixation()
+        elif key_code == self.config.get('keyboard_shortcuts', 'prev_fixation'):
+            self.OnPrevFixation()
+        elif key_code == self.config.get('keyboard_shortcuts', 'faster'):
+            self.OnFaster()
+        elif key_code == self.config.get('keyboard_shortcuts', 'slower'):
+            self.OnSlower()
+        elif key_code == self.config.get('keyboard_shortcuts', 'play/pause'):
+            if self.playing:
+                self.OnPause()
+            else:
+                self.OnPlay()
+        elif key_code == self.config.get('keyboard_shortcuts', 'delete'):
+            for to_delete in self.category_list.GetSelected():
+                self.controller.deleteCategorisation(to_delete[0])
+                self.category_list.Update(to_delete, "-")
+                self.needs_save = True
+        else:
+            # try to categorise the current frame to the category which may belong tho key_code
+            if self.categorise(key_code) and event.GetEventType() == wx.EVT_KEY_DOWN:
+                if self.controller.categorisationObjects() == 'frames':
+                    self.OnNextFrame()
+                else: 
+                    self.OnNextFixation()
 
     def categorise(self, key_code, overwrite=True):
-      if key_code is None: return
-      if not overwrite and not self.controller.getCategoryOfFrame(self.current_frame.value) is None: return
-      try:
-        return_info = self.controller.categorise(key_code)
-      except CategoryContainerError:
-        # the category container will raise an error when the keycode is not assigned
-        # and as we forward nearly all pressed keys this would be quite annoying
-        return_info = False
-        return False
-      if return_info:
-        self.needs_save = True
-	index, category = return_info
-	self.category_list.Update(index, category)
-	# load Image so category_list will jump to categorised frame
-	self.category_list.MarkFrame(self.current_frame.value)
-	
-	self.loopthrough_categorykey = key_code
-        return True
+        """Categorises the current frame with the category that belongs to `key_code`.
+        This method also takes care of the loopthrough of a category from one
+        fixation/frame to the next."""
+        if key_code is None: return
+        if not overwrite and not self.controller.getCategoryOfFrame(self.current_frame.value) is None: return
+        try:
+            return_info = self.controller.categorise(key_code)
+        except CategoryContainerError:
+            # the category container will raise an error when the keycode is not assigned
+            # and as we forward nearly all pressed keys this would be quite annoying
+            return_info = False
+            return False
+        if return_info:
+            self.needs_save = True
+            index, category = return_info
+            self.category_list.Update(index, category)
+            # load Image so category_list will jump to categorised frame
+            self.category_list.MarkFrame(self.current_frame.value)
+            
+            self.loopthrough_categorykey = key_code
+            return True
 	
 
     # ---------------- PLAYBACK CONTROLL --------------
@@ -422,8 +470,8 @@ class MainFrame(wx.Frame):
 
       self.controller.jumpToNextUncategorisedObject()
       self.loadImage()
-
     # ---------------- PLAYBACK CONTROLL END ----------
+    
     # ---------------- SHOWING EYE STATUS CONTROLLS ---
     def OnLeftEyeCheckbox(self, event):
       self.controller.leftEyeStatus(event.Checked())
@@ -439,6 +487,7 @@ class MainFrame(wx.Frame):
       self.loadImage()
     # ---------------- SHOWING EYE STATUS END --------
 
+    #----------------- MENU ITEMS --------------------
     def OnCategoryExport(self, event):
       file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
       if file_dialog.ShowModal() == wx.ID_OK:
@@ -446,7 +495,7 @@ class MainFrame(wx.Frame):
 	if not "." in path:
 	  path += ".csv"
         self.controller.exportCategorisations(path)
-    #------------------------------------------- menu items     
+   
     def OnAbout(self, e):
         dlg = wx.MessageDialog(self, "PyPsy is a tool for processing eyetracking Data.", "About PyPsy", wx.OK)
         dlg.ShowModal()
@@ -482,6 +531,9 @@ class MainFrame(wx.Frame):
 	self.autosave_timer.Restart()
 
     def OnExport(self, event):
+      """This method takes care of the export of a video. For better performance,
+      this is handled in a new thread `waiting_thread`. While this thread works,
+      a progress dialog will show up. """  
       file_dialog = wx.FileDialog(self, "Export video", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI file (*.avi)|*.avi")
       if file_dialog.ShowModal() == wx.ID_OK:
 	path = file_dialog.GetPath()
