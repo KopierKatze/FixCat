@@ -50,10 +50,13 @@ class VideoWriter(object):
     
 class WriterError(Exception):
     """This error will be thrown in the following methods. 
-        1. A `VideoWriterError` is thrown in `VideoWriter.__init__()` if: 
+        0. A `VideoWriterError` is thrown in `VideoWriter.__init__()` if: 
             - no `VideoWriter.__init__.filepath` was specified
             - `VideoWriter.__init__.fps` was not specified or is lower than 1
             - the cv size of the output file was not specified or is smaller than 1
-        2. A `VideoWriterError` is thrown in `VideoWriter.addFrame()` if: 
-            - `VideoWriter.addFrame.new_frame` is none """
+            
+        1. A `VideoWriterError` is thrown in `VideoWriter.addFrame()` if: 
+            - `VideoWriter.addFrame.new_frame` is none
+            
+    """
     pass

@@ -88,22 +88,24 @@ class VideoReader(Saveable):
 
 class ReaderError(Exception):
     """This error will be thrown in the following methods. 
-        1. A `ReaderError` is thrown in `VideoReader.__init__()` if: 
+        0. A `ReaderError` is thrown in `VideoReader.__init__()` if: 
             - `VideoReader.__init__.filepath` is None or empty and 
-            `VideoReader.__init__.saved_state` is empty. This means that no new
-            file and no saved state are being opened.
+                `VideoReader.__init__.saved_state` is empty. This means that no new
+                file and no saved state are being opened.
             - `VideoReader.__init__.saved_state` is not empty and a 
-            `VideoReader.__init__.filepath` for a new file is specified. This means
-            that it is unclear if we start from a saved state or start with a 
-            new video file. 
+                `VideoReader.__init__.filepath` for a new file is specified. This means
+                that it is unclear if we start from a saved state or start with a 
+                new video file. 
             - the file at `VideoReader.__init__.filepath` does not exist or you
-            do not have the rights to read it. 
+                do not have the rights to read it. 
             - the codec could not be retrieved from the cv capture or the file 
-            might be broken. 
-        2. A `ReaderError` is thrown in `VideoReader.frame()` if: 
+                might be broken. 
+            
+        1. A `ReaderError` is thrown in `VideoReader.frame()` if: 
             - a problem occured during retrieving a frame at the specified 
-            `VideoReader.frame.frame_number`
+                `VideoReader.frame.frame_number`
             - `VideoReader.frame.frame_number` is not a valid frame number, meaning
-            that it is higher than the total number of frames or smaller than 0
-            """
+                that it is higher than the total number of frames or smaller than 0
+            
+    """
     pass
