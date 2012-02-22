@@ -5,25 +5,25 @@ from thread import start_new_thread
 from time import time, sleep
 
 class Clock(Saveable):
-    """This class provides the methods for the Clock that runs in the background 
-    of the tool. It plays a central role by defining the speed of playback and 
-    keeping track of methods to be executed at each tick. 
-    Methods can be registered via the `register()` method. This will cause the 
+    """This class provides the methods for the Clock that runs in the background
+    of the tool. It plays a central role by defining the speed of playback and
+    keeping track of methods to be executed at each tick.
+    Methods can be registered via the `register()` method. This will cause the
     registered methods to be performed at each tick. Registered methods can be
     informed about the current time in frame numbers.
-    Playback speed - i.e. the time of passed within one interval - 
-    can be manipulated with the `setMultiplicator()` method. 
-    After the Clock is set to `run()`, it can `seek()` to different positions 
+    Playback speed - i.e. the time of passed within one interval -
+    can be manipulated with the `setMultiplicator()` method.
+    After the Clock is set to `run()`, it can `seek()` to different positions
     within the video file by specifying the frame number you want it to be placed.
-    If the Cloc has reached the end of the video, the `stop()` method will be 
-    called. 
-    
-    As specified in the `run()` method, the Clock itself does not actually run 
-    itself, but it creates a worker thread that will do the work instead. See 
+    If the Cloc has reached the end of the video, the `stop()` method will be
+    called.
+
+    As specified in the `run()` method, the Clock itself does not actually run
+    itself, but it creates a worker thread that will do the work instead. See
     ClockWorker for more details."""
-    
+
     def __init__(self, total_frames=None, fps=None, saved_state={}):
-        """Creates a clock with a total amount of frames of the video, framerate 
+        """Creates a clock with a total amount of frames of the video, framerate
         of the videoand, if existing, a saved state. The `saved_state` contains
         data about the frame that was displayed the last time you opened the project,
         the multiplicator that was set, the `fps` and total_frames."""
@@ -54,7 +54,7 @@ class Clock(Saveable):
             raise ClockError("Error during appending function. Function to be appended may not be null")
         else:
             self.registered.append(function)
- 
+
     def setMultiplicator(self, multiplicator):
         """Manipulates how much time passes within one interval or tick.
         The length of an interval will be altered the following way:
@@ -64,8 +64,8 @@ class Clock(Saveable):
         else:
             raise ClockError("Multiplicator may not be 0")
 
-    def run(self): 
-        """Runs the Clock by running the ClockWorker thread. The worker should only 
+    def run(self):
+        """Runs the Clock by running the ClockWorker thread. The worker should only
         be started, if the Clock itself is already running."""
         if self.running == False:
             self.running = True
@@ -73,9 +73,9 @@ class Clock(Saveable):
             worker.start()
         else:
             raise ClockError("Clock already running")
-        
 
-    def stop(self): 
+
+    def stop(self):
         """Stop the Clock at the current time. """
         if self.running == True:
             self.running = False
@@ -84,8 +84,8 @@ class Clock(Saveable):
 
     def seek(self, frame):
         """Set the Clock to `frame`, eg. for seeking in the player and for normal
-        playback. See `run()` in ClockWorker. 
-        If `frame` is higher than the total amount of frames, a ClockError will 
+        playback. See `run()` in ClockWorker.
+        If `frame` is higher than the total amount of frames, a ClockError will
         be raised"""
         if self.frame == frame:
             # nothing to change so save cpu time
@@ -102,26 +102,26 @@ class Clock(Saveable):
 class ClockError(Exception):
     """This Error is thrown if
         - The function you tried to append in `Clock.register()` is None
-        - The new multiplicator in `Clock.setMultiplicator()` is 0. 
-        This value is intended to be greater than 0. 
-        - The Clock is already running and `Clock.run()` is called again. This is not 
-        allowed, since only one Clock and its ClockWorker are supposed to be 
+        - The new multiplicator in `Clock.setMultiplicator()` is 0.
+        This value is intended to be greater than 0.
+        - The Clock is already running and `Clock.run()` is called again. This is not
+        allowed, since only one Clock and its ClockWorker are supposed to be
         running at once.
-        - The number of the frame passed to `Clock.seek()` is either 
+        - The number of the frame passed to `Clock.seek()` is either
         smaller than 0 or greater than the total number of frames of the video."""
     pass
-    
+
 class ClockWorker(threading.Thread):
-    """This worker class is need for the actual work our Clock does. 
+    """This worker class is need for the actual work our Clock does.
     It instantiates a Clock of the class above and then uses its methods in the
     `Clock.run()` method. The ClockWorker runs in its own thread, so it has to inherit
-    from the threading module. 
+    from the threading module.
     The running instance of a ClockWorker sleeps for a certain interval(depending
     on the multiplicator) and then increments the framecount.
     If the count of total_frames is smaller than the
-    amount of frames in the video, the ClockWorker seeks to the 
-    new frame, if total_frames is bigger, 
-    the clock will seek to the highest frame number possible and then stop. 
+    amount of frames in the video, the ClockWorker seeks to the
+    new frame, if total_frames is bigger,
+    the clock will seek to the highest frame number possible and then stop.
     """
     def __init__(self, Clock):
         threading.Thread.__init__(self)
@@ -140,9 +140,9 @@ class ClockWorker(threading.Thread):
             else: sleep(0.00001)
             new_frame = self.c._frame + (1.0 * self.c.multiplicator)
             if round(new_frame) > self.c.total_frames:
-              self.c.seek(self.c.total_frames)
-              self.c.stop()
+                self.c.seek(self.c.total_frames)
+                self.c.stop()
             else:
-              self.c.seek(new_frame)
+                self.c.seek(new_frame)
             actual = time() - temptime
             #print int(actual/target*100), sleeptime

@@ -85,4 +85,3 @@ play = PyEmbeddedImage(
 getplayData = play.GetData
 getplayImage = play.GetImage
 getplayBitmap = play.GetBitmap
-

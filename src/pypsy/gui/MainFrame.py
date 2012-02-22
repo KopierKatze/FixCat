@@ -13,10 +13,10 @@ import threading # used for video export
 class MainFrame(wx.Frame):
     """This class handles the main window of pyPsy."""
     def __init__(self, video_str, current_frame, controller):
-        """In order to manage everythin in the main window, the MainFrame needs 
-        to know the `controller` that handles everything, as well as the number 
-        `current_frame` and a string representation of the video image in 
-        `video_str`. For more information about `video_str`, please see 
+        """In order to manage everythin in the main window, the MainFrame needs
+        to know the `controller` that handles everything, as well as the number
+        `current_frame` and a string representation of the video image in
+        `video_str`. For more information about `video_str`, please see
         L{StringImage}."""
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
@@ -48,29 +48,29 @@ class MainFrame(wx.Frame):
         self.save_file = None
         asm = self.config.get('general', 'autosave_minutes')
         if asm is None:
-	  self.autosave_timer = wx.CallLater(10, lambda: None)
-	  self.autosave_timer.Restart = lambda: None
-	else:
-	  self.autosave_timer = wx.CallLater(asm*60*1000, self.autosave)
-	  # activated on project load
-	  self.autosave_timer.Stop()
+            self.autosave_timer = wx.CallLater(10, lambda: None)
+            self.autosave_timer.Restart = lambda: None
+        else:
+            self.autosave_timer = wx.CallLater(asm*60*1000, self.autosave)
+            # activated on project load
+            self.autosave_timer.Stop()
 
-	self.OnOpen(bootstrap_phase=True)
+        self.OnOpen(bootstrap_phase=True)
 
-	self.ActivateMouseAndKeyCatching()
+        self.ActivateMouseAndKeyCatching()
 
     def autosave(self):
         """Handles the behaviour of autosave, as well as the dialog that pops up."""
         if self.save_file is None:
-	    d = wx.MessageDialog(self, "This is the auto save dialog. You have not yet saved your modified project. Do you want to save the modifications? This dialog will only show up once.", style=wx.YES_NO)
-	    if d.ShowModal() == wx.ID_YES:
-	      self.OnSave()
-	    d.Destroy()
-	else:
-	    self.statusBar.SetFields(['auto save...'])
-	    self.controller.save_project(self.save_file+"_autosave")
-	    self.autosave_timer.Restart()
-	    self.statusBar.SetFields([''])
+            d = wx.MessageDialog(self, "This is the auto save dialog. You have not yet saved your modified project. Do you want to save the modifications? This dialog will only show up once.", style=wx.YES_NO)
+            if d.ShowModal() == wx.ID_YES:
+                self.OnSave()
+            d.Destroy()
+        else:
+            self.statusBar.SetFields(['auto save...'])
+            self.controller.save_project(self.save_file+"_autosave")
+            self.autosave_timer.Restart()
+            self.statusBar.SetFields([''])
 
     def InitMenu(self):
         """Draws the menu at the top of the window."""
@@ -110,12 +110,12 @@ class MainFrame(wx.Frame):
         """Initializes and draws the buttons and UI elements used for playback
         control or boxes defining which eyemovement data is used in the overlayed
         video."""
-	play_bmp = button_images.getplayBitmap()
-	pause_bmp = button_images.getpauseBitmap()
-	next_f_bmp = button_images.getn_frameBitmap()
-	prev_f_bmp = button_images.getp_frameBitmap()
-	next_uncat_bmp = button_images.getnext_uncatBitmap()
-	
+        play_bmp = button_images.getplayBitmap()
+        pause_bmp = button_images.getpauseBitmap()
+        next_f_bmp = button_images.getn_frameBitmap()
+        prev_f_bmp = button_images.getp_frameBitmap()
+        next_uncat_bmp = button_images.getnext_uncatBitmap()
+
         self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
         self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 1, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider)
@@ -129,7 +129,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
         self.speedslider = wx.Slider(self.controllspanel, wx.ID_ANY, 100, 10, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSpeedSliderScroll, self.speedslider)
-        
+
         self.speed_text = wx.StaticText(self.controllspanel, wx.ID_ANY, "Playback speed")
         #slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
         #self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
@@ -207,7 +207,7 @@ class MainFrame(wx.Frame):
         contentsizer.Add(self.controllspanel, 0, flag=wx.EXPAND|wx.TOP|wx.ALIGN_BOTTOM, border=5)
 
         self.Bind(wx.EVT_CLOSE, self.OnExit)
-	
+
     def ActivateMouseAndKeyCatching(self):
         """Check for mouse or keyboard input of the user."""
         # ------ global mouse and key events ------------
@@ -238,7 +238,7 @@ class MainFrame(wx.Frame):
     def loadImage(self):
         """Updates the image of the video widget and displays the first
         frame of the video if a new project is started. This method also handles
-        the status of the video, eg. `current time`, beeing displayed in the 
+        the status of the video, eg. `current time`, beeing displayed in the
         lower right corner of the MainFrame."""
         image_str = self.video_str.get_obj().raw[:self.video_str_length]
         self.videoimage.SetImage(image_str)
@@ -265,12 +265,12 @@ class MainFrame(wx.Frame):
     def newProjectPlausible(self):
         """This method runs the `Controller.plausibleCheck()` of the `controller`
         in order to check if the video and the eyemovement data match to a certain
-        degree or not. If this is not the case, the user will see a dialog window 
+        degree or not. If this is not the case, the user will see a dialog window
         asking, if he wants to continue."""
         return self.controller.plausibleCheck()
 
     def getMaxFramesOfEyeMovement(self):
-        """Returns the overall number of frames contained in the trial of the 
+        """Returns the overall number of frames contained in the trial of the
         eyemovement file by using `Controller.getMaxFramesOfEyeMovement()`."""
         return self.controller.getMaxFramesOfEyeMovement()
 
@@ -282,18 +282,18 @@ class MainFrame(wx.Frame):
         self._loadProjectInfo()
 
     def _loadProjectInfo(self):
-        """Helper function for `loadProject()` that takes care of resetting the 
+        """Helper function for `loadProject()` that takes care of resetting the
         necessary parts of the UI for the project."""
         self.video_str_length = self.controller.getVideoStrLength()
         self.frames_total = self.controller.getVideoFrameCount()
         self.fps = self.controller.getVideoFrameRate()
-        
+
         self.videoimage.SetImageSize(self.controller.getVideoWidth(), self.controller.getVideoHeight())
 
         self.slider.SetMax(self.controller.getVideoFrameCount())
 
         self.setEyeCheckboxStates()
-        
+
         self.category_list.SetCategorisationOrder(self.controller.getCategorisationsOrder())
         self.loadCategorisationInToList()
 
@@ -325,13 +325,13 @@ class MainFrame(wx.Frame):
         return self.controller.getCategories()
 
     def editCategory(self, old_shortcut, new_shortcut, category_name):
-        """Called if the user edited a category. Either its `category_name` is 
+        """Called if the user edited a category. Either its `category_name` is
         changed or the `old_shortcut` is changed to a `new_shortcut`."""
         self.needs_save = True
         return self.controller.editCategory(old_shortcut, new_shortcut, category_name)
 
     def importCategories(self, filepath):
-        """Imports categories from an existing project into the one currently 
+        """Imports categories from an existing project into the one currently
         opened, by calling `Controller.importCategories()` in the `controller`."""
         self.needs_save = True
         self.controller.importCategories(filepath)
@@ -382,7 +382,7 @@ class MainFrame(wx.Frame):
             if self.categorise(key_code) and event.GetEventType() == wx.EVT_KEY_DOWN:
                 if self.controller.categorisationObjects() == 'frames':
                     self.OnNextFrame()
-                else: 
+                else:
                     self.OnNextFixation()
 
     def categorise(self, key_code, overwrite=True):
@@ -404,78 +404,78 @@ class MainFrame(wx.Frame):
             self.category_list.Update(index, category)
             # load Image so category_list will jump to categorised frame
             self.category_list.MarkFrame(self.current_frame.value)
-            
+
             self.loopthrough_categorykey = key_code
             return True
-	
+
 
     # ---------------- PLAYBACK CONTROLL --------------
     def OnPlay(self, event=None):
-      """Playback of the video, either if the button in the UI was used, or if
-      the user used the keybaord shortcut."""
-      self.loopthrough_categorykey = None
+        """Playback of the video, either if the button in the UI was used, or if
+        the user used the keybaord shortcut."""
+        self.loopthrough_categorykey = None
 
-      self.playing = True
-      self.controller.play()
-      self.loadImage()
+        self.playing = True
+        self.controller.play()
+        self.loadImage()
 
     def OnPause(self, event=None):
-      """Stops playback, either if the button in the UI was used, or if
-      the user used the keybaord shortcut."""
-      self.loopthrough_categorykey = None
+        """Stops playback, either if the button in the UI was used, or if
+        the user used the keybaord shortcut."""
+        self.loopthrough_categorykey = None
 
-      self.playing = False
-      self.controller.pause()
-      self.loadImage()
+        self.playing = False
+        self.controller.pause()
+        self.loadImage()
 
     def OnNextFrame(self, event=None):
-      """Loads and displays the next frame, either if the button in the UI was
-      used or if the user used the keyboard shortcut. The user can also jump to
-      the next frame by using the mousewheel."""
-      self.controller.nextFrame()
-      self.loadImage()
-      self.categorise(self.loopthrough_categorykey, False)
+        """Loads and displays the next frame, either if the button in the UI was
+        used or if the user used the keyboard shortcut. The user can also jump to
+        the next frame by using the mousewheel."""
+        self.controller.nextFrame()
+        self.loadImage()
+        self.categorise(self.loopthrough_categorykey, False)
 
     def OnPrevFrame(self, event=None):
-      """Loads and displays the previous frame, either if the button in the UI was
-      used or if the user used the keyboard shortcut. The user can also jump to
-      the previous frame by using the mousewheel."""
-      self.controller.prevFrame()
-      self.loadImage()
-      self.categorise(self.loopthrough_categorykey, False)
+        """Loads and displays the previous frame, either if the button in the UI was
+        used or if the user used the keyboard shortcut. The user can also jump to
+        the previous frame by using the mousewheel."""
+        self.controller.prevFrame()
+        self.loadImage()
+        self.categorise(self.loopthrough_categorykey, False)
 
     def OnNextFixation(self, event=None):
-      """Jumps to the next fixation, either if the user used the UI button or 
-      the keyboard shortcut."""
-      self.controller.nextFixation()
-      self.loadImage()
-      self.categorise(self.loopthrough_categorykey, False)
+        """Jumps to the next fixation, either if the user used the UI button or
+        the keyboard shortcut."""
+        self.controller.nextFixation()
+        self.loadImage()
+        self.categorise(self.loopthrough_categorykey, False)
 
     def OnPrevFixation(self, event=None):
-       """Jumps to the previous fixation, either if the user used the UI button or 
-      the keyboard shortcut."""
-      self.controller.prevFixation()
-      self.loadImage()
-      self.categorise(self.loopthrough_categorykey, False)
+        """Jumps to the previous fixation, either if the user used the UI button or
+        the keyboard shortcut."""
+        self.controller.prevFixation()
+        self.loadImage()
+        self.categorise(self.loopthrough_categorykey, False)
 
     def OnSlower(self, event=None):
-      """Reduces playback speed to 90% if the user clicked on the `slower` button."""
-      self.controller.slowerPlayback()
+        """Reduces playback speed to 90% if the user clicked on the `slower` button."""
+        self.controller.slowerPlayback()
 
     def OnNormal(self, event=None):
-      """Resets playback speed to normal."""
-      self.controller.normalPlayback()
+        """Resets playback speed to normal."""
+        self.controller.normalPlayback()
 
     def OnFaster(self, event=None):
-      """Increases playback speed to 1100% if the user clicked on the `faster` button."""
-      self.controller.fasterPlayback()
+        """Increases playback speed to 1100% if the user clicked on the `faster` button."""
+        self.controller.fasterPlayback()
 
     def OnSliderScroll(self, event):
-      """Sets the slider to the new value produced by moving the `slider`."""
-      self.loopthrough_categorykey = None
+        """Sets the slider to the new value produced by moving the `slider`."""
+        self.loopthrough_categorykey = None
 
-      self.seek(self.slider.GetValue())
-    
+        self.seek(self.slider.GetValue())
+
     def OnSpeedSliderScroll(self, event=None):
         """Sets the slider for playback speed control to the new value produced
         by moving the `speedslider`. This method also handles the update of the status
@@ -485,49 +485,49 @@ class MainFrame(wx.Frame):
         speed = self.speedslider.GetValue() * 0.01
         self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
         self.controller.setPlaybackSpeed(speed)
-        
-    def OnNextUncategorisedObject(self,event):
-      """Called if the user clicked on the UI button for the `next_uncategorised`
-      frame or fixation."""
-      self.loopthrough_categorykey = None
 
-      self.controller.jumpToNextUncategorisedObject()
-      self.loadImage()
+    def OnNextUncategorisedObject(self,event):
+        """Called if the user clicked on the UI button for the `next_uncategorised`
+        frame or fixation."""
+        self.loopthrough_categorykey = None
+
+        self.controller.jumpToNextUncategorisedObject()
+        self.loadImage()
     # ---------------- PLAYBACK CONTROLL END ----------
-    
+
     # ---------------- SHOWING EYE STATUS CONTROLLS ---
     def OnLeftEyeCheckbox(self, event):
-      """Called, if the checkbox for the left eye in the UI controls panel is
-      checked."""
-      self.controller.leftEyeStatus(event.Checked())
-      # load changed image, important if we currently not playing
-      self.loadImage()
+        """Called, if the checkbox for the left eye in the UI controls panel is
+        checked."""
+        self.controller.leftEyeStatus(event.Checked())
+        # load changed image, important if we currently not playing
+        self.loadImage()
     def OnRightEyeCheckbox(self, event):
-      """Called, if the checkbox for the right eye in the UI controls panel is
-      checked."""
-      self.controller.rightEyeStatus(event.Checked())
-      # load changed image, important if we currently not playing
-      self.loadImage()
+        """Called, if the checkbox for the right eye in the UI controls panel is
+        checked."""
+        self.controller.rightEyeStatus(event.Checked())
+        # load changed image, important if we currently not playing
+        self.loadImage()
     def OnMeanEyeCheckbox(self, event):
-      """Called, if the checkbox for the mean eye status in the UI controls panel 
-      is checked."""
-      self.controller.meanEyeStatus(event.Checked())
-      # load changed image, important if we currently not playing
-      self.loadImage()
+        """Called, if the checkbox for the mean eye status in the UI controls panel
+        is checked."""
+        self.controller.meanEyeStatus(event.Checked())
+        # load changed image, important if we currently not playing
+        self.loadImage()
     # ---------------- SHOWING EYE STATUS END --------
 
     #----------------- MENU ITEMS --------------------
     def OnCategoryExport(self, event):
-      """Guides the user through the process of exporting categories. After 
-      the user selected the output file in the dialog, 
-      `Controller.exportCategorisations()` is called and handles the export."""
-      file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
-      if file_dialog.ShowModal() == wx.ID_OK:
-	path = file_dialog.GetPath()
-	if not "." in path:
-	  path += ".csv"
-        self.controller.exportCategorisations(path)
-   
+        """Guides the user through the process of exporting categories. After
+        the user selected the output file in the dialog,
+        `Controller.exportCategorisations()` is called and handles the export."""
+        file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
+        if file_dialog.ShowModal() == wx.ID_OK:
+            path = file_dialog.GetPath()
+            if not "." in path:
+                path += ".csv"
+            self.controller.exportCategorisations(path)
+
     def OnAbout(self, e):
         """Shows the about text of pyPsy."""
         dlg = wx.MessageDialog(self, "PyPsy is a tool for processing eyetracking Data.", "About PyPsy", wx.OK)
@@ -539,10 +539,10 @@ class MainFrame(wx.Frame):
         is called. This method takes care of showing a dialog if the user wants
         to continue or save the changes. If yes was selected, `OnSave()` is called."""
         if self.needs_save:
-          dlg = wx.MessageDialog(self, "The project has been modified. Do you want to save your changes?", "Save changes?", wx.YES_NO|wx.ICON_QUESTION)
-          if dlg.ShowModal() == wx.ID_YES:
-            self.OnSave()
- 
+            dlg = wx.MessageDialog(self, "The project has been modified. Do you want to save your changes?", "Save changes?", wx.YES_NO|wx.ICON_QUESTION)
+            if dlg.ShowModal() == wx.ID_YES:
+                self.OnSave()
+
     def OnExit(self, e):
         """Closes pyPsy and shows a dialog if the user wants to save the changes
         made if necessary."""
@@ -550,11 +550,11 @@ class MainFrame(wx.Frame):
         self.Destroy()
 
     def OnOpen(self, event=None, bootstrap_phase=False):
-      """Opens the OpenDialog that guides the user through the process of either
-      loading an existing project or creating a new one."""
-      self.SaveAsk()
-      open_dialog = OpenDialog(self, bootstrap_phase)
-      open_dialog.ShowModal()
+        """Opens the OpenDialog that guides the user through the process of either
+        loading an existing project or creating a new one."""
+        self.SaveAsk()
+        open_dialog = OpenDialog(self, bootstrap_phase)
+        open_dialog.ShowModal()
 
     def OnEditCategory(self, e):
         """Opens the CategoryDialog that displays all categories and their
@@ -563,43 +563,42 @@ class MainFrame(wx.Frame):
         CategoryDialog(self, wx.ID_ANY).ShowModal()
 
     def OnSave(self, event=None):
-      """Opens a dialog for saving the project to a file."""  
-      file_dialog = wx.FileDialog(self, "Save project", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
-      if file_dialog.ShowModal() == wx.ID_OK:
-	path = file_dialog.GetPath()
-	if not "." in path:
-	  path += ".pyps"
-	self.controller.save_project(path)
-	self.save_file = path
-        self.needs_save = False
-	self.autosave_timer.Restart()
+        """Opens a dialog for saving the project to a file."""
+        file_dialog = wx.FileDialog(self, "Save project", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="PYPS Datei (*.pyps)|*.pyps")
+        if file_dialog.ShowModal() == wx.ID_OK:
+            path = file_dialog.GetPath()
+            if not "." in path:
+                path += ".pyps"
+            self.controller.save_project(path)
+            self.save_file = path
+            self.needs_save = False
+            self.autosave_timer.Restart()
 
     def OnExport(self, event):
-      """This method takes care of the export of a video. For better performance,
-      this is handled in a new thread `waiting_thread`. While this thread works,
-      a progress dialog will show up. """  
-      file_dialog = wx.FileDialog(self, "Export video", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI file (*.avi)|*.avi")
-      if file_dialog.ShowModal() == wx.ID_OK:
-	path = file_dialog.GetPath()
-	if not "." in path:
-	  path += ".avi"
+        """This method takes care of the export of a video. For better performance,
+        this is handled in a new thread `waiting_thread`. While this thread works,
+        a progress dialog will show up. """
+        file_dialog = wx.FileDialog(self, "Export video", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI file (*.avi)|*.avi")
+        if file_dialog.ShowModal() == wx.ID_OK:
+            path = file_dialog.GetPath()
+            if not "." in path:
+                path += ".avi"
 
-	progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
-	  style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
-	# show progress by displaying the current frame
-	waiting_thread = threading.Thread()
-	waiting_thread.run = lambda: self.controller.exportVideo(path)
-	waiting_thread.start()
-	while waiting_thread.isAlive():
-	  wx.MilliSleep(900)
-          progress_dialog.Update(self.current_frame.value)
-	progress_dialog.Destroy()
-        self.loadImage()
+            progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
+              style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
+            # show progress by displaying the current frame
+            waiting_thread = threading.Thread()
+            waiting_thread.run = lambda: self.controller.exportVideo(path)
+            waiting_thread.start()
+            while waiting_thread.isAlive():
+                wx.MilliSleep(900)
+                progress_dialog.Update(self.current_frame.value)
+            progress_dialog.Destroy()
+            self.loadImage()
 
 
 if __name__ == '__main__':
-  
+
     app = wx.App()
     Example(None, title="eyepsy window")
     app.MainLoop()
-

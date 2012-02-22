@@ -21,16 +21,16 @@ class Saveable(object):
     own."""
 
     def __init__(self, saved_state=None):
-        """When the saved program state is loaded 
+        """When the saved program state is loaded
         this object will be passed to the `__init__`
         constructor as keyword argument `saved_state`."""
         raise NotImplementedError('This method should be overwritten in the child.')
 
     def getState(self):
-      """This method should return a standart python
-      object which contains the whole state of this 
-      object."""
-      raise NotImplementedError('This method should be overwritten in the child.')
+        """This method should return a standart python
+        object which contains the whole state of this
+        object."""
+        raise NotImplementedError('This method should be overwritten in the child.')
 
 class SaveController(object):
     """This class implements saving of childs of the `Saveable` class.
