@@ -48,6 +48,10 @@ class EyeMovement(Saveable):
             self._parseFile(filepath, trialid_target)
 
     def getState(self):
+        """Returns the state of this instance for saving.
+
+        The state contains the lists of status of the left, right and meaned eye
+        and the looking positions of left and right eye."""
         return {'left':self._status_left, 'right':self._status_right, 'mean':self._status_mean, 'looks':self._looks}
 
     def _parseFile(self, filepath, trialid_target):
@@ -139,6 +143,19 @@ class EyeMovement(Saveable):
         self._calculateMeanStatusList()
 
     def _completeContainer(self, container):
+        """This is a optimization method.
+
+        After we parsed our trial in the edf-file we get a
+        dict which maps for example frames to eye status
+        {1:'fixated', 6:'saccade, ...}.
+        This intents that from frame 1 to frame 6 we have
+        a fixated eye.
+        To speed up and easy the retrieval of the status/look
+        position of a eye at a given frame we turn this dict
+        into a list and the indices of this list represent the
+        frames.
+        This results in a "status[frame]" which is fast and
+        easy."""
         complete = []
         current_value = None
         for i in xrange(max(container.keys())):
@@ -148,6 +165,7 @@ class EyeMovement(Saveable):
         return complete
 
     def _calculateMeanStatus(self, left, right):
+        """Return the mean status of left and right eye."""
         if left is None and right is None:
             return None
         elif left is None:
@@ -165,6 +183,14 @@ class EyeMovement(Saveable):
             return (max(int(left[0]), int(right[0])), 'blink')
 
     def _calculateMeanStatusList(self):
+        """Take the status list of the left and right eye and
+        compute the status list for the meaned eye.
+
+        Due to the fact that those lists contain tuples like
+        (21345234,'saccade') ((edf-file time, status)) this
+        method is a more complex as you would expect. Because
+        we have to caculate the correct edf-time for the meaned
+        eye."""
         self._status_mean = []
         previous_state = None
         previous_index = None
@@ -195,6 +221,9 @@ class EyeMovement(Saveable):
                 self._status_mean.append(inference)
 
     def _getListTupleItem(self, list, list_index, tuple_index):
+        """Helper method.
+
+        Returns list[list_index][tuple_index] or None on error."""
         try:
             return list[list_index][tuple_index]
             # happens if eye info is None -> no status for this frame
@@ -229,6 +258,11 @@ class EyeMovement(Saveable):
         return ((l[0] + r[0])/2.0, (l[1] + r[1])/2.0)
 
     def nextFixationFrame(self, frame, left):
+        """We are currently at frame `frame` and want to jump
+        to the next fixation. This method returns the frame of
+        the next fixation.
+        `left` has to be True (looking for next fixation of left eye),
+        False (right eye) or None (meaned eye)."""
         if left is True:
             return self._prev_nextFixationFrame(frame, 1, self.statusLeftEyeAt, len(self._status_left))
         elif left is False:
@@ -239,6 +273,7 @@ class EyeMovement(Saveable):
             raise Exception("Left has to be True, False or None!")
 
     def prevFixationFrame(self, frame, left):
+        """See `nextFixationFrame`."""
         if left is True:
             return self._prev_nextFixationFrame(frame, -1, self.statusLeftEyeAt, len(self._status_left))
         elif left is False:
@@ -249,6 +284,7 @@ class EyeMovement(Saveable):
             raise Exception("Left has to be True, False or None!")
 
     def _prev_nextFixationFrame(self, frame, direction, func, max_frame):
+        """Helper method for `prevFixationFrame` and `nextFixationFrame`."""
         saw_other_state = False
         current_frame = frame
 
@@ -262,7 +298,11 @@ class EyeMovement(Saveable):
 
     def fixations(self, left):
         """returns a list of fixation indexes (times of their occurence in edf file)
-        indexed by (start of fixation video frame, end of fixation video frame)"""
+        indexed by (start of fixation video frame, end of fixation video frame)
+
+        See `nextFixationFrame` for information about `left` argument.
+
+        This method is used to create the `CategoryContainer`."""
         if left is True:
             status = self._status_left
         elif left is False:
