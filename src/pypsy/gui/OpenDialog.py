@@ -46,6 +46,7 @@ class OpenDialog(wx.Dialog):
     sizer.Add(self.eye_rb, 0, wx.LEFT, 25)
 
     self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Categorise frames or fixations", choices=['frame', 'fixations'])
+    self.frames_rb.SetSelection(1)
     sizer.Add(self.frames_rb, 0, wx.LEFT, 25)
 
     trialid_box = wx.BoxSizer(wx.HORIZONTAL)
