@@ -31,6 +31,7 @@ class EditCategoryDialog(wx.Dialog):
     box.Add(label, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
 
     self.shortcut_button = wx.Button(self, -1, KeyCodeToHumanReadable(self.old_shortcut), size=(80,-1))
+    self.shortcut_button.SetToolTip(wx.ToolTip('Click this button to enter a new shortcut for this category'))
     box.Add(self.shortcut_button, 1, wx.ALIGN_CENTRE|wx.ALL, 5)
 
     sizer.Add(box, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)

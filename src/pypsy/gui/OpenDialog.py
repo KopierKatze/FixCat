@@ -47,12 +47,14 @@ class OpenDialog(wx.Dialog):
 
     self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Categorise frames or fixations", choices=['frame', 'fixations'])
     self.frames_rb.SetSelection(1)
+    self.frame_categorisation = False #because SetSelection does not actually fire a radiobox event
     sizer.Add(self.frames_rb, 0, wx.LEFT, 25)
 
     trialid_box = wx.BoxSizer(wx.HORIZONTAL)
     self.trialid_text = wx.StaticText(self, wx.ID_ANY, "Select trial id...")
     trialid_box.Add(self.trialid_text, 1, wx.ALIGN_CENTER|wx.LEFT, 25)
     self.trialid_target = wx.lib.intctrl.IntCtrl(self, limited=True)
+    self.trialid_target.SetToolTip(wx.ToolTip('Enter id of the trial you want to work on. This id will retrieve the corresponding trial from the eyemovement file.'))
     self.trialid_target.SetValue(1)
     self.trialid_target.SetMin(1)
     trialid_box.Add(self.trialid_target, 0)
