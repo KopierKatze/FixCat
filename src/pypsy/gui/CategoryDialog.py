@@ -18,125 +18,126 @@ class CategoryDialog(wx.Dialog):
         wx.Dialog.Destroy(self)
 
     def InitUI(self):
-      mainbox  = wx.BoxSizer(wx.VERTICAL)
-      tablebox = wx.BoxSizer(wx.HORIZONTAL)
-      btnbox = wx.BoxSizer(wx.VERTICAL)
-      textbox = wx.BoxSizer(wx.VERTICAL)
+        mainbox  = wx.BoxSizer(wx.VERTICAL)
+        tablebox = wx.BoxSizer(wx.HORIZONTAL)
+        btnbox = wx.BoxSizer(wx.VERTICAL)
+        textbox = wx.BoxSizer(wx.VERTICAL)
 
-      textpnl = wx.Panel(self, -1)
+        textpnl = wx.Panel(self, -1)
 
-      self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-      self.lc.SetToolTip(wx.ToolTip('List of categories with associated shortcuts'))
-      self.lc.InsertColumn(0, 'Kategorie')
-      self.lc.InsertColumn(1, 'Shortcut')
-      self.lc.SetColumnWidth(0, 140)
-      self.lc.SetColumnWidth(1, 100)
+        self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
+        self.lc.SetToolTip(wx.ToolTip('List of categories with associated shortcuts'))
+        self.lc.InsertColumn(0, 'Kategorie')
+        self.lc.InsertColumn(1, 'Shortcut')
+        self.lc.SetColumnWidth(0, 140)
+        self.lc.SetColumnWidth(1, 100)
 
-      self.FillCategoryTable()
+        self.FillCategoryTable()
+        tablebox.Add(self.lc, 4, wx.EXPAND)
 
-      tablebox.Add(self.lc, 4, wx.EXPAND)
+        btn_new = wx.Button(self, 3, 'New') 
+        btnbox.Add(btn_new, 0, wx.ALIGN_CENTER)
+        btn_new.SetToolTip(wx.ToolTip('Create a new category'))
+        self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
 
-      btn_new = wx.Button(self, 3, 'New') 
-      btnbox.Add(btn_new, 0, wx.ALIGN_CENTER)
-      btn_new.SetToolTip(wx.ToolTip('Create a new category'))
-      self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
+        btn_edit = wx.Button(self, 1, 'Edit')
+        btnbox.Add(btn_edit, 0, wx.ALIGN_CENTER)
+        btn_edit.SetToolTip(wx.ToolTip('Edit a category and its shortcut'))
+        self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
 
-      btn_edit = wx.Button(self, 1, 'Edit')
-      btnbox.Add(btn_edit, 0, wx.ALIGN_CENTER)
-      btn_edit.SetToolTip(wx.ToolTip('Edit a category and its shortcut'))
-      self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
+        btn_delete = wx.Button(self, 4, 'Delete')
+        btnbox.Add(btn_delete, 0, wx.ALIGN_CENTER)
+        btn_delete.SetToolTip(wx.ToolTip('Delete a category and its shortcut'))
+        self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
 
-      btn_delete = wx.Button(self, 4, 'Delete')
-      btnbox.Add(btn_delete, 0, wx.ALIGN_CENTER)
-      btn_delete.SetToolTip(wx.ToolTip('Delete a category and its shortcut'))
-      self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
+        btn_import = wx.Button(self, 5, 'Import')
+        btnbox.Add(btn_import, 0, wx.ALIGN_CENTER)
+        btn_import.SetToolTip(wx.ToolTip('Import categories of another project into the current project'))
+        self.Bind (wx.EVT_BUTTON, self.OnImport, id=5)
 
-      btn_import = wx.Button(self, 5, 'Import')
-      btnbox.Add(btn_import, 0, wx.ALIGN_CENTER)
-      btn_import.SetToolTip(wx.ToolTip('Import categories of another project into the current project'))
-      self.Bind (wx.EVT_BUTTON, self.OnImport, id=5)
+        tablebox.Add(btnbox, 1, flag=wx.EXPAND)
 
-      tablebox.Add(btnbox, 1, flag=wx.EXPAND)
 
-      btn_close = wx.Button(self, 2, 'Close')
-      textbox.Add(btn_close, 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
-      btn_close.SetToolTip(wx.ToolTip('Close this window'))
-      self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
+        btn_close = wx.Button(self, 2, 'Close')
+        textbox.Add(btn_close, 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
+        btn_close.SetToolTip(wx.ToolTip('Close this window'))
+        self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
 
-      mainbox.Add(tablebox, 3, flag=wx.EXPAND)
-      mainbox.Add(textbox, 0, flag=wx.EXPAND)
-      self.SetSizer(mainbox)
+        mainbox.Add(tablebox, 3, flag=wx.EXPAND)
+        mainbox.Add(textbox, 0, flag=wx.EXPAND)
+        self.SetSizer(mainbox)
 
-      self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
     def OnImport(self, event):
-      confirm_dialog = wx.MessageDialog(self, 
-	'This procedure overrides all existing categories and categorisations! This cannot be reverted. Do you want to continue?',
-	'Import categories', wx.YES_NO)
+        confirm_dialog = wx.MessageDialog(self,
+          'This procedure overrides all existing categories and categorisations! This cannot be reverted. Do you want to continue?',
+          'Import categories', wx.YES_NO)
 
-      if confirm_dialog.ShowModal() == wx.ID_YES:
-	file_dialog = wx.FileDialog(self, 'Open existing project', style=wx.FD_OPEN, wildcard='PYPS file (*.pyps)|*.pyps')
-	if file_dialog.ShowModal() == wx.ID_OK:
-	  self.MainFrame.importCategories(file_dialog.GetPath())
-	  self.FillCategoryTable()
+        if confirm_dialog.ShowModal() == wx.ID_YES:
+            file_dialog = wx.FileDialog(self, 'Open existing project', style=wx.FD_OPEN, wildcard='PYPS file (*.pyps)|*.pyps')
+            if file_dialog.ShowModal() == wx.ID_OK:
+                self.MainFrame.importCategories(file_dialog.GetPath())
+                self.FillCategoryTable()
 
     def OnClose(self, event):
-      self.MainFrame.loadCategorisationInToList()
-      self.Destroy()
+        self.MainFrame.loadCategorisationInToList()
+        self.Destroy()
 
     def OnEdit(self, event):
-      index = self.lc.GetFocusedItem()
-      cat = self.lc.GetItem(index, 0).GetText()
-      short = self.lc.GetItemData(index)
-      
-      # in case there are no categories
-      if index is None or cat == '': return
-      
-      edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
-      edit_dlg.ShowModal()
-      # refreshing list 
-      self.lc.DeleteAllItems()
-      self.FillCategoryTable()
+        index = self.lc.GetFocusedItem()
+        cat = self.lc.GetItem(index, 0).GetText()
+        short = self.lc.GetItemData(index)
+
+        # in case there are no categories
+        if cat == '' or index is None: return
+
+        edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
+        edit_dlg.ShowModal()
+        # refreshing list
+        self.lc.DeleteAllItems()
+        self.FillCategoryTable()
 
     def OnAdd(self, event):
-      edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory)
-      edit_dlg.ShowModal()
-      # refreshing list
-      self.lc.DeleteAllItems()
-      self.FillCategoryTable()
+        edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory)
+        edit_dlg.ShowModal()
+        # refreshing list
+        self.lc.DeleteAllItems()
+        self.FillCategoryTable()
 
     def OnDelete(self, event):
-      # in case there are no categories
-      index = self.lc.GetFocusedItem()
-      if index is None or self.lc.GetItem(index, 0).GetText() == '': return
-      confirm_dialog = wx.MessageDialog(self, 
-	'This category and all of its categorisations will be deleted! This cannot be reverted. Do you want to continue?',
-	'Delete category', wx.YES_NO)
+        # in case there are no categories
+        index = self.lc.GetFocusedItem()
+        if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetItem(index, 0) is None: return
+        confirm_dialog = wx.MessageDialog(self,
+          'This category and all of its categorisations will be deleted! This cannot be reverted. Do you want to continue?',
+          'Delete category', wx.YES_NO)
 
-      if confirm_dialog.ShowModal() != wx.ID_YES:
-        return
-      
-      short = self.lc.GetItemData(index)
+        if confirm_dialog.ShowModal() != wx.ID_YES:
+            return
 
-      self.MainFrame.editCategory(short, None, None)
-      # refreshing list
-      self.lc.DeleteAllItems()
-      self.FillCategoryTable()
+        short = self.lc.GetItemData(index)
+
+        self.MainFrame.editCategory(short, None, None)
+        # refreshing list
+        self.lc.DeleteAllItems()
+        self.FillCategoryTable()
+
 
     def FillCategoryTable(self):
-      for shortcut, category in self.MainFrame.getCategories().iteritems():
-	  num_items = self.lc.GetItemCount()
-	  self.lc.InsertStringItem(num_items, category)
-	  self.lc.SetStringItem(num_items, 1, KeyCodeToHumanReadable(shortcut))
-	  self.lc.SetItemData(num_items, shortcut)
+        for shortcut, category in self.MainFrame.getCategories().iteritems():
+            num_items = self.lc.GetItemCount()
+            self.lc.InsertStringItem(num_items, category)
+            self.lc.SetStringItem(num_items, 1, KeyCodeToHumanReadable(shortcut))
+            self.lc.SetItemData(num_items, shortcut)
 
 if __name__ == "__main__":
     class MyApp(wx.App):
         def OnInit(self):
-           frame = CategoryFrame(None, -1, 'Category overview')
-           frame.Show(True)
-           frame.Centre()
-           return True
+            frame = CategoryFrame(None, -1, 'Category overview')
+            frame.Show(True)
+            frame.Centre()
+            return True
 
     app = MyApp(0)
     app.MainLoop()

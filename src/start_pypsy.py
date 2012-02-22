@@ -13,46 +13,46 @@ from pypsy import Config
 
 myController = None
 def getController():
-  global myController, video_str, current_frame
-  if myController is None:
-    myController = Controller(video_str, current_frame)
-  return myController
+    global myController, video_str, current_frame
+    if myController is None:
+        myController = Controller(video_str, current_frame)
+    return myController
 
 def set_shared_vars(v, f):
-  global video_str, current_frame, myController
+    global video_str, current_frame, myController
 
-  myController = None
+    myController = None
 
-  video_str = v
-  current_frame = f
+    video_str = v
+    current_frame = f
 
 class ControllerManager(SyncManager):
-  pass
+    pass
 
 ControllerManager.register('getController', getController)
 
 if __name__ == '__main__':
-  # activate multiprocessing freeze support (needed to build executables)
-  freeze_support()
-  # configuration file check
-  try:
-    # will raise configerror on problems
-    Config.Config()
-  except Config.ConfigError, e:
-    app = wx.PySimpleApp()
-    wx.MessageBox('Fehler beim Laden der Konfiguration: %s'% e.message, 'Fehler')
-    app.MainLoop()
-    raise SystemExit()
-  
-  video_str = Array('c', 2**20*'_')
-  current_frame = Value('i', 0)
+    # activate multiprocessing freeze support (needed to build executables)
+    freeze_support()
+    # configuration file check
+    try:
+        # will raise configerror on problems
+        Config.Config()
+    except Config.ConfigError, e:
+        app = wx.PySimpleApp()
+        wx.MessageBox('Fehler beim Laden der Konfiguration: %s'% e.message, 'Fehler')
+        app.MainLoop()
+        raise SystemExit()
 
-  controllermanager = ControllerManager()
-  controllermanager.start(set_shared_vars, (video_str, current_frame))
+    video_str = Array('c', 2**20*'_')
+    current_frame = Value('i', 0)
 
-  controllerproxy = controllermanager.getController()
+    controllermanager = ControllerManager()
+    controllermanager.start(set_shared_vars, (video_str, current_frame))
 
-  a = wx.PySimpleApp()
-  e = MainFrame(video_str, current_frame, controllerproxy)
-  e.Show()
-  a.MainLoop()
+    controllerproxy = controllermanager.getController()
+
+    a = wx.PySimpleApp()
+    e = MainFrame(video_str, current_frame, controllerproxy)
+    e.Show()
+    a.MainLoop()

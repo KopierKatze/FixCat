@@ -7,11 +7,11 @@ setup(
   options={
     'py2exe':{
       'excludes':['_gtkagg', '_tkagg', 'bsddb',
-		  'curses', 'email', 'pywin.debugger',
-		  'pywin.debugger.dbgcon', 'pywin.dialogs',
-		  'tcl', 'Tkconstants', 'Tkinter', 'email',
-		  'pydoc_data', 'doctest', 'compiler',
-		  'xml', 'distutils', 'setuptools',
+                  'curses', 'email', 'pywin.debugger',
+                  'pywin.debugger.dbgcon', 'pywin.dialogs',
+                  'tcl', 'Tkconstants', 'Tkinter', 'email',
+                  'pydoc_data', 'doctest', 'compiler',
+                  'xml', 'distutils', 'setuptools',
                   'logging', 'pydoc', 'tarfile',
                   'urllib', 'urllib2', 'cookielib',
                   'optparse', 'xmlrpclib', 'zipfile',
@@ -30,4 +30,3 @@ setup(
     }
   }
 )
-

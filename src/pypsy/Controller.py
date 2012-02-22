@@ -7,9 +7,9 @@ from Config import Config
 from Saveable import Saveable, SaveController, SaveControllerError
 
 try:
-  from cv2 import cv
+    from cv2 import cv
 except ImportError:
-  import cv
+    import cv
 
 class Controller(Saveable):
     """this class connects all the in- and output classes together and provides a
@@ -48,7 +48,7 @@ class Controller(Saveable):
         self.produceCurrentImage()
 # ------ STATUS STUFF ---
     def isClockRunning(self):
-        return self.clock.running  
+        return self.clock.running
     def categorisationEye(self):
         if self.categorising_eye_is_left == True:
             return 'left'
@@ -82,7 +82,7 @@ class Controller(Saveable):
             bool(self.eye_movement) and \
             bool(self.clock) and \
             bool(self.cursors) and \
-            bool(self.category_container)            
+            bool(self.category_container)
     def getMaxFramesOfEyeMovement(self):
         return self.eye_movement.maxFrames()
     def plausibleCheck(self):
