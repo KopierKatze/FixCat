@@ -26,6 +26,7 @@ class CategoryDialog(wx.Dialog):
       textpnl = wx.Panel(self, -1)
 
       self.lc = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
+      self.lc.SetToolTip(wx.ToolTip('List of categories with associated shortcuts'))
       self.lc.InsertColumn(0, 'Kategorie')
       self.lc.InsertColumn(1, 'Shortcut')
       self.lc.SetColumnWidth(0, 140)
@@ -35,21 +36,31 @@ class CategoryDialog(wx.Dialog):
 
       tablebox.Add(self.lc, 4, wx.EXPAND)
 
-      btnbox.Add(wx.Button(self, 3, 'New'), 0, wx.ALIGN_CENTER)
+      btn_new = wx.Button(self, 3, 'New') 
+      btnbox.Add(btn_new, 0, wx.ALIGN_CENTER)
+      btn_new.SetToolTip(wx.ToolTip('Create a new category'))
       self.Bind (wx.EVT_BUTTON, self.OnAdd, id=3)
 
-      btnbox.Add(wx.Button(self, 1, 'Edit'), 0, wx.ALIGN_CENTER)
+      btn_edit = wx.Button(self, 1, 'Edit')
+      btnbox.Add(btn_edit, 0, wx.ALIGN_CENTER)
+      btn_edit.SetToolTip(wx.ToolTip('Edit a category and its shortcut'))
       self.Bind (wx.EVT_BUTTON, self.OnEdit, id=1)
 
-      btnbox.Add(wx.Button(self, 4, 'Delete'), 0, wx.ALIGN_CENTER)
+      btn_delete = wx.Button(self, 4, 'Delete')
+      btnbox.Add(btn_delete, 0, wx.ALIGN_CENTER)
+      btn_delete.SetToolTip(wx.ToolTip('Delete a category and its shortcut'))
       self.Bind (wx.EVT_BUTTON, self.OnDelete, id=4)
 
-      btnbox.Add(wx.Button(self, 5, 'Import'), 0, wx.ALIGN_CENTER)
+      btn_import = wx.Button(self, 5, 'Import')
+      btnbox.Add(btn_import, 0, wx.ALIGN_CENTER)
+      btn_import.SetToolTip(wx.ToolTip('Import categories of another project into the current project'))
       self.Bind (wx.EVT_BUTTON, self.OnImport, id=5)
 
       tablebox.Add(btnbox, 1, flag=wx.EXPAND)
 
-      textbox.Add(wx.Button(self, 2, 'Close'), 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
+      btn_close = wx.Button(self, 2, 'Close')
+      textbox.Add(btn_close, 0, wx.ALIGN_BOTTOM | wx.ALIGN_CENTER)
+      btn_close.SetToolTip(wx.ToolTip('Close this window'))
       self.Bind (wx.EVT_BUTTON, self.OnClose, id=2)
 
       mainbox.Add(tablebox, 3, flag=wx.EXPAND)
@@ -79,7 +90,7 @@ class CategoryDialog(wx.Dialog):
       short = self.lc.GetItemData(index)
       
       # in case there are no categories
-      if cat == '' or index is None: return
+      if index is None or cat == '': return
       
       edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
       edit_dlg.ShowModal()
@@ -97,7 +108,7 @@ class CategoryDialog(wx.Dialog):
     def OnDelete(self, event):
       # in case there are no categories
       index = self.lc.GetFocusedItem()
-      if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetItem(index, 0) is None: return
+      if index is None or self.lc.GetItem(index, 0).GetText() == '': return
       confirm_dialog = wx.MessageDialog(self, 
 	'This category and all of its categorisations will be deleted! This cannot be reverted. Do you want to continue?',
 	'Delete category', wx.YES_NO)
