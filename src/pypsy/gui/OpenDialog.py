@@ -191,4 +191,4 @@ class OpenDialog(wx.Dialog):
         if self.bootstrap_phase:
             raise SystemExit()
         self.Destroy()
->>>>>>> 874ff5fbcfc50eb2af3c1c9c64ec59cd0e88049c
+
