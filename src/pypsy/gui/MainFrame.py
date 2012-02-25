@@ -120,14 +120,19 @@ class MainFrame(wx.Frame):
         self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 1, 0, 1000)
         self.Bind(wx.EVT_SCROLL, self.OnSliderScroll, self.slider)
         pause = wx.BitmapButton(self.controllspanel, -1, pause_bmp)
+        pause.SetToolTip(wx.ToolTip('Pause playback'))
         self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
         play = wx.BitmapButton(self.controllspanel, -1, play_bmp)
+        play.SetToolTip(wx.ToolTip('Start/resume playback'))
         self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
         next = wx.BitmapButton(self.controllspanel, -1, next_f_bmp)
+        next.SetToolTip(wx.ToolTip('Jump to next frame'))
         self.Bind(wx.EVT_BUTTON, self.OnNextFrame, next)
         prev = wx.BitmapButton(self.controllspanel, -1, prev_f_bmp)
+        prev.SetToolTip(wx.ToolTip('Jump to previous frame'))
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
         self.speedslider = wx.Slider(self.controllspanel, wx.ID_ANY, 100, 10, 1000)
+        self.speedslider.SetToolTip(wx.ToolTip('Change playback speed'))
         self.Bind(wx.EVT_SCROLL, self.OnSpeedSliderScroll, self.speedslider)
 
         self.speed_text = wx.StaticText(self.controllspanel, wx.ID_ANY, "Playback speed")
@@ -138,13 +143,17 @@ class MainFrame(wx.Frame):
         #faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
         #self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
         next_uncategorised = wx.BitmapButton(self.controllspanel, -1, next_uncat_bmp)
+        next_uncategorised.SetToolTip(wx.ToolTip('Jump to next uncategorised frame'))
         self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
 
         self.left_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "L")
+        self.left_eye.SetToolTip(wx.ToolTip('Display position of the left eye'))
         self.Bind(wx.EVT_CHECKBOX, self.OnLeftEyeCheckbox, self.left_eye)
         self.right_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "R")
+        self.right_eye.SetToolTip(wx.ToolTip('Display position of the right eye'))
         self.Bind(wx.EVT_CHECKBOX, self.OnRightEyeCheckbox, self.right_eye)
         self.mean_eye = wx.CheckBox(self.controllspanel, wx.ID_ANY, "M")
+        self.mean_eye.SetToolTip(wx.ToolTip('Display mean position of both eyes'))
         self.Bind(wx.EVT_CHECKBOX, self.OnMeanEyeCheckbox, self.mean_eye)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -445,14 +454,14 @@ class MainFrame(wx.Frame):
         self.categorise(self.loopthrough_categorykey, False)
 
     def OnNextFixation(self, event=None):
-        """Jumps to the next fixation, either if the user used the UI button or
+        """Jumps to the next fixation, either if the user used the UI button or 
         the keyboard shortcut."""
         self.controller.nextFixation()
         self.loadImage()
         self.categorise(self.loopthrough_categorykey, False)
 
     def OnPrevFixation(self, event=None):
-        """Jumps to the previous fixation, either if the user used the UI button or
+        """Jumps to the previous fixation, either if the user used the UI button or 
         the keyboard shortcut."""
         self.controller.prevFixation()
         self.loadImage()
@@ -509,7 +518,7 @@ class MainFrame(wx.Frame):
         # load changed image, important if we currently not playing
         self.loadImage()
     def OnMeanEyeCheckbox(self, event):
-        """Called, if the checkbox for the mean eye status in the UI controls panel
+        """Called, if the checkbox for the mean eye status in the UI controls panel 
         is checked."""
         self.controller.meanEyeStatus(event.Checked())
         # load changed image, important if we currently not playing
@@ -518,8 +527,8 @@ class MainFrame(wx.Frame):
 
     #----------------- MENU ITEMS --------------------
     def OnCategoryExport(self, event):
-        """Guides the user through the process of exporting categories. After
-        the user selected the output file in the dialog,
+        """Guides the user through the process of exporting categories. After 
+        the user selected the output file in the dialog, 
         `Controller.exportCategorisations()` is called and handles the export."""
         file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
         if file_dialog.ShowModal() == wx.ID_OK:
@@ -586,6 +595,7 @@ class MainFrame(wx.Frame):
 
             progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
               style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
+
             # show progress by displaying the current frame
             waiting_thread = threading.Thread()
             waiting_thread.run = lambda: self.controller.exportVideo(path)
