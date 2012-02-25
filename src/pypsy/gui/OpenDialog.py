@@ -146,14 +146,20 @@ class OpenDialog(wx.Dialog):
     def OnSelectVideo(self, event):
         q = self._open_file('Choose video file...', 'AVI file (*.avi)|*.avi')
         if not q is None:
-            self.video_text.SetLabel(q)
+            self.video_text.SetLabel(self._TrimFilepath(q, 30))
             self.video_filepath = q
 
     def OnSelectEyedata(self, event):
         q = self._open_file('Choose edf...', 'ASC file (*.asc)|*.asc')
         if not q is None:
-            self.eyedata_text.SetLabel(q)
+            self.eyedata_text.SetLabel(self._TrimFilepath(q, 30))
             self.eyedata_filepath = q
+
+    def _TrimFilepath(self, filepath, max_length):
+        max_length -= 1 #zero index string
+        if len(filepath) > max_length:
+            filepath = filepath[:max_length/2-2] + "..." + filepath[-(max_length/2+1):]
+        return filepath
 
     def OnSelectSaved(self, event):
         q = self._open_file('Choose existing project', 'PYPS file (*.pyps)|*.pyps|PYPS-AUTOSAVES (*.pyps_autosave)|*.pyps_autosave')
