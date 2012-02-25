@@ -85,12 +85,11 @@ class CategoryDialog(wx.Dialog):
         self.Destroy()
 
     def OnEdit(self, event):
+        # in case there are no categories
         index = self.lc.GetFocusedItem()
+        if index == -1 or self.lc.GetItem(index, 0).GetText() == '': return             
         cat = self.lc.GetItem(index, 0).GetText()
         short = self.lc.GetItemData(index)
-
-        # in case there are no categories
-        if cat == '' or index is None: return
 
         edit_dlg = EditCategoryDialog(self, self.MainFrame.editCategory, cat, short)
         edit_dlg.ShowModal()
@@ -108,7 +107,7 @@ class CategoryDialog(wx.Dialog):
     def OnDelete(self, event):
         # in case there are no categories
         index = self.lc.GetFocusedItem()
-        if self.lc.GetItem(index, 0).GetText() == '' or self.lc.GetItem(index, 0) is None: return
+        if index == -1 or self.lc.GetItem(index, 0).GetText() == '': return
         confirm_dialog = wx.MessageDialog(self,
           'This category and all of its categorisations will be deleted! This cannot be reverted. Do you want to continue?',
           'Delete category', wx.YES_NO)
