@@ -27,6 +27,7 @@ class MainFrame(wx.Frame):
         self.Centre()
         self.Maximize()
         self.Show()
+        self.SetIcon(wx.IconFromBitmap(images.get_application_iconBitmap()))
 
         self.video_str = video_str
         self.current_frame = current_frame
