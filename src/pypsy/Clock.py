@@ -3,6 +3,7 @@ from Saveable import Saveable
 import threading
 from thread import start_new_thread
 from time import time, sleep
+from sys import float_info
 
 class Clock(Saveable):
     """This class provides the methods for the Clock that runs in the background
@@ -135,14 +136,16 @@ class ClockWorker(threading.Thread):
         sleeptime = self.c.interval
         while self.c.running:
             temptime = time()
-            sleeptime = 0.8 * sleeptime + 0.2 * (target - actual)
-            if sleeptime > 0.00001: sleep(sleeptime)
-            else: sleep(0.00001)
-            new_frame = self.c._frame + (1.0 * self.c.multiplicator)
-            if round(new_frame) > self.c.total_frames:
+            sleeptime = 0.6 * sleeptime + 0.4 * (target - actual)
+            if sleeptime > 0: sleep(sleeptime)
+            # turn multiplicator into float for more precise computing
+            new_frame = self.c._frame + float(self.c.multiplicator)
+            if new_frame > self.c.total_frames:
                 self.c.seek(self.c.total_frames)
                 self.c.stop()
             else:
+                # will be turned into int by Clock.frame property
                 self.c.seek(new_frame)
             actual = time() - temptime
-            #print int(actual/target*100), sleeptime
+            # debug output:
+            # print int(actual/target*100), sleeptime
