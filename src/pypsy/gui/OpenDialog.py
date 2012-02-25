@@ -23,6 +23,8 @@ class OpenDialog(wx.Dialog):
 
         self.Center()
 
+        self._trim_count = 30
+
     def InitUI(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -150,13 +152,13 @@ class OpenDialog(wx.Dialog):
     def OnSelectVideo(self, event):
         q = self._open_file('Choose video file...', 'AVI file (*.avi)|*.avi')
         if not q is None:
-            self.video_text.SetLabel(self._TrimFilepath(q, 30))
+            self.video_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.video_filepath = q
 
     def OnSelectEyedata(self, event):
         q = self._open_file('Choose edf...', 'ASC file (*.asc)|*.asc')
         if not q is None:
-            self.eyedata_text.SetLabel(self._TrimFilepath(q, 30))
+            self.eyedata_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.eyedata_filepath = q
 
     def _TrimFilepath(self, filepath, max_length):
@@ -168,7 +170,7 @@ class OpenDialog(wx.Dialog):
     def OnSelectSaved(self, event):
         q = self._open_file('Choose existing project', 'PYPS file (*.pyps)|*.pyps|PYPS-AUTOSAVES (*.pyps_autosave)|*.pyps_autosave')
         if not q is None:
-            self.saved_text.SetLabel(q)
+            self.saved_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.saved_filepath = q
 
     def OnLoad(self, event=None, overwrite_video_filepath=None):
