@@ -3,7 +3,6 @@ from Saveable import Saveable
 import threading
 from thread import start_new_thread
 from time import time, sleep
-from sys import float_info
 
 class Clock(Saveable):
     """This class provides the methods for the Clock that runs in the background
