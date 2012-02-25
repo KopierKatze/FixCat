@@ -190,8 +190,8 @@ class MainFrame(wx.Frame):
         """Initializes the different parts of the UI and adds the widget that
         displays the video."""
         self.InitMenu()
-        self.statusBar = self.CreateStatusBar(3)
-        self.statusBar.SetStatusWidths([-4,-1,180])
+        self.statusBar = self.CreateStatusBar(4)
+        self.statusBar.SetStatusWidths([-4,-1,40,150])
 
         # correct colors in windows 7
         self.mainpanel = wx.Panel(self, wx.ID_ANY)
@@ -258,8 +258,10 @@ class MainFrame(wx.Frame):
 
         current_time = round(self.current_frame.value/self.fps)
         total_time = round(self.frames_total/self.fps)
+        self.statusBar.SetStatusText('%i:%02i/%i:%02i (%i/%i)'%(current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 3)
+
         speed = self.speedslider.GetValue() * 0.01
-        self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
+        self.statusBar.SetStatusText('%.1fx'%speed, 2)
 
         if self.controller.isClockRunning():
             self.reloadTimer.Restart()
@@ -489,10 +491,7 @@ class MainFrame(wx.Frame):
         """Sets the slider for playback speed control to the new value produced
         by moving the `speedslider`. This method also handles the update of the status
         information of the video displayed in the lower right corner."""
-        current_time = round(self.current_frame.value/self.fps)
-        total_time = round(self.frames_total/self.fps)
         speed = self.speedslider.GetValue() * 0.01
-        self.statusBar.SetStatusText('%.1fx %i:%02i/%i:%02i (%i/%i)'%(speed, current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 2)
         self.controller.setPlaybackSpeed(speed)
 
     def OnNextUncategorisedObject(self,event):
