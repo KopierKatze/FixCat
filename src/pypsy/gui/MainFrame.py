@@ -191,7 +191,7 @@ class MainFrame(wx.Frame):
         displays the video."""
         self.InitMenu()
         self.statusBar = self.CreateStatusBar(3)
-        self.statusBar.SetStatusWidths([-4,-1,150])
+        self.statusBar.SetStatusWidths([-4,-1,180])
 
         # correct colors in windows 7
         self.mainpanel = wx.Panel(self, wx.ID_ANY)
