@@ -2,7 +2,7 @@ from CategoryDialog import CategoryDialog
 from StringImage import StringImage
 from CategoryList import CategoryList
 from OpenDialog import OpenDialog
-import button_images
+import images
 
 from pypsy.Config import Config
 from pypsy.CategoryContainer import CategoryContainerError
@@ -110,11 +110,11 @@ class MainFrame(wx.Frame):
         """Initializes and draws the buttons and UI elements used for playback
         control or boxes defining which eyemovement data is used in the overlayed
         video."""
-        play_bmp = button_images.getplayBitmap()
-        pause_bmp = button_images.getpauseBitmap()
-        next_f_bmp = button_images.getn_frameBitmap()
-        prev_f_bmp = button_images.getp_frameBitmap()
-        next_uncat_bmp = button_images.getnext_uncatBitmap()
+        play_bmp = images.getplayBitmap()
+        pause_bmp = images.getpauseBitmap()
+        next_f_bmp = images.getn_frameBitmap()
+        prev_f_bmp = images.getp_frameBitmap()
+        next_uncat_bmp = images.getnext_uncatBitmap()
 
         self.controllspanel = wx.Panel(self.mainpanel, wx.ID_ANY)
         self.slider = wx.Slider(self.controllspanel, wx.ID_ANY, 1, 0, 1000)
