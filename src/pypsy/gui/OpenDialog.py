@@ -15,7 +15,7 @@ class OpenDialog(wx.Dialog):
         self.video_filepath = None
         self.eyedata_filepath = None
         self.left_eye_categorisation = True # None -> mean eye, True -> left eye, False -> right eye
-        self.frame_categorisation = True # False -> fixation categorisation
+        self.frame_categorisation = False # -> fixation categorisation
 
         self.saved_filepath = None
 
@@ -47,7 +47,6 @@ class OpenDialog(wx.Dialog):
 
         self.frames_rb = wx.RadioBox(self, wx.ID_ANY, "Categorise frames or fixations", choices=['frame', 'fixations'])
         self.frames_rb.SetSelection(1)
-        self.frame_categorisation = False #because SetSelection does not actually fire a radiobox event
         sizer.Add(self.frames_rb, 0, wx.LEFT, 25)
 
         trialid_box = wx.BoxSizer(wx.HORIZONTAL)
@@ -121,6 +120,7 @@ class OpenDialog(wx.Dialog):
         self.saved_text.SetForegroundColour((125,125,125))
         self.video_text.SetForegroundColour((0,0,0))
         self.eyedata_text.SetForegroundColour((0,0,0))
+        self.trialid_text.SetForegroundColour((0,0,0))
         self.eye_rb.Enable(True)
         self.frames_rb.Enable(True)
 
@@ -134,6 +134,7 @@ class OpenDialog(wx.Dialog):
         self.saved_text.SetForegroundColour((0,0,0))
         self.video_text.SetForegroundColour((125,125,125))
         self.eyedata_text.SetForegroundColour((125,125,125))
+        self.trialid_text.SetForegroundColour((125,125,125))
         self.eye_rb.Enable(False)
         self.frames_rb.Enable(False)
 
