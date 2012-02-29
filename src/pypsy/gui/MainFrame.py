@@ -20,6 +20,7 @@ class MainFrame(wx.Frame):
         L{StringImage}."""
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
+        self.SetIcon(images.get_application_iconIcon())
 
         self.controller = controller
 
@@ -27,7 +28,6 @@ class MainFrame(wx.Frame):
         self.Centre()
         self.Maximize()
         self.Show()
-        self.SetIcon(wx.IconFromBitmap(images.get_application_iconBitmap()))
 
         self.video_str = video_str
         self.current_frame = current_frame

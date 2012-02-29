@@ -1897,3 +1897,4 @@ application_icon = PyEmbeddedImage(
 get_application_iconData = application_icon.GetData
 get_application_iconImage = application_icon.GetImage
 get_application_iconBitmap = application_icon.GetBitmap
+get_application_iconIcon = application_icon.GetIcon
