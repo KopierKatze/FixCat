@@ -196,4 +196,13 @@ class CategoryContainer(Saveable):
         return None
 
 class CategoryContainerError(Exception):
+    """This error is thrown if 
+        - No category is assigned to a new shortcut
+        - The shortcut the user wants to edit does not exist
+        - The shortcut the user wants to edit is already assigned to another 
+            category
+        - The user tries to categorise a frame that is not part of the trial, 
+            meaning that no eyemovement data for it exists
+        - The user tries to categorise a frame with a non existing category
+    """
     pass
