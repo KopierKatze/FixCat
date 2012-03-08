@@ -12,8 +12,14 @@ except ImportError:
     import cv
 
 class Controller(Saveable):
-    """this class connects all the in- and output classes together and provides a
-    clean interface for the connection to the gui"""
+    """This class connects all the in- and output classes together and provides a
+    clean interface for the connection to the gui. This means that a lot of the
+    methods are like proxies, eg. `isClockRunning()` uses the instance of the 
+    Clock class to run the corresponding method in Clock. For information about 
+    those methods, please see the documentation of the class they are defined in.
+    The images for the `cursors` which indicate the state of each eye are 
+    retreived from the `config` file. 
+    """
     def __init__(self, video_str, current_frame):
         self.video_reader = None
         self.eye_movement = None
@@ -76,8 +82,8 @@ class Controller(Saveable):
     def getEyeStatus(self):
         return self.show_eyes
     def ready(self):
-        """you should'nt always make sure this class is ready before using it's functions.
-        ready means every data needed is available"""
+        """You should always make sure this class is ready before using it's functions.
+        If `ready()` returns true, this means every data needed is available"""
         return bool(self.video_reader) and \
             bool(self.eye_movement) and \
             bool(self.clock) and \
@@ -93,8 +99,9 @@ class Controller(Saveable):
             return True
 # ----------- LOAD/SAVE/NEW PROJECT ----
     def new_project(self, video_file, eye_movement_file, trialid_target, categorise_frames=False, categorising_eye_is_left=None):
-        """create a new project.
-        you can decide whether you want to categorise frames or fixations by the 'categorise_frames' flag.
+        """Creates a new project.
+        Categorisation of frames or fixations is indicated by the 
+        'categorise_frames' flag.
         """
         self.categorise_frames = categorise_frames
         self.categorising_eye_is_left = categorising_eye_is_left
@@ -120,7 +127,7 @@ class Controller(Saveable):
         else:
             self.show_eyes = [False, False, True]
 
-        # seek to zero so we'll have a picture
+        # seek to zero so we'll have a picture after loading the videeo file
         self.produceCurrentImage()
     def save_project(self, saved_filepath):
         sc = SaveController()
@@ -152,6 +159,8 @@ class Controller(Saveable):
 
         self.produceCurrentImage()
     def getState(self):
+        """Returns the state of the selected eye(s) and if frames or fixations are
+        being categorised."""
         return {'show_eyes':self.show_eyes, 'categorise_frames':self.categorise_frames}
 # ----------- CATEGORISATION STUFF ----
     def categorise(self, shortcut):
@@ -180,6 +189,9 @@ class Controller(Saveable):
         return self.category_container.getCategoryOfFrame(frame)
 # -----------  IMAGE PROCESSING ----
     def overlayedFrame(self, frame, left, right, mean):
+        """This method produces the overlay of eyemovement data on the current 
+        frame. It uses the `video_reader` to grab the frame and then uses 
+        `_addCursorToImage()` to draw the overlay."""
         # retrieve original image from video file
         image = self.video_reader.frame(frame)
         # add cursors as neede
@@ -192,6 +204,9 @@ class Controller(Saveable):
 
         return image
     def _addCursorToImage(self, image, cursor, position):
+        """This helper method draws the overlay of the cursor image onto the 
+        video image, by using functions of opencv. In order for the overlay to 
+        be drawn correctly, it has to be put in a mask (`cursorMask`)."""
         # in case that we don't have information about the position or cursor end now
         if position is None or cursor is None: return
 
@@ -241,8 +256,9 @@ class Controller(Saveable):
         cv.Add(image, cursor, image)
         cv.ResetImageROI(image)
     def produceCurrentImage(self):
-        """will populate current image to gui.
-        have a look at Clock class for more information."""
+        """This method populates the video widget of the gui with the current 
+        video image.
+        For more information, please look at the documentation of the Clock class."""
         frame = self.clock.frame
         fr = self.overlayedFrame(frame, self.show_eyes[0], self.show_eyes[1], self.show_eyes[2])
         return_frame = cv.CreateImage((self.video_reader.width, self.video_reader.height), cv.IPL_DEPTH_8U, 3)
@@ -253,7 +269,8 @@ class Controller(Saveable):
         self.video_str.value = return_frame.tostring()
 
     def exportVideo(self, output_file):
-        """ export the overlayed video to a new video file with the VideoWriter"""
+        """ Exports the overlayed video to a new video file by using the 
+        VideoWriter. """
         frame_size = (self.getVideoWidth(), self.getVideoHeight())
         vidfps = self.video_reader.fps
         codec = self.config.get('general', 'video_export_codec')
@@ -280,20 +297,22 @@ class Controller(Saveable):
             # seeked to a frame out of video
             pass
     def nextFrame(self):
-        """jump one frame into the future"""
+        """Jump one frame ahead."""
         self.seek(self.clock.frame + 1)
     def prevFrame(self):
-        """jump one frame into the past"""
+        """Jump back one frame."""
         self.seek(self.clock.frame - 1)
     def jumpToNextUncategorisedObject(self):
+        """Jump to the next frame or fixation (depending on what the user 
+        entered in the project wizard) that is not categorised yet."""
         frame = self.category_container.nextNotCategorisedIndex(self.clock.frame)
         self.seek(frame)
     def nextFixation(self):
-        '''jump to next fixation'''
+        '''Jump to the next fixation.'''
         frame = self.eye_movement.nextFixationFrame(self.clock.frame, self.categorising_eye_is_left)
         self.seek(frame)
     def prevFixation(self):
-        '''jump to prev fixation'''
+        '''Jump to the previous fixation.'''
         frame = self.eye_movement.prevFixationFrame(self.clock.frame, self.categorising_eye_is_left)
         self.seek(frame)
     def slowerPlayback(self):
