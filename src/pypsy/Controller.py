@@ -317,8 +317,6 @@ class Controller(Saveable):
         self.seek(frame)
     def slowerPlayback(self):
         self.clock.setMultiplicator(self.clock.multiplicator * 0.9)
-    def normalPlayback(self):
-        self.clock.setMultiplicator(1.0)
     def fasterPlayback(self):
         self.clock.setMultiplicator(self.clock.multiplicator * 1.1)
     def setPlaybackSpeed(self, speed):
