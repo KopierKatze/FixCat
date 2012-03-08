@@ -39,6 +39,7 @@ class MainFrame(wx.Frame):
         self.reloadTimer.Stop()
 
         self.playing = False
+        self.speed = 1.0
 
         self.loopthrough_categorykey = None
 
@@ -132,17 +133,12 @@ class MainFrame(wx.Frame):
         prev = wx.BitmapButton(self.controllspanel, -1, prev_f_bmp)
         prev.SetToolTip(wx.ToolTip('Jump to previous frame'))
         self.Bind(wx.EVT_BUTTON, self.OnPrevFrame, prev)
+        
         self.speedslider = wx.Slider(self.controllspanel, wx.ID_ANY, 100, 10, 1000)
         self.speedslider.SetToolTip(wx.ToolTip('Change playback speed'))
         self.Bind(wx.EVT_SCROLL, self.OnSpeedSliderScroll, self.speedslider)
-
         self.speed_text = wx.StaticText(self.controllspanel, wx.ID_ANY, "Playback speed")
-        #slower  = wx.Button(self.controllspanel, wx.ID_ANY, "90%")
-        #self.Bind(wx.EVT_BUTTON, self.OnSlower, slower)
-        #normal  = wx.Button(self.controllspanel, wx.ID_ANY, "100%")
-        #self.Bind(wx.EVT_BUTTON, self.OnNormal, normal)
-        #faster  = wx.Button(self.controllspanel, wx.ID_ANY, "110%")
-        #self.Bind(wx.EVT_BUTTON, self.OnFaster, faster)
+       
         next_uncategorised = wx.BitmapButton(self.controllspanel, -1, next_uncat_bmp)
         next_uncategorised.SetToolTip(wx.ToolTip('Jump to next uncategorised frame'))
         self.Bind(wx.EVT_BUTTON, self.OnNextUncategorisedObject, next_uncategorised)
@@ -261,8 +257,8 @@ class MainFrame(wx.Frame):
         total_time = round(self.frames_total/self.fps)
         self.statusBar.SetStatusText('%i:%02i/%i:%02i (%i/%i)'%(current_time/60, current_time%60, total_time/60, total_time%60, self.current_frame.value,self.frames_total), 3)
 
-        speed = self.speedslider.GetValue() * 0.01
-        self.statusBar.SetStatusText('%.1fx'%speed, 2)
+        self.speed = self.speedslider.GetValue() * 0.01
+        self.statusBar.SetStatusText('%.1fx'%self.speed, 2)
 
         if self.controller.isClockRunning():
             self.reloadTimer.Restart()
@@ -471,16 +467,22 @@ class MainFrame(wx.Frame):
         self.categorise(self.loopthrough_categorykey, False)
 
     def OnSlower(self, event=None):
-        """Reduces playback speed to 90% if the user clicked on the `slower` button."""
-        self.controller.slowerPlayback()
-
-    def OnNormal(self, event=None):
-        """Resets playback speed to normal."""
-        self.controller.normalPlayback()
+        """Reduces playback speed to 90% if the user used the custom slower shortcut."""
+        if(self.speed > 0.1):
+            self.speed = self.speed * 0.9
+            print self.speed
+            self.controller.slowerPlayback()
+            self.speedslider.SetValue(self.speed * 100.0)
+            self.loadImage()
 
     def OnFaster(self, event=None):
-        """Increases playback speed to 1100% if the user clicked on the `faster` button."""
-        self.controller.fasterPlayback()
+        """Increases playback speed to 110% if the user used the custom faster shortcut."""
+        if(self.speed <= 8.9):
+            self.speed = self.speed * 1.1
+            print self.speed
+            self.controller.fasterPlayback()
+            self.speedslider.SetValue(self.speed * 100.0)
+            self.loadImage()
 
     def OnSliderScroll(self, event):
         """Sets the slider to the new value produced by moving the `slider`."""
@@ -492,8 +494,9 @@ class MainFrame(wx.Frame):
         """Sets the slider for playback speed control to the new value produced
         by moving the `speedslider`. This method also handles the update of the status
         information of the video displayed in the lower right corner."""
-        speed = self.speedslider.GetValue() * 0.01
-        self.controller.setPlaybackSpeed(speed)
+        self.speed = self.speedslider.GetValue() * 0.01
+        self.controller.setPlaybackSpeed(self.speed)
+        self.loadImage()
 
     def OnNextUncategorisedObject(self,event):
         """Called if the user clicked on the UI button for the `next_uncategorised`
