@@ -4,61 +4,68 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows, positioning}
 \usepackage{pgf-umlcd}
-
 \title{Entwicklerdokumentation pyPsy}
 \author{Alexandra Weiss und Franz Gregor}
 \date{\today}
+\makeindex
 
 \begin{document}
 \pagenumbering{arabic}
 \maketitle
 \newpage
-\section{Inhaltsverzeichnis}
+\tableofcontents
 \begin{itemize}
 	\item was macht pypsy, genaue beschreibung der funktionalität
 	\item komponenten und beschreibungen 
 	\item zeitaufwand
 	\item ausblick, ausstehende punkte
 \end{itemize}
+\newpage
 \section{Komponenten}
-\subsection{Klassenentwurf}
-  Der Klassenentwurf orientiert sich an folgendem Grobentwurf:
+\subsection{Controller}
+  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model View Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf bspw. die Clock nur über den Controller zugreifen können. 
   \begin{figure}[ht]
     \begin{center}
     \begin{tikzpicture}[auto, node distance=1.2cm]
-      \node (controller) {Controller};
-      \node[left=0.5cm of controller] (gui) {GUI};
-      \node[right=2.2cm of controller] (vid_reader) {VideoReader};
+      \node (controller) {Controller};    
+      \node[right=2.2cm of controller] (clock) {Clock};
+      \node[above of=clock] (categories) {CategoryContainer};
+      \node[above of=categories] (eyes) {EyeMovement};
+      \node[above of=eyes] (saveable) {Saveable};  
+      \node[below of=clock] (vid_reader) {VideoReader};
       \node[below of=vid_reader] (vid_writer) {VideoWriter};
-      \node[above of=vid_reader] (cursor) {Cursor};
-      \node[above of=cursor] (clock) {Clock};
-      \node[below of=vid_writer] (eyes) {EyeMovement};
-      \node[below of=eyes] (categories) {CategoryContainer};
-      \node[left=2.2cm of gui](mainview) {MainView};
-      \node[below=of mainview] (loadview) {LoadView};
-      \node[below=of loadview] (categoryview) {CategoryView};
-      \node[below=of categoryview] (cursorview) {CursorView};
-      \node[above=of mainview] (exportcsvview) {ExpostCSVView};
-      \node[above=of exportcsvview] (exportvideoview) {ExportVideoView};
+      \node[below of=vid_writer] (cfg) {Config};
+      \node[below of=cfg] (help) {Helper};
+        
+      \node[left=2.2cm of controller](mainframe) {MainFrame};     
+      \node[above of= mainframe] (editcatdlg) {EditCategoryDialog};
+      \node[above of= editcatdlg] (catdlg) {CategoryDialog};
+      \node[above of= catdlg] (opendlg) {OpenDialog};
+      
+      \node[below of= mainframe] (categorylist) {CategoryList};      
+      \node[below of= categorylist] (strimage) {StringImage};
+      \node[below of= strimage] (cursors) {images};
 
       \path
-	(controller) edge (gui)
+	(controller) edge (clock)
 	(controller) edge (vid_reader)
 	(controller) edge (vid_writer)
-	(controller) edge (categories)
-	(controller) edge[dotted] (cursor)
-	(controller) edge (clock)
 	(controller) edge (eyes)
-	(gui) edge (mainview)
-	(gui) edge (loadview)
-	(gui) edge (categoryview)
-	(gui) edge[dotted] (cursorview)
-	(gui) edge (exportcsvview)
-	(gui) edge (exportvideoview)
+	(controller) edge (categories)
+	(controller) edge (cfg)
+	(controller) edge (help)
+	(controller) edge (saveable)
+	(controller) edge (mainframe)
+	(controller) edge (categorylist)
+	(controller) edge (opendlg)
+	(controller) edge (catdlg)
+	(controller) edge (editcatdlg)
+	(controller) edge (strimage)
+	(controller) edge (cursors)
       ;
     \end{tikzpicture}
     \end{center}
-  \caption{Grobentwurf}
+  \caption{Verwendete Klassen und Rolle des Controllers}
   \label{Grobentwurf}
   \end{figure}
   
