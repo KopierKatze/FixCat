@@ -21,8 +21,16 @@ categories_and_attributes = {
 }
 
 class Config(object):
+    """This class is used for creating a .json config file for pyPsy, if 
+    necessary, and it takes care of performing a `check()` if the config 
+    file is valid.
+    All data is stored in a dictionary. 
+    The config file has to be called config.json in order for pyPsy to 
+    recognize and use it. """
     def __init__(self):
-        # will hold configuration information in a dict
+        """Checks if there is already an existing config file. If not, a new 
+        one will be created. After that, the config file will be loaded via the 
+        `load()` method. """
         self.raw = None
 
         if not self.file_available():
@@ -31,10 +39,12 @@ class Config(object):
         self.load()
 
     def file_available(self):
+        """Checks, if the config file at `config_filepath` exists. Returns
+        True if the file exists. """
         return os.path.isfile(config_filepath)
 
     def load(self):
-        """load and check configuration from a file."""
+        """Loads and checks configuration of a file."""
         try:
             fp = open(config_filepath)
             try:
@@ -50,7 +60,8 @@ class Config(object):
         self.check()
 
     def _check(self, debit, credit, category_name=None):
-        """compare debit and credit"""
+        """Helper function of `check()`. This function actually compares the 
+        amounts of needed data(`debit`) and existing data(`credit`). """
         debit = set(debit)
         credit = set(credit)
 
@@ -69,9 +80,11 @@ class Config(object):
                 raise ConfigError('Unbekannte Kategorien in der Konfigurationsdatei: %s.' % to_much)
 
     def check(self):
-        """evaluate the current raw dict whether it is a valid pypsy config."""
+        """Evaluate the current raw dictionary whether it is a valid pypsy config
+        by compary needed data and existing data of the config file. 
+        Both amounts are compared in the `_check()` method. """
 
-        # vollstaendigkeit und nicht uebervoll
+        # completeness and not too much
         self._check(categories_and_attributes.keys(), self.raw.keys())
         for category in categories_and_attributes.keys():
             self._check(categories_and_attributes[category], self.raw[category].keys())
@@ -82,6 +95,8 @@ class Config(object):
                 self.get(category, attr)
 
     def write_default(self):
+        """ Writes the data of the `default_config` into a new config file at
+        `config_filepath`."""
         try:
             f = open(config_filepath, "wb")
             f.write(default_config)
@@ -90,6 +105,11 @@ class Config(object):
             raise ConfigError('Konnte die Konfigurationsdatei nicht anlegen (%s).' % e.message)
 
     def get(self, category, attr):
+        """ This method is used by `check()` in order to retreive configuration 
+        data from the dictionary. Individual shortcuts (`attr`) are listed within
+        the `keyboard_shortcuts` `category`. 
+        `autosave_minutes` and the codec used for the video export
+        (`video_export_codec`) are stored in the `general` `category`. """
         if category == 'keyboard_shortcuts':
             value = self.raw[category][attr]
             if hasattr(value, "isdigit"):
@@ -129,6 +149,25 @@ class Config(object):
         return self.raw[category][attr]
 
 class ConfigError(Exception):
+    """A ConfigError is thrown in case of errors in the config file, for example:
+        1. If the config file is not formatted correctly in the json syntax.
+        2. If the file could not be read correctly (eg. a read error of the 
+            operating system occured.
+        3. If attributes or categories are missing or uknown attributes or 
+            categories are found. 
+        4. If the config file could not be written to disk. This includes errors
+            from the operating system as well, eg. if the user has no write 
+            permissions in the directory.
+        5. If a keyboard shortcut is not spelled properly, meaning that it is 
+            not part of the standard keycodes used for eg. the space key. 
+            For examples please see the standard configuration below in 
+            `default_config_raw`. 
+        6. If one of the cursor files could not be opened, eg. because of a 
+            reading error thrown by the operating system.
+        7. If the time interval in `autosave_minutes` is less than 0 (or null) 
+            or not a number at all.
+        8. If the codec in the `video_export_codec` field is not a valid FOURCC 
+            codec. Please see fourcc.org for information about FOURCC codecs. """
     pass
 
 # default configuration
