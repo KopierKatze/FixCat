@@ -154,12 +154,14 @@ class OpenDialog(wx.Dialog):
         if not q is None:
             self.video_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.video_filepath = q
+            self.video_text.SetToolTip(wx.ToolTip(self.video_filepath))
 
     def OnSelectEyedata(self, event):
         q = self._open_file('Choose edf...', 'ASC file (*.asc)|*.asc')
         if not q is None:
             self.eyedata_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.eyedata_filepath = q
+            self.eyedata_text.SetToolTip(wx.ToolTip(self.eyedata_filepath))
 
     def _TrimFilepath(self, filepath, max_length):
         max_length -= 1 #zero index string
@@ -172,6 +174,7 @@ class OpenDialog(wx.Dialog):
         if not q is None:
             self.saved_text.SetLabel(self._TrimFilepath(q, self._trim_count))
             self.saved_filepath = q
+            self.saved_text.SetToolTip(wx.ToolTip(self.saved_filepath))
 
     def OnLoad(self, event=None, overwrite_video_filepath=None):
         try:
