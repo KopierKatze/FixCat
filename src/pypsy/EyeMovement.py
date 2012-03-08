@@ -342,6 +342,14 @@ class EyeMovement(Saveable):
 
 
 class EyeMovementError(Exception):
+    """This Error is thrown if:
+        - no eyemovement data was supplied (no `trialid`, no `saved_state` and 
+            no new edf file)
+        - a new edf file(`filepath`) and a `saved_state` were given. Only one set
+            of eyemovement data should be given
+        - the edf file at `filepath` does not exist
+        - the user does not have read permissions for the edf file
+        - the `trialid` does not exist """
     pass
 
 if __name__ == '__main__':
