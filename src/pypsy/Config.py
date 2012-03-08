@@ -50,9 +50,9 @@ class Config(object):
             try:
                 self.raw = json.load(fp)
             except ValueError:
-                raise ConfigError('Konfigurationsdatei nicht valid formatiert (JSON).')
+                raise ConfigError('Config file not formatted correctly (JSON).')
         except IOError:
-            raise ConfigError('Konfigurationsdatei nicht lesbar.')
+            raise ConfigError('Could not read config file.')
         finally:
             fp.close()
 
@@ -68,16 +68,16 @@ class Config(object):
         to_less = debit - credit
         if not len(to_less) == 0:
             if category_name:
-                raise ConfigError('In Kategorie %s der Konfigurationsdatei fehlen folgende Attribute: %s' % (category_name, to_less))
+                raise ConfigError('The %s category lacks the following attributes: %s' % (category_name, to_less))
             else:
-                raise ConfigError('Fehlende Kategorien in der Konfigurationsdatei: %s.' % to_less)
+                raise ConfigError('The following categories are missing in the config file: %s.' % to_less)
 
         to_much = (credit - set(['__comment'])) - debit
         if not len(to_much) == 0:
             if category_name:
-                raise ConfigError('In Kategorie %s der Konfigurationsdatei sind folgende unbekannte Attribute: %s' % (category_name, to_much))
+                raise ConfigError('The %s category has the following unknown attributes: %s' % (category_name, to_much))
             else:
-                raise ConfigError('Unbekannte Kategorien in der Konfigurationsdatei: %s.' % to_much)
+                raise ConfigError('The following unknown categories were found in the config file: %s.' % to_much)
 
     def check(self):
         """Evaluate the current raw dictionary whether it is a valid pypsy config
@@ -102,7 +102,7 @@ class Config(object):
             f.write(default_config)
             f.close()
         except Exception, e:
-            raise ConfigError('Konnte die Konfigurationsdatei nicht anlegen (%s).' % e.message)
+            raise ConfigError('Could not write config file (%s).' % e.message)
 
     def get(self, category, attr):
         """ This method is used by `check()` in order to retreive configuration 
@@ -122,12 +122,12 @@ class Config(object):
             elif value == None:
                 return None
             # if none of the above found the correct key not valid
-            raise ConfigError('Konfigurationsdatei enthaelt falschen Keyboard Shortcut fuer %s (Wert: %s).' % (attr, value))
+            raise ConfigError('The config file contains the following wrong keyboard shortcut for %s (value: %s).' % (attr, value))
         elif category == 'cursors':
             try:
                 return cv.LoadImage(self.raw[category][attr])
             except IOError, e:
-                raise ConfigError('Konnte Cursor fuer %s nicht oeffnen (%s) (Pfad: %s).' % (attr, e.message, self.raw[category][attr]))
+                raise ConfigError('Could not open cursor %s (%s) (path: %s).' % (attr, e.message, self.raw[category][attr]))
         elif category == 'general':
             if attr == 'autosave_minutes':
                 if self.raw[category][attr] is None:
@@ -140,10 +140,10 @@ class Config(object):
                         else:
                             return val
                     except TypeError:
-                        raise ConfigError('Die Angabe der Zeit zwischen dem automatischem Speichern muss entweder 0 o. null sein (deaktiviert) oder eine Zahl, nicht %s' % self.raw[category][attr])
+                        raise ConfigError('The time interval for autosaving has to be either 0 or null (deactivated) or a digit; you inserted: %s' % self.raw[category][attr])
             elif attr == 'video_export_codec':
                 if not (type(self.raw[category][attr]) == unicode and len(self.raw[category][attr]) == 4):
-                    raise ConfigError('Der video export Codec muss im FOURCC Format als String angegeben sein! (Bsp.: "DIVX")')
+                    raise ConfigError('The codec for exporting a video has to be a valid FOURCC codec (eg: "DIVX").')
                 else:
                     return str(self.raw[category][attr])
         return self.raw[category][attr]
