@@ -40,7 +40,7 @@ if __name__ == '__main__':
         Config.Config()
     except Config.ConfigError, e:
         app = wx.PySimpleApp()
-        wx.MessageBox('Fehler beim Laden der Konfiguration: %s'% e.message, 'Fehler')
+        wx.MessageBox('Error while loading config file: %s'% e.message, 'Error')
         app.MainLoop()
         raise SystemExit()
 
