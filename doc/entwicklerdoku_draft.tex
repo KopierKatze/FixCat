@@ -5,7 +5,7 @@
 \usetikzlibrary{arrows, positioning}
 \usepackage{pgf-umlcd}
 \title{Entwicklerdokumentation pyPsy}
-\author{Alexandra Weiss und Franz Gregor}
+\author{Franz Gregor und Alexandra Weiss}
 \date{\today}
 \makeindex
 
@@ -21,9 +21,16 @@
 	\item ausblick, ausstehende punkte
 \end{itemize}
 \newpage
+\section{Beschreibung}
+Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
+Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
+Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
+
 \section{Komponenten}
+In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben. 
+
 \subsection{Controller}
-  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model View Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
+  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
   \begin{figure}[ht]
     \begin{center}
     \begin{tikzpicture}[auto, node distance=1.2cm]
@@ -69,64 +76,43 @@
   \label{Grobentwurf}
   \end{figure}
   
-  Die im Grobentwurf aufgezeigten Komponenten werden im Programm durch Klassen wiedergespiegelt.
-  
-  Der Grobentwurf zeigt eine Model-View-Controller Architektur mit der Besonderheit das es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
-
-  \begin{enumerate}
-    \item[VideoReader] Der VideoReader öffnet Videodateien. Er kann ein einzelnes Bild zu einem bestimmten Zeitpunkt aus dem Video extrahieren und bietet Informationen über das Video an.
-    \item[VideoWriter] Der VideoWriter nimmt Einzelbilder entgegen und schreibt diese in eine Videodatei.
-    \item[CategoryContainer] Der CategoryContainer hält die vom Nutzer angegebenen Kategorien, ihre Tastenkürzel eine Liste der Fixationen und eine Zuordnung der Fixationen zu Kategorien.
-    \item[Clock] Die Clock ist der programminterne Zeitgeber.
-    \item[EyeMovement] Diese Komponent hält die Daten der Augenbewegungen und ist für die Korrekture dergleichen zuständig (Optional).
-    \item[Cursor] Die Cursor Klasse soll den angezeigten Blickcursor anpassbar machen. Sie erhält Informationen zum aktuellen Status der Augenbewegung und gibt einen Blickcursor zurück. (Optional)
-  \end{enumerate}
-
-Folgend werden die Funktionsweisen der Models, des Controllers und der GUI im Detail besprochen.
+  Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
 
 \subsection{Clock}
 Diese Klasse ist der programminterne Zeitgeber. 
-Das bedeuted sie enth\"alt in erste Linie den aktuellen Zeitpunkt des Programms in Bezug auf das Video bzw. die Augenbewegungsdaten.
+Das bedeutet, sie enthält in erste Linie den aktuellen Zeitpunkt des Programms in Bezug auf das Video beziehungsweise die Augenbewegungsdaten.
 
-Alle Komponenten greifen direkt oder indirekt auf diese Instanz zur\"uck wenn sie eine zeitver\"anderliche Eigenschaft abrufen. Daher gehen alle zeitlichen Steuerbefehle an die Instanze dieser Klasse. Bspw. n\"achstes Frame oder vorherige Fixation.
+Alle Komponenten greifen direkt oder indirekt auf diese Instanz zurück wenn sie eine zeitveränderliche Eigenschaft abrufen. Daher gehen alle zeitlichen Steuerbefehle an die Instanz dieser Klasse, wie beispielsweise nächstes Frame oder vorherige Fixation. 
 
-Zeitabh\"angige Komponenten k\"onnen \"uber die Funktion $register(function)$ gem\"aß des Observer Patterns \"uber eine Ver\"anderung der Zeit informiert werden.
-Wir werden die GUI mit Hilfe dieser Funktion dar\"uber informieren, dass sie das gezeigte Bild aktualisieren muss.
+Zeitabhängige Komponenten können über die Funktion $register(function)$ gemäß des "`Observer Patterns"' über eine Veränderung der Zeit informiert werden.
+Mit dieser Funktion wird biepsielsweise die GUI darüber informiert, dass sie das gezeigte Bild aktualisieren muss.
 
 \subsection{VideoReader}
-Die VideoReader Klasse ist f\"ur den Zugriff auf die Videobilder zust\"andig.
+Die VideoReader Klasse ist für den Zugriff auf die Videobilder zuständig.
 
-Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben.
-Anschließend bietet sie framegenauen Zugriff und Informationen zum geladenem Video.
+Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben und anschließend bietet sie framegenauen Zugriff und Informationen zum geladenen Video.
 
 \subsection{VideoWriter}
 Diese Klasse nimmt einzelne Bilder entgegen und speichert sie in einer Videodatei ab.
 
 Dazu erhält sie bei der Initialisierung den Pfad der zu erstellenden Videodatei, die gewünschte Anzahl der Bilder pro Sekunde und den zu verwendenden Videocodec.
-Die verfügbaren Videocodecs können mit Hilfe einer Klassenmethode abgerufen werden.
-
-\subsection{Cursor}
-Die Cursor Klasse ordnet den aktuellen Augenstatus (Fixation, Sakade, Blinzeln, noch iwas?) einen eigenen Blickcursor zu.
-
-Dafür hat die Klasse eine Methode der der Augenstatus übergeben wird und die den jeweiligen Cursor zurückgibt. Außerdem eine Methode mit der einem Augenstatus ein Cursor zugewiesen wird.
+Das zu verwendende FOURCC Videocodec kann in der Konfigurationsdatei angegeben werden. Es ist wichtig, dass das angegebene FOURCC Codec auf dem System instaliert ist und der FOURCC Name korrekt ist. Ist dies nicht der Fall, erscheint eine Fehlermeldung.
 
 \subsection{CategoryContainer}
-Die CategoryContainer Klasse hält die Kategorien sowie die Zuordnung von Fixationen/Frames zu Kategorien.
+Die CategoryContainer Klasse hält die Kategorien sowie die Zuordnung von Fixationen oder Frames zu Kategorien.
 
 Bei der Initialisierung der Klasse wird festgelegt ob sie Fixationen oder Frames zu Kategorien zuordnet.
 
-Anschließend bietet die Instanz Methoden um die Kategorien zu verwalten (anzulegen, Namen o. Tastenkürzel ändern, löschen), ein(e) Fixation/Frame einer Kategorie zuzuordnen, die Zuordnungen zu exportieren und um auf die beinhalteten Daten zuzugreifen.
-
-Außerdem implementiert sie auch das Observer Pattern um andere Komponenten über Veränderungen zu informieren. Was wir für die Anzeige der Fixationen in der Mainview verwenden werden.
+Anschließend bietet die Instanz Methoden, um die Kategorien zu verwalten (anlegen, Namen oder Tastenkürzel ändern, löschen), eine Fixation oder ein Frame einer Kategorie zuzuordnen, die Zuordnungen zu exportieren und um auf die beinhalteten Daten zuzugreifen.
 
 \subsection{EyeMovement}
 Die EyeMovement Klasse bereitet die Augenbewegungsdaten auf und bietet sie anderen Komponenten des Programms an.
 
-Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdatendatei übergeben wurde parst sie diese Datei und legt die enthaltenen Daten in internen Datenstrukturen an. Nun können andere Komponenten den Zustand der Augen zu einem bestimmten Zeitpunkt bestimmen. Konkret kann folgendes abgerufen werden: Blickposition, Sakkade, Fixation oder Blinzeln jeweils des linken und rechten Auges und gemittelt für beide Augen.
+Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdatendatei übergeben wurde, parst sie diese Datei und legt die enthaltenen Daten in internen Datenstrukturen an. Nun können andere Komponenten den Zustand der Augen zu einem bestimmten Zeitpunkt kategorisieren. Konkret kann folgendes abgerufen werden: Blickposition, Sakkade, Fixation oder Blinzeln jeweils des linken und rechten Auges und gemittelt für beide Augen.
 
-\subsection{Controller}
-Der Controller ist die zentrale Instanz des Programms. Er führt die einzelnen Datenquellen zusammen und setzt die Befehle des Nutzers auf diese um.
-
+\subsection{Überblick über die Klassen}
+Im Folgenden werden kurz die wichtigsten Attribute der Model Klassen und des Controllers aufgelistet. 
+%TODO!!!
 \begin{figure}[hb]
   \begin{tikzpicture}
     \begin{class}{VideoContainer}{0,0}
@@ -182,4 +168,21 @@ Der Controller ist die zentrale Instanz des Programms. Er führt die einzelnen D
   \end{tikzpicture}
   \caption{Entwurf der Klassen}
 \end{figure}
+
+\section{Zeitaufwand}
+%TODO!!!
+\begin{tabular}{|c|c|c|}
+\hline \rule[-2ex]{0pt}{5.5ex}  & Franz Gregor & Alexandra Weiß \\ 
+\hline \rule[-2ex]{0pt}{5.5ex} Geschätzt & • & • \\ 
+\hline \rule[-2ex]{0pt}{5.5ex} Real & • & • \\ 
+\hline 
+\end{tabular} 
+
+\section{Nicht implementierte Features/Ausblick}
+Die Folgenden nicht hoch priorisierten Features wurden bisher nicht 
+implementiert:
+%TODO!!!
+\begin{itemize}
+\item •
+\end{itemize}
 \end{document}
