@@ -26,6 +26,20 @@ Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Da
 Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
+\section{Architektur}
+pyPsy ist eine multiprocessing Anwendung.
+Das bedeuted das mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
+Wir haben uns f\"uer diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen sich herrausgestellt hat, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
+Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
+
+Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
+Der erste Prozess k\"ummert sich um die Nutzerinterarktion und damit Haupts\"achlich um die GUI.
+Der zweite Prozess \"ubernimmt die fachlichen Aufgaben. Das sind z.B. das Videobild samt Overlay bereitstellen oder die Kategoriesierungen verwalten und exportieren.
+Der erste Prozess wird nachfolgen GUI-Prozess, der zweite Prozess Backend-Prozess genannt.
+Die Programmkontrolle geht in aller Regel vom GUI-Prozess aus.
+In den folgenden Abschnitten wird die Controller Komponente n\"aher beschrieben.
+Diese ist gewisserma\ssen das Interface zum Backend-Prozess.
+
 \section{Komponenten}
 In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben. 
 
