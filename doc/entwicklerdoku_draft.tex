@@ -23,11 +23,14 @@
 \newpage
 \section{Beschreibung}
 Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
-Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
+Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
 \section{Komponenten}
 In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben. 
+
+\subsection{Saveable}
+%TODO!!!
 
 \subsection{Controller}
   Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
@@ -169,14 +172,21 @@ Im Folgenden werden kurz die wichtigsten Attribute der Model Klassen und des Con
   \caption{Entwurf der Klassen}
 \end{figure}
 
-\section{Zeitaufwand}
-%TODO!!!
-\begin{tabular}{|c|c|c|}
-\hline \rule[-2ex]{0pt}{5.5ex}  & Franz Gregor & Alexandra Weiß \\ 
-\hline \rule[-2ex]{0pt}{5.5ex} Geschätzt & • & • \\ 
-\hline \rule[-2ex]{0pt}{5.5ex} Real & • & • \\ 
-\hline 
-\end{tabular} 
+\section{Verwendete Python Module}
+In den folgenden Abschnitten werden verwendete Python Module aufgezählt und kurz erklärt, wofür diese konkret in pyPsy verwendet werden. Dabei werden nur die Module erwähnt, die für die Funktionalität von pyPsy direkt notwendig sind und nicht häufig verwendete Module wie beispielsweise das "`os'" Modul. 
+\subsection{OpenCV für Python}
+Für die Verarbeitung von Videodateien und allen dazugehören Operationen wird OpenCV für Python verwendet, da es sehr viele Möglichkeiten bietet, gut dokumentiert und außerdem performant ist. 
+Im Einzelnen wird OpenCV für das framebasierte Einlesen des Ausgangsvideos, das Zeichnen des Overlays (also der Augdaten) und das Erzeugen eines neuen Videos mit Overlay verwendet.
+\subsection{Multiprocessing und Threading}
+%Do not touch our shit, biatches!!!!
+%Verweis auf Seite, die Grundlagen von Threading abstrakt erklärt?
+Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen und dadurch eine flüssige Wiedergabe des Videos. 
+In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter "`tickt'". 
+Multiprocessing wird in der start_pypsy
+\subsection{Json für Python}
+Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config un in der Saveable Klasse. 
+\subsection{Pickle}
+Das Picke Modul wird in der Saveable Klasse verwendet, um die vom Benutzer generierten Kategorisierungen gut lesbar in einer csv-Datei abzuspeichern. Das Modul übernimmt dabei einen großen Teil der Arbeit des sogenannten Pretty-Printings, also der Formatierung.
 
 \section{Nicht implementierte Features/Ausblick}
 Die Folgenden nicht hoch priorisierten Features wurden bisher nicht 
