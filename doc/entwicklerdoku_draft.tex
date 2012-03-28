@@ -1,6 +1,7 @@
 \documentclass[a4paper,draft]{scrartcl}
 \usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{arrows, positioning}
 \usepackage{pgf-umlcd}
@@ -23,7 +24,7 @@
 \newpage
 \section{Beschreibung}
 Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
-Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
+Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
 \section{Architektur}
@@ -106,6 +107,8 @@ Das hei\"st sie stellen die fachliche Funktionalit\"at her.
   
   Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
 
+\subsubsection{Savable}
+
 \subsubsection{Clock}
 Diese Klasse ist der programminterne Zeitgeber. 
 Das bedeutet, sie enthält in erste Linie den aktuellen Zeitpunkt des Programms in Bezug auf das Video beziehungsweise die Augenbewegungsdaten.
@@ -142,4 +145,23 @@ Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdaten
   \begin{description}
     \item[Deinteralicing] Blablabla
   \end{description}
+
+\section{Verwendete Python Module}
+In den folgenden Abschnitten werden verwendete Python Module aufgezählt und kurz erklärt, wofür diese konkret in pyPsy verwendet werden. Dabei werden nur die Module erwähnt, die für die Funktionalität von pyPsy direkt notwendig sind und nicht häufig verwendete Module wie beispielsweise das "`os"' Modul. 
+\subsection{OpenCV für Python}
+Für die Verarbeitung von Videodateien und allen dazugehören Operationen wird OpenCV für Python verwendet, da es sehr viele Möglichkeiten bietet, gut dokumentiert und außerdem performant ist. 
+Im Einzelnen wird OpenCV für das framebasierte Einlesen des Ausgangsvideos, das Zeichnen des Overlays (also der Augdaten) und das Erzeugen eines neuen Videos mit Overlay verwendet.
+\subsection{Multiprocessing und Threading}
+Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen und dadurch eine flüssige Wiedergabe des Videos. 
+In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter tickt. 
+Multiprocessing wird in der start\_pypsy Klasse verwendet, um die Performance (evtl anderes wort?)von pyPsy weiter zu verbessern. Hierbei wird der Controller als Adapter zwischen den Model und den View Klassen verwendet, da nur über den Controller und das von ihm genutzte "` Shared Memory "' Daten von den Model Klassen zu den View Klassen und anders herum gelangen können. Dies geschieht unter anderem auch über "` Shared Variables "' des Controllers. 
+Durch die Verwendung von Multiprocessing müssen folglich alle Daten und Variablen, auf die auch fremde Klassen zugreifen können sollen, dem Controller bekannt sein. Hierbei wird ein sogenannter "`Sync Manager"' aus dem Multiprocessing Modul verwendet und kein "`Process Pool"'.
+Die Python Doku erklärt weitere Details zu \href{''http://docs.python.org/library/multiprocessing.html''}{''Multiprocessing''} 
+
+\subsection{Json für Python}
+Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config un in der Saveable Klasse. 
+
+\subsection{Pickle}
+Das Picke Modul wird in der Saveable Klasse verwendet, um die vom Benutzer generierten Kategorisierungen gut lesbar in einer csv-Datei abzuspeichern. Das Modul übernimmt dabei einen großen Teil der Arbeit des sogenannten Pretty-Printings, also der Formatierung.
+
 \end{document}
