@@ -27,13 +27,38 @@ Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Da
 Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
+\section{Architektur}
+pyPsy ist eine multiprocessing Anwendung.
+Das bedeuted das mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
+Wir haben uns f\"uer diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen sich herrausgestellt hat, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
+Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
+
+Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
+Der erste Prozess k\"ummert sich um die Nutzerinterarktion und damit Haupts\"achlich um die GUI.
+Der zweite Prozess \"ubernimmt die fachlichen Aufgaben. Das sind z.B. das Videobild samt Overlay bereitstellen oder die Kategoriesierungen verwalten und exportieren.
+Der erste Prozess wird nachfolgen GUI-Prozess, der zweite Prozess Backend-Prozess genannt.
+Die Programmkontrolle geht in aller Regel vom GUI-Prozess aus.
+In den folgenden Abschnitten wird die Controller Komponente n\"aher beschrieben.
+Diese ist gewisserma\ssen das Interface zum Backend-Prozess.
+
 \section{Komponenten}
-In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben. 
+In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben.
 
-\subsection{Saveable}
-%TODO!!!
+\subsection{GUI}
+Die folgenden Komponenten stellen die GUI oder ihre Elemente bereit und werden im GUI-Prozess ausgef\"uhrt.
+Diese Liste ist nicht vollst\"andig.
+Sie betrachtet nur die interessantesten Konzepte.
 
-\subsection{Controller}
+\subsubsection{MainFrame}
+Ist das ein und alles
+
+\subsubsection{CategoryList}
+
+\subsection{Backend}
+Die Komponenten in diesem Abschnitt werden im Backend genutzt.
+Das hei\"st sie stellen die fachliche Funktionalit\"at her.
+
+\subsubsection{Controller}
   Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
   \begin{figure}[ht]
     \begin{center}
@@ -82,7 +107,9 @@ In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Inter
   
   Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
 
-\subsection{Clock}
+\subsubsection{Savable}
+
+\subsubsection{Clock}
 Diese Klasse ist der programminterne Zeitgeber. 
 Das bedeutet, sie enthält in erste Linie den aktuellen Zeitpunkt des Programms in Bezug auf das Video beziehungsweise die Augenbewegungsdaten.
 
@@ -91,87 +118,33 @@ Alle Komponenten greifen direkt oder indirekt auf diese Instanz zurück wenn sie
 Zeitabhängige Komponenten können über die Funktion $register(function)$ gemäß des "`Observer Patterns"' über eine Veränderung der Zeit informiert werden.
 Mit dieser Funktion wird biepsielsweise die GUI darüber informiert, dass sie das gezeigte Bild aktualisieren muss.
 
-\subsection{VideoReader}
+\subsubsection{VideoReader}
 Die VideoReader Klasse ist für den Zugriff auf die Videobilder zuständig.
 
 Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben und anschließend bietet sie framegenauen Zugriff und Informationen zum geladenen Video.
 
-\subsection{VideoWriter}
+\subsubsection{VideoWriter}
 Diese Klasse nimmt einzelne Bilder entgegen und speichert sie in einer Videodatei ab.
 
 Dazu erhält sie bei der Initialisierung den Pfad der zu erstellenden Videodatei, die gewünschte Anzahl der Bilder pro Sekunde und den zu verwendenden Videocodec.
 Das zu verwendende FOURCC Videocodec kann in der Konfigurationsdatei angegeben werden. Es ist wichtig, dass das angegebene FOURCC Codec auf dem System instaliert ist und der FOURCC Name korrekt ist. Ist dies nicht der Fall, erscheint eine Fehlermeldung.
 
-\subsection{CategoryContainer}
+\subsubsection{CategoryContainer}
 Die CategoryContainer Klasse hält die Kategorien sowie die Zuordnung von Fixationen oder Frames zu Kategorien.
 
 Bei der Initialisierung der Klasse wird festgelegt ob sie Fixationen oder Frames zu Kategorien zuordnet.
 
 Anschließend bietet die Instanz Methoden, um die Kategorien zu verwalten (anlegen, Namen oder Tastenkürzel ändern, löschen), eine Fixation oder ein Frame einer Kategorie zuzuordnen, die Zuordnungen zu exportieren und um auf die beinhalteten Daten zuzugreifen.
 
-\subsection{EyeMovement}
+\subsubsection{EyeMovement}
 Die EyeMovement Klasse bereitet die Augenbewegungsdaten auf und bietet sie anderen Komponenten des Programms an.
 
 Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdatendatei übergeben wurde, parst sie diese Datei und legt die enthaltenen Daten in internen Datenstrukturen an. Nun können andere Komponenten den Zustand der Augen zu einem bestimmten Zeitpunkt kategorisieren. Konkret kann folgendes abgerufen werden: Blickposition, Sakkade, Fixation oder Blinzeln jeweils des linken und rechten Auges und gemittelt für beide Augen.
 
-\subsection{Überblick über die Klassen}
-Im Folgenden werden kurz die wichtigsten Attribute der Model Klassen und des Controllers aufgelistet. 
-%TODO!!!
-\begin{figure}[hb]
-  \begin{tikzpicture}
-    \begin{class}{VideoContainer}{0,0}
-      \attribute{file : string}
-      \attribute{duration : float}
-      
-      \operation{init( file : string )}
-      \operation{getImageAt( second : float )}
-    \end{class}
-    
-    \begin{class}{EyeMovementData}{8,0}
-      \attribute{times : list of float}
-      \attribute{fixation\_end : list of 2-tuple of point}
-      \attribute{fixation\_start : list of 2-tuple of point}
-      
-      \operation{init( file : string )}
-      \operation{getMeanFixationAt( second : float )}
-      \operation{getLeftFixationAt( second : float )}
-      \operation{getRightFixationAt( second : float )}
-      \operation{getFixationNumber( second : float )}
-      \operation{getFixationStartSecond( number : integer )}
-      \operation{setOffset( )}
-    \end{class}
-    
-    \begin{class}{Clock}{0,-3}
-      \attribute{worker : thread}
-      \attribute{interval : float}
-      \attribute{time : float}
-      
-      \operation{init( interval=0.01 : float)}
-      \operation{register ( f : callable)}
-      \operation{seek ( second : float)}
-      \operation{start ( multiplier : float )}
-      \operation{stop ()}
-    \end{class}
-    
-    \begin{class}{Controller}{0,-8}
-      \attribute{clock : Clock}
-      \attribute{eye\_movement\_data : EyeMovementData}
-      \attribute{video\_container : VideoContainer}
-      \attribute{gui : GUI}
-      
-      \operation{newClockTick( time )}
-      \operation{getOverlayedPicture()}
-      \operation{getCursorPicture()}
-    \end{class}
-    
-    \begin{class}{GUI}{8, -9.5}
-      \operation{refresh()}
-    \end{class}
-  
-  
-  \end{tikzpicture}
-  \caption{Entwurf der Klassen}
-\end{figure}
+\section{M\"ogliche Erweiterung}
+  \begin{description}
+    \item[Deinteralicing] Blablabla
+  \end{description}
 
 \section{Verwendete Python Module}
 In den folgenden Abschnitten werden verwendete Python Module aufgezählt und kurz erklärt, wofür diese konkret in pyPsy verwendet werden. Dabei werden nur die Module erwähnt, die für die Funktionalität von pyPsy direkt notwendig sind und nicht häufig verwendete Module wie beispielsweise das "`os"' Modul. 
@@ -192,11 +165,4 @@ Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, 
 \subsection{Pickle}
 Das Picke Modul wird in der Saveable Klasse verwendet, um die vom Benutzer generierten Kategorisierungen gut lesbar in einer csv-Datei abzuspeichern. Das Modul übernimmt dabei einen großen Teil der Arbeit des sogenannten Pretty-Printings, also der Formatierung.
 
-\section{Nicht implementierte Features/Ausblick}
-Die Folgenden nicht hoch priorisierten Features wurden bisher nicht 
-implementiert:
-%TODO!!!
-\begin{itemize}
-\item •
-\end{itemize}
 \end{document}
