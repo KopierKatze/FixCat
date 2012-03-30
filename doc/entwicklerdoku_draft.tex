@@ -183,8 +183,9 @@ Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen 
 In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter tickt. 
 Multiprocessing wird in der start\_pypsy Klasse verwendet, um die Performance (evtl anderes wort?)von pyPsy weiter zu verbessern. Hierbei wird der Controller als Adapter zwischen den Model und den View Klassen verwendet, da nur über den Controller und das von ihm genutzte "` Shared Memory "' Daten von den Model Klassen zu den View Klassen und anders herum gelangen können. Dies geschieht unter anderem auch über "` Shared Variables "' des Controllers. 
 Durch die Verwendung von Multiprocessing müssen folglich alle Daten und Variablen, auf die auch fremde Klassen zugreifen können sollen, dem Controller bekannt sein. Hierbei wird ein sogenannter "`Sync Manager"' aus dem Multiprocessing Modul verwendet und kein "`Process Pool"'.
-Die Python Doku erklärt weitere Details zu \href{''http://docs.python.org/library/multiprocessing.html''}{''Multiprocessing''} 
-
+Die Python Doku erklärt weitere Details zu Multiprocessing: \href{http://docs.python.org/library/multiprocessing.html}
+{Multiprocessing}.
+\url{http://docs.python.org/library/multiprocessing.html}
 \subsection{Json für Python}
 Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config un in der Saveable Klasse. 
 
