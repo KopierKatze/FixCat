@@ -22,9 +22,9 @@ Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
 \section{Architektur}
-pyPsy ist eine multiprocessing Anwendung.
-Das bedeuted das mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
-Wir haben uns f\"uer diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
+pyPsy ist eine Multiprocessing Anwendung.
+Das bedeutet, dass mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
+Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
 Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL("`Global Interpreter Lock'") und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
 
 Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
@@ -44,9 +44,45 @@ Diese Liste ist nicht vollst\"andig.
 Sie betrachtet nur die interessantesten Konzepte.
 
 \subsubsection{MainFrame}
-Ist das ein und alles
+Der MainFrame ist das Hauptfenster von pyPsy, in dem der Benutzer das Video sehen und steuern kann. Des weiteren werden die bereits vorgenommenen Kategorisierungen auf der rechten Seite in der CategoryList angezeigt. Die Spalte Index bezeichnet entweder den Index des Frames oder - je nach EinCategoryListstellung des Projekts - der Fixation im Video, während rechts daneben der Name der Kategorie eingetragen wird. 
+Direkt unter dem Bild des Videos ist ein Slider, mit dem der Benutzer Frame genau durch das Video navigieren kann.
+Unterhalb des Bildes vom Video sind Buttons für die Steuerung der Wiedergabe des Videos. Von links nach rechts sind dies
+\begin{itemize}
+\item Frame zurück springen
+\item Play
+\item Pause
+\item Frame nach vorne springen
+\item zum/r nächsten nicht kategorisierten Frame/Fixation springen
+\end{itemize}
+Daneben sind Checkboxen mit denen der Benutzer festlegen kann, welche Augendaten im Video angezeigt werden sollen. Dabei steht
+\begin{itemize}
+\item L für Daten des linken Auges
+\item R für Daten des rechten Auges
+\item M für die Mittelung der Daten beider Augen
+\end{itemize}
+Rechterhand unter der Liste der Kategorisierungen befindet sich der Speed Slider, mit dem der Benutzer die Abspielgeschwindigkeit des Videos einstellen kann. 
+In der Status Bar rechts am unteren Ende des Fensters werden alle relevanten Informationen für einen besseren Überblick angezeigt. Der Reihe nach sind diese:
+\begin{itemize}
+\item angezeigte Augendaten (eingestellt durch die Checkboxen)
+\item ob Fixationen oder Frames kategorisiert werden
+\item Abspielgeschwindigkeit des Videos
+\item bereits verstrichene Zeit des Videos
+\item Länge des Videos
+\item aktuelle/r Frame/Fixation 
+\item Anzahl Frames/Fixationen des Videos
+\end{itemize}
+Die Menüs oben links bieten dem Benutzer folgende Untermenüs:
+Das "`File'" Menü ist unterteilt in "`Open'", "`Save'", "`About'" und "`Quit'". 
+Im "`Category'" Menü mit den Punkten "`Mange categories'" und "`Export categories'" kann der Benutzer Kategorien anlegen und verwalten. Dies schließt den Import von Kategorien aus anderen pyPsy-Projekten ein.
+Im Menüpunkt für den Export können die vorgenommenen Kategorisierungen als .csv-Datei exportiert werden. 
+Das"`Export'" Menü mit dem Unterpunkt "`Video'" ist für den Videoexport zuständig. Wird dieser Menüpunkt ausgewählt, so muss der Benutzer zunächst den Pfad und den Namen für die resultierende .avi-Datei angeben. Der Fortschritt des Exports wird in einem Fortschrittsfenster angezeigt.
+
 
 \subsubsection{CategoryList}
+Auf der rechten Seite des MainFrames werden die bereits vorgenommenen Kategorisierungen angezeigt, sobald der Benutzer diese vornimmt. 
+Da entweder Frames oder Fixationen kategorisiert werden, werden als Index links von den Kategorienamen die Indices der Frames oder Fixationen angezeigt. Ist ein/e Frame/Fixation noch nicht kategorisiert, wird nur ein Strich angezeigt.
+Um eine Folge von Frames oder Fixationen zu kategorisieren, kann nach Anwendung einer Kategorie auf einen Index diese Kategorie durch drücken der Pfeiltaste nach unten diese Kategorie auch auf die folgenden Indices angewendet werden.
+Falls nötig, können Kategorisierungen gelöscht werden, indem die entsprechenden Indices markiert werden und die Entfernen Taste gedrückt wird. 
 
 \subsection{Backend}
 Die Komponenten in diesem Abschnitt werden im Backend genutzt.
@@ -138,6 +174,7 @@ Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdaten
 \section{M\"ogliche Erweiterung}
   \begin{description}
     \item[Deinteralicing] Blablabla, opencv y u no deinterlacing?
+    \item[Autosave Dialog] nicht aufmachen während Video Export?
   \end{description}
 
 \section{Verwendete Python Module}
