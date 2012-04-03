@@ -22,6 +22,24 @@
 	\item ausblick, ausstehende punkte
 \end{itemize}
 \newpage
+\section{Projektziel}
+In der Arbeitsgruppe "Angewandte Kognitionsforschung des Instituts f\"ur Psychologie III der Fakult\"at f\"ur Mathematik und Naturwissenschaften der Technischen Universtit\"at Dresden wird die Aufmerksamkeit des Menschen untersucht.
+Dazu werden unter Anderem Experimente bei dennen Probanten einen Eye-Tracker tragen durchge\"uhrt.
+
+Den Eye-Tracker kann man sich als \"ubergrosse, mit mehereren Kameras ausgestattete Brille vorstellen.
+Diese Kameras nehmen zum einem das Blickfeld des Probanden sowie seine Augen auf.
+Aus den Aufnahmen der Augen errechnet das Eye-Tracking-System die Blickrichtung des Probanden.
+Und liefert nach dem Versuch ein Rohvideo, das das Blickfeld des Probanden zeigt und eine Datei mit den bin\"ar gepeicherten Rohblickdaten.
+Diese beiden Dateien k\"onnen mit Hilfe eines Tools des Herstellers des Eye-Tracking-Systems in ein Video mit Overlay und eine ASCII Datei mit genauen Informationen \"uber das Blickverhalten des Probanden umgewandelt werden.
+Das Video mit Overlay ist zeigt das Blickfeld des Probanden und einen blauen Punkt an der Stelle auf die Proband gerade sieht.
+
+F\"ur die Auswertung der Experimente ist es vor allem interessant was der Proband wann wahrgenommen hat.
+Um diese Information ohne weitere Hilfsmittel zu erhalten m\"ussen mindestens das Video mit Overlay und die ASCII Datei mit den Blickdaten gleichzeitg betrachtet werden.
+Ausserdem m\"ussen die Daten erfasst werden.
+Was dazu gef\"uhrt hat das die Wissenschaftler mit Stift und Block vor dem Computer sassen und lange Stunden die Videos ausgewertet haben.
+
+Dieser Prozess soll mit Hilfe des zu entwicklenden Programms vereinfacht werden.
+
 \section{Beschreibung}
 Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
 Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
@@ -152,11 +170,14 @@ In den folgenden Abschnitten werden verwendete Python Module aufgezählt und kur
 Für die Verarbeitung von Videodateien und allen dazugehören Operationen wird OpenCV für Python verwendet, da es sehr viele Möglichkeiten bietet, gut dokumentiert und außerdem performant ist. 
 Im Einzelnen wird OpenCV für das framebasierte Einlesen des Ausgangsvideos, das Zeichnen des Overlays (also der Augdaten) und das Erzeugen eines neuen Videos mit Overlay verwendet.
 \subsection{Multiprocessing und Threading}
-Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen und dadurch eine flüssige Wiedergabe des Videos. 
+Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen da sie mehrere gleichzeitige Verarbeitungsprozesse erm\"oglichen. In pyPsy sind das Beispielsweise gleichzeitiges Reagieren auf Nutzereingaben (z.B. Kategorisierung) w\"ahrend der Videowiedergabe.
+Im Backend verwenden wir Threading um den internen Zeitgeber weiter zu setzen und gleichzeitig Anfragen der GUI (des Benutzers) abarbeiten zu k\"onnen.
 In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter tickt. 
-Multiprocessing wird in der start\_pypsy Klasse verwendet, um die Performance (evtl anderes wort?)von pyPsy weiter zu verbessern. Hierbei wird der Controller als Adapter zwischen den Model und den View Klassen verwendet, da nur über den Controller und das von ihm genutzte "` Shared Memory "' Daten von den Model Klassen zu den View Klassen und anders herum gelangen können. Dies geschieht unter anderem auch über "` Shared Variables "' des Controllers. 
-Durch die Verwendung von Multiprocessing müssen folglich alle Daten und Variablen, auf die auch fremde Klassen zugreifen können sollen, dem Controller bekannt sein. Hierbei wird ein sogenannter "`Sync Manager"' aus dem Multiprocessing Modul verwendet und kein "`Process Pool"'.
-Die Python Doku erklärt weitere Details zu \href{''http://docs.python.org/library/multiprocessing.html''}{''Multiprocessing''} 
+Das Multiprocessing Packet wird in der Startroutine von pyPsy verwendet, um die performante Nebenl\"aufigkeit der Prozesse (GUI und Backend) in pyPsy zu gew\"ahrleisten. Dabei wird der Controller als Adapter zwischen den Model (Backend) und den View (GUI) Klassen verwendet. Das bedeuted das die Kommunikation zwischen GUI und Backend nur \"uber die Methoden des Controllers stattfindet. Daf\"ur erh\"alt die GUI einen Proxy des Controllers. Welcher die Methodenaufrufe an die echte Controllerinstanz in einem anderem Prozess durch Interprozesskommunikation weiterleitet.
+
+Da die Interprozzeskommunikation vergleichweise langsam ist werden die sich schnell \"andernten Bilddateien (Bild & Bildnummer) mit Hilfe eines gemeinsamen Speichers zwischen beiden Prozessen ausgetauscht.
+
+F\"ur die Umsetzung der Interprozesskommunikation und des gemeinsamen Speichers haben wir auf die Standard Python Bibliothek zur\"uckgegriffen. Dieser k\"onnen auch weiter Informationen \"uber das Thema entnommen werden (\href{''http://docs.python.org/library/multiprocessing.html''})
 
 \subsection{Json für Python}
 Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config un in der Saveable Klasse. 
