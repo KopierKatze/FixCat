@@ -13,9 +13,9 @@ Windows:
 3.) install python package wxPython
 4.) install python package OpenCV
  - download opencv superpack
- - copy the python package of the superpack
+ - copy cv.pyd / cv2.pyd
    into your python site-packages directory (e.g. C:\Python27\Lib\site-packages)
- - copy opencv dlls of the superpack
+ - copy opencv dlls (opencv_*.dll) of the superpack
    to your python executable (e.g. C:\Python27)
  - the location the specified files changes between opencv releases, so you have to find them on your own
 
