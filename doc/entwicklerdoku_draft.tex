@@ -18,31 +18,31 @@
 \newpage
 \section{Projektziel}
 In der Arbeitsgruppe "Angewandte Kognitionsforschung des Instituts f\"ur Psychologie III der Fakult\"at f\"ur Mathematik und Naturwissenschaften der Technischen Universtit\"at Dresden wird die Aufmerksamkeit des Menschen untersucht.
-Dazu werden unter Anderem Experimente bei dennen Probanten einen Eye-Tracker tragen durchge\"uhrt.
+Dazu werden unter Anderem Experimente bei dennen Probanten einen Eye-Tracker tragen durchgef\"uhrt.
 
 Den Eye-Tracker kann man sich als \"ubergrosse, mit mehereren Kameras ausgestattete Brille vorstellen.
 Diese Kameras nehmen zum einem das Blickfeld des Probanden sowie seine Augen auf.
 Aus den Aufnahmen der Augen errechnet das Eye-Tracking-System die Blickrichtung des Probanden.
 Und liefert nach dem Versuch ein Rohvideo, das das Blickfeld des Probanden zeigt und eine Datei mit den bin\"ar gepeicherten Rohblickdaten.
 Diese beiden Dateien k\"onnen mit Hilfe eines Tools des Herstellers des Eye-Tracking-Systems in ein Video mit Overlay und eine ASCII Datei mit genauen Informationen \"uber das Blickverhalten des Probanden umgewandelt werden.
-Das Video mit Overlay ist zeigt das Blickfeld des Probanden und einen blauen Punkt an der Stelle auf die Proband gerade sieht.
+Das Video mit Overlay zeigt das Blickfeld des Probanden und einen blauen Punkt an der Stelle auf die Proband gerade sieht.
 
 F\"ur die Auswertung der Experimente ist es vor allem interessant was der Proband wann wahrgenommen hat.
-Um diese Information ohne weitere Hilfsmittel zu erhalten m\"ussen mindestens das Video mit Overlay und die ASCII Datei mit den Blickdaten gleichzeitg betrachtet werden.
+Um diese Information ohne weitere Hilfsmittel zu erhalten, m\"ussen mindestens das Video mit Overlay und die ASCII Datei mit den Blickdaten gleichzeitg betrachtet werden.
 Ausserdem m\"ussen die Daten erfasst werden.
-Was dazu gef\"uhrt hat das die Wissenschaftler mit Stift und Block vor dem Computer sassen und lange Stunden die Videos ausgewertet haben.
+Was dazu gef\"uhrt hat, dass die Wissenschaftler mit Stift und Block vor dem Computer sassen und lange Stunden die Videos ausgewertet haben.
 
 Dieser Prozess soll mit Hilfe des zu entwicklenden Programms vereinfacht werden.
 
 \section{Beschreibung}
 Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
-Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
-Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
+Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc-Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
+Innerhalb einer *.asc-Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
 \section{Architektur}
 pyPsy ist eine Multiprocessing Anwendung.
 Das bedeutet, dass mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
-Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
+Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei Programml\"aufe existieren, ein Wiedergabeprozess, der das Video "abspielt" und ein Prozess der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.). W\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese Prozesse in Python nicht durch Threads repr\"asentiert werden k\"oennen.
 Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL("`Global Interpreter Lock'") und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
 
 Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
@@ -104,7 +104,7 @@ Falls nötig, können Kategorisierungen gelöscht werden, indem die entsprechend
 
 \subsection{Backend}
 Die Komponenten in diesem Abschnitt werden im Backend genutzt.
-Das hei\"\ss t sie stellen die fachliche Funktionalit\"at her.
+Das hei\ss t sie stellen die fachliche Funktionalit\"at her.
 
 \subsubsection{Controller}
   Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
@@ -155,7 +155,9 @@ Das hei\"\ss t sie stellen die fachliche Funktionalit\"at her.
   
   Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Dadurch soll der Implementationsaufwand minimiert werden. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um.
 
-\subsubsection{Savable}
+\subsubsection{Saveable}
+Um möglichst viele Eigenschaften eines pyPsy Projektes abspeichern zu können, erben die meisten Klassen des Backends von Saveable. Diese Klasse enthält Methoden, die es beispielsweise ermöglichen die verstrichene Zeit des Videos in der *.pyps-Datei abzulegen. 
+Für eine bessere Verwaltung der Objekte, die abgespeichert werden zu erreichen, gibt es den sogenannten "`SaveController'", der die Liste speicherbarer Objekte verwaltet. 
 
 \subsubsection{Clock}
 Diese Klasse ist der programminterne Zeitgeber. 
@@ -205,11 +207,11 @@ Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen 
 Im Backend verwenden wir Threading um den internen Zeitgeber weiter zu setzen und gleichzeitig Anfragen der GUI (des Benutzers) abarbeiten zu k\"onnen.
 In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter tickt. 
 
-Das Multiprocessing Packet wird in der Startroutine von pyPsy verwendet, um die performante Nebenl\"aufigkeit der Prozesse (GUI und Backend) in pyPsy zu gew\"ahrleisten. Dabei wird der Controller als Adapter zwischen den Model (Backend) und den View (GUI) Klassen verwendet. Das bedeuted das die Kommunikation zwischen GUI und Backend nur \"uber die Methoden des Controllers stattfindet. Daf\"ur erh\"alt die GUI einen Proxy des Controllers. Welcher die Methodenaufrufe an die echte Controllerinstanz in einem anderem Prozess durch Interprozesskommunikation weiterleitet.
+Das Multiprocessing Packet wird in der Startroutine von pyPsy verwendet, um die performante Nebenl\"aufigkeit der Prozesse (GUI und Backend) in pyPsy zu gew\"ahrleisten. Dabei wird der Controller als Adapter zwischen den Model (Backend) und den View (GUI) Klassen verwendet. Das bedeutet, dass die Kommunikation zwischen GUI und Backend nur \"uber die Methoden des Controllers stattfindet. Daf\"ur erh\"alt die GUI einen Proxy des Controllers, welcher die Methodenaufrufe an die echte Controllerinstanz in einem anderem Prozess durch Interprozesskommunikation weiterleitet.
 
-Da die Interprozzeskommunikation vergleichweise langsam ist werden die sich schnell \"andernten Bilddateien (Bild & Bildnummer) mit Hilfe eines gemeinsamen Speichers zwischen beiden Prozessen ausgetauscht.
+Da die Interprozzeskommunikation vergleichweise langsam ist, werden die sich schnell \"andernden Bilddateien (Bild \& Bildnummer) mit Hilfe eines gemeinsamen Speichers zwischen beiden Prozessen ausgetauscht.
 
-F\"ur die Umsetzung der Interprozesskommunikation und des gemeinsamen Speichers haben wir auf die Standard Python Bibliothek zur\"uckgegriffen. Dieser k\"onnen auch weiter Informationen \"uber das Thema entnommen werden (\href{''http://docs.python.org/library/multiprocessing.html''})
+F\"ur die Umsetzung der Interprozesskommunikation und des gemeinsamen Speichers haben wir auf die Standard Python Bibliothek zur\"uckgegriffen. Dieser k\"onnen auch weiter Informationen \"uber das Thema entnommen werden (\href{''http://docs.python.org/library/multiprocessing.html''}{Multiprocessing})
 
 \subsection{Json für Python}
 Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config un in der Saveable Klasse. 
