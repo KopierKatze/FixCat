@@ -15,12 +15,6 @@
 \maketitle
 \newpage
 \tableofcontents
-\begin{itemize}
-	\item was macht pypsy, genaue beschreibung der funktionalität
-	\item komponenten und beschreibungen 
-	\item zeitaufwand
-	\item ausblick, ausstehende punkte
-\end{itemize}
 \newpage
 \section{Projektziel}
 In der Arbeitsgruppe "Angewandte Kognitionsforschung des Instituts f\"ur Psychologie III der Fakult\"at f\"ur Mathematik und Naturwissenschaften der Technischen Universtit\"at Dresden wird die Aufmerksamkeit des Menschen untersucht.
@@ -46,18 +40,18 @@ Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in
 Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
 
 \section{Architektur}
-pyPsy ist eine multiprocessing Anwendung.
-Das bedeuted das mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
-Wir haben uns f\"uer diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen sich herrausgestellt hat, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
-Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
+pyPsy ist eine Multiprocessing Anwendung.
+Das bedeutet, dass mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
+Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
+Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL("`Global Interpreter Lock'") und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
 
 Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
-Der erste Prozess k\"ummert sich um die Nutzerinterarktion und damit Haupts\"achlich um die GUI.
+Der erste Prozess k\"ummert sich um die Nutzerinterarktion und damit haupts\"achlich um die GUI.
 Der zweite Prozess \"ubernimmt die fachlichen Aufgaben. Das sind z.B. das Videobild samt Overlay bereitstellen oder die Kategoriesierungen verwalten und exportieren.
-Der erste Prozess wird nachfolgen GUI-Prozess, der zweite Prozess Backend-Prozess genannt.
+Der erste Prozess wird nachfolgend GUI-Prozess, der zweite Prozess Backend-Prozess genannt.
 Die Programmkontrolle geht in aller Regel vom GUI-Prozess aus.
 In den folgenden Abschnitten wird die Controller Komponente n\"aher beschrieben.
-Diese ist gewisserma\ssen das Interface zum Backend-Prozess.
+Diese ist gewisserma\ss en das Interface zum Backend-Prozess.
 
 \section{Komponenten}
 In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben.
@@ -68,13 +62,49 @@ Diese Liste ist nicht vollst\"andig.
 Sie betrachtet nur die interessantesten Konzepte.
 
 \subsubsection{MainFrame}
-Ist das ein und alles
+Der MainFrame ist das Hauptfenster von pyPsy, in dem der Benutzer das Video sehen und steuern kann. Des weiteren werden die bereits vorgenommenen Kategorisierungen auf der rechten Seite in der CategoryList angezeigt. Die Spalte Index bezeichnet entweder den Index des Frames oder - je nach EinCategoryListstellung des Projekts - der Fixation im Video, während rechts daneben der Name der Kategorie eingetragen wird. 
+Direkt unter dem Bild des Videos ist ein Slider, mit dem der Benutzer Frame genau durch das Video navigieren kann.
+Unterhalb des Bildes vom Video sind Buttons für die Steuerung der Wiedergabe des Videos. Von links nach rechts sind dies
+\begin{itemize}
+\item Frame zurück springen
+\item Play
+\item Pause
+\item Frame nach vorne springen
+\item zum/r nächsten nicht kategorisierten Frame/Fixation springen
+\end{itemize}
+Daneben sind Checkboxen mit denen der Benutzer festlegen kann, welche Augendaten im Video angezeigt werden sollen. Dabei steht
+\begin{itemize}
+\item L für Daten des linken Auges
+\item R für Daten des rechten Auges
+\item M für die Mittelung der Daten beider Augen
+\end{itemize}
+Rechterhand unter der Liste der Kategorisierungen befindet sich der Speed Slider, mit dem der Benutzer die Abspielgeschwindigkeit des Videos einstellen kann. 
+In der Status Bar rechts am unteren Ende des Fensters werden alle relevanten Informationen für einen besseren Überblick angezeigt. Der Reihe nach sind diese:
+\begin{itemize}
+\item angezeigte Augendaten (eingestellt durch die Checkboxen)
+\item ob Fixationen oder Frames kategorisiert werden
+\item Abspielgeschwindigkeit des Videos
+\item bereits verstrichene Zeit des Videos
+\item Länge des Videos
+\item aktuelle/r Frame/Fixation 
+\item Anzahl Frames/Fixationen des Videos
+\end{itemize}
+Die Menüs oben links bieten dem Benutzer folgende Untermenüs:
+Das "`File'" Menü ist unterteilt in "`Open'", "`Save'", "`About'" und "`Quit'". 
+Im "`Category'" Menü mit den Punkten "`Mange categories'" und "`Export categories'" kann der Benutzer Kategorien anlegen und verwalten. Dies schließt den Import von Kategorien aus anderen pyPsy-Projekten ein.
+Im Menüpunkt für den Export können die vorgenommenen Kategorisierungen als .csv-Datei exportiert werden. 
+Das"`Export'" Menü mit dem Unterpunkt "`Video'" ist für den Videoexport zuständig. Wird dieser Menüpunkt ausgewählt, so muss der Benutzer zunächst den Pfad und den Namen für die resultierende .avi-Datei angeben. Der Fortschritt des Exports wird in einem Fortschrittsfenster angezeigt.
+
 
 \subsubsection{CategoryList}
+Auf der rechten Seite des MainFrames werden die bereits vorgenommenen Kategorisierungen angezeigt, sobald der Benutzer diese vornimmt. 
+Da entweder Frames oder Fixationen kategorisiert werden, werden als Index links von den Kategorienamen die Indices der Frames oder Fixationen angezeigt. Ist ein/e Frame/Fixation noch nicht kategorisiert, wird nur ein Strich angezeigt.
+Um eine Folge von Frames oder Fixationen zu kategorisieren, kann nach Anwendung einer Kategorie auf einen Index diese Kategorie durch drücken der Pfeiltaste nach unten diese Kategorie auch auf die folgenden Indices angewendet werden.
+Falls nötig, können Kategorisierungen gelöscht werden, indem die entsprechenden Indices markiert werden und die Entfernen Taste gedrückt wird. 
 
 \subsection{Backend}
 Die Komponenten in diesem Abschnitt werden im Backend genutzt.
-Das hei\"st sie stellen die fachliche Funktionalit\"at her.
+Das hei\"\ss t sie stellen die fachliche Funktionalit\"at her.
 
 \subsubsection{Controller}
   Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
@@ -161,7 +191,8 @@ Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdaten
 
 \section{M\"ogliche Erweiterung}
   \begin{description}
-    \item[Deinteralicing] Blablabla
+    \item[Deinteralicing] Blablabla, opencv y u no deinterlacing?
+    \item[Autosave Dialog] nicht aufmachen während Video Export?
   \end{description}
 
 \section{Verwendete Python Module}
@@ -173,6 +204,7 @@ Im Einzelnen wird OpenCV für das framebasierte Einlesen des Ausgangsvideos, das
 Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen da sie mehrere gleichzeitige Verarbeitungsprozesse erm\"oglichen. In pyPsy sind das Beispielsweise gleichzeitiges Reagieren auf Nutzereingaben (z.B. Kategorisierung) w\"ahrend der Videowiedergabe.
 Im Backend verwenden wir Threading um den internen Zeitgeber weiter zu setzen und gleichzeitig Anfragen der GUI (des Benutzers) abarbeiten zu k\"onnen.
 In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Interval schläft und erst danach weiter tickt. 
+
 Das Multiprocessing Packet wird in der Startroutine von pyPsy verwendet, um die performante Nebenl\"aufigkeit der Prozesse (GUI und Backend) in pyPsy zu gew\"ahrleisten. Dabei wird der Controller als Adapter zwischen den Model (Backend) und den View (GUI) Klassen verwendet. Das bedeuted das die Kommunikation zwischen GUI und Backend nur \"uber die Methoden des Controllers stattfindet. Daf\"ur erh\"alt die GUI einen Proxy des Controllers. Welcher die Methodenaufrufe an die echte Controllerinstanz in einem anderem Prozess durch Interprozesskommunikation weiterleitet.
 
 Da die Interprozzeskommunikation vergleichweise langsam ist werden die sich schnell \"andernten Bilddateien (Bild & Bildnummer) mit Hilfe eines gemeinsamen Speichers zwischen beiden Prozessen ausgetauscht.
