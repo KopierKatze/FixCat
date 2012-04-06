@@ -70,18 +70,19 @@ F\"ur wxPython fand sich leicht eine M\"oglichkeit zum Anzeigen des Videobilds.
 Das war der Grund f\"ur die Entscheidung f\"ur wxPython.
 
 \subsection{Architektur}
-pyPsy ist eine Multiprocessing Anwendung.
-Das bedeutet, dass mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
-Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei Programml\"aufe existieren - ein Wiedergabeprozess, der das Video "`abspielt"' und ein Prozess, der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.). W\"ahrend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese Prozesse in Python nicht durch Threads repr\"asentiert werden k\"oennen.
-Der Grund daf\"ur liegt in der Implementierung von Threads in Python per GIL("`Global Interpreter Lock"') und der daraus resultierenden nicht ausreichenden Performance der Threadingl\"osung.
+Im Laufe der Entwicklung stellte sich herraus, dass die Leistung unserer Computer (\"alterem Baujahrs) nicht ausreichte um die Videos ruckelfrei wiederzugeben.
+Es zeigte sich, dass die beiden w\"ahrend der Wiedergabe gleichzeitig ablaufenden Prozesse 'Bilder bereitstellen' und 'Bilder anzeigen' allein ausreicht performant sind und auch weniger als die H\"alfte der Prozessorleistung nutzen.
+Gemeinsam in einzelnen Threads jedoch zeigte sich das Problem.
 
-Wir trennen die Anwendung in zwei Prozesse mit jeweils unterschiedlichen Aufgaben auf.
-Der erste Prozess k\"ummert sich um die Nutzerinterarktion und damit haupts\"achlich um die GUI.
-Der zweite Prozess \"ubernimmt die fachlichen Aufgaben. Das sind zum Beispiel das Videobild samt Overlay bereitstellen oder die Kategoriesierungen verwalten und exportieren.
-Der erste Prozess wird nachfolgend GUI-Prozess, der zweite Prozess Backend-Prozess genannt.
-Die Programmkontrolle geht in aller Regel vom GUI-Prozess aus.
-In den folgenden Abschnitten wird die Controller Komponente n\"aher beschrieben.
-Diese ist gewisserma\ss en das Interface zum Backend-Prozess.
+Die Ursache da\"ur liegt in der Architektur von Python mit dem GIL und den damit verbundenen teurer Kontextwechseln zwischen zwei Threads.
+Wir entschieden uns daher pyPsy als multiprocessing Anwendung zu implementieren.
+Mit Hilfe der Python Standardbibliothek war dies auch mit relativ wenig Aufwand verbunden.
+
+In pyPsy gibt es einen Backend-Prozess und einen GUI-Prozess die mit Hilfe von IPC und Shared Memory (Video) miteinander kommunizieren.
+Der gr\"o\ss te Teil des multiprocessing Codes findet sich in der start\_pypsy.py Datei.
+
+Der folgende Abschnitt ist in GUI und Backend Komponenten unterteilt.
+Diese finden sich zur Laufzeit in den entsprechenden Prozessen.
 
 \section{Komponenten}
 In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben.
