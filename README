@@ -13,10 +13,11 @@ Windows:
 3.) install python package wxPython
 4.) install python package OpenCV
  - download opencv superpack
- - copy cv.pyd / cv2.pyd
+ - copy cv.pyd and cv2.pyd
    into your python site-packages directory (e.g. C:\Python27\Lib\site-packages)
  - copy opencv dlls (opencv_*.dll) of the superpack
    to your python executable (e.g. C:\Python27)
+   be sure to copy the right dlls (x64 or x86) and don't forget the opencv_ffmpeg.dll which may be in another place than the other dlls
  - the location the specified files changes between opencv releases, so you have to find them on your own
 
 Linux:
@@ -30,10 +31,16 @@ Ubuntu (should be the same in other Debian flavored distros):
 BUILD DISTRIBUTION
 ==================
 
-prerequire: python package py2exe installed
+prerequire: 
+ - python package py2exe installed
+ - MSVCP90.dll available (e.g. lies next to python.exe)
 
 change into src directory and execute
 
   python setup.py py2exe
 
-maybe you have to use 'c:\Python27\python.exe' instead of just 'python'
+  maybe you have to use 'c:\Python27\python.exe' instead of just 'python'
+
+a dist directory exists after the programm has terminated
+copy the cursors directory and all the opencv_*.dlls next to your python.exe into the dist directory
+you can now distrubute the dist directory and start the application by executing start_pypsy.exe
