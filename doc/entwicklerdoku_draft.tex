@@ -18,8 +18,9 @@
 \newpage
 \section{Einleitung}
 Dieses Dokument ist die Entwicklerdokumentation von pyPsy.
+Es richtet vor allem an Personen doe pyPsy weiterentwickeln wollen.
 
-Es enh\"alt eine Beschreibung des Ziel die mit diesem Programm/Projekt erreicht wurden.
+Es enh\"alt eine Beschreibung des Ziels das mit diesem Programm/Projekt erreicht wurde.
 Die Anforderungen an die Software.
 Sowie die darauf aufbauenden getroffenen Entscheidungen bzgl. Architektur und Implementation.
 Darrauf folgt eine \"Ubersicht \"uber die Funktion und Aufgaben der einzelnen Komponenten des Programms.
@@ -44,12 +45,33 @@ Was dazu gef\"uhrt hat das die Wissenschaftler mit Stift und Block vor dem Compu
 
 Dieser Prozess soll mit Hilfe des zu entwicklenden Programms vereinfacht werden.
 
-\section{Beschreibung}
-Die Aufgabe von pyPsy ist es, den Benutzer bei der Verwertung von Eyetracking Daten zu untersützen. Konkret wird der von der Besuchsperson betrachtete Punkt als farbiges Overlay in das Video gezeichnet, sodass eine Auswertung in Form einer Kategorisierung durchgeführt werden kann. Dabei wird die Kategorisierung der betrachteten Gegenstände in pyPsy eingetragen und kann dann als csv-Datei abgespeichert werden, wodurch eine genaue Aufschlüsselung der Häufigkeiten möglich ist. 
-Um die Augenbewegungsdaten in pyPsy auslesen zu können, müssen diese vorher in eine *.asc Datei exportiert werden. Liegt eine solche Datei für ein Video vor, so können beide Dateien in pyPsy geladen und bearbeitet werden.
-Innerhalb einer *.asc Datei gibt es mehrere Trials, die gesondert voneinander betrachtet werden.
+\section{Anforderungen}
+Die Anforderungen k\"onnen dem seperatem Anforderungsdokument entnommen werden.
 
-\section{Architektur}
+\section{Entscheidungen}
+In diesem Abschnitt stellen wir die von uns w\"ahrend der Entwicklung getroffenen Entscheidungen, welche den Entwicklungsprozess und die entstandene Software nachhaltig beeinflusst haben, vor.
+
+\subsection{Programmiersprache}
+Da von Anfang des Projektes an davon gesprochen wurde, dass die Software nach der Erstellung von anderen Personen gepflegt und erweitert werden soll, haben wir uns f\"ur Python als Programmiersprache entschieden.
+WAS ZEICHNET PYTHON ALS PLEGELEICHTE WARTBARE EINFACH ZU UEBERSCHAUENDE SPRACHE AUS?
+
+\subsection{Videobibliothek \& GUI-Bibliothek}
+Eine der wichtigsten Komponenten einer Video wiedergebenden Software ist die Videobibliothek.
+Sie muss in diesem Projekt Videos mit DV-Codec lesen, Videos in unterschiedlichen Codecs ausgeben und einzelne Videobilder relativ komplex bearbeiten (Overlay) k\"onnen.
+Au\ss erdem muss sie dass ganze effizient erledigen um eine Wiedergabe in Echtzeit zu erm\"oglichen.
+
+Alleine die Anforderung Videos auch erstellen zu k\"onnen schloss schon einen gro\ss teil der vorhandenen Bibliotheken aus.
+Wegen dem Bearbeiten von Einzelbildern wurde unter anderem auch ein bildweiser Zugriff auf das Video ben\"otigt und auch das Anzeigen des Videos in der GUI musste funktionieren.
+Nach etlichen Stunden testen kristalisierte sich eine L\"osung mit Hilfe von OpenCV als Videobibliothek und wxPython als GUI herraus.
+
+OpenCV war Aufgrund der Anforderungen und der Programmiersprache eigentlich Alternativloss.
+Wahrscheinlich auch bei den meisten anderen Programmiersprachen.
+Die Kombination aus Videocodecs und Einzelbildzugriff macht's.
+
+F\"ur wxPython fand sich leicht eine M\"oglichkeit zum Anzeigen des Videobilds.
+Das war der Grund f\"ur die Entscheidung f\"ur wxPython.
+
+\subsection{Architektur}
 pyPsy ist eine Multiprocessing Anwendung.
 Das bedeutet, dass mehrere unabh\"angige Prozesse miteinander arbeiten um die gesamte Funktionalit\"at bereit zu stellen.
 Wir haben uns f\"ur diese Architektur entscheiden, weil in einem Videoplayer mindestens zwei ???PROGRAMML\"aufe existieren, ein WiedergabePROZESS, der das Video "abspielt" und ein PROZESS der auf Aktionen des Benutzers reagiert (Wiedergabe stoppen, etc.), und w\"arend der Machbarkeitsuntersuchungen hat sich herausgestellt, dass diese PROZESSE in Python nicht durch Threads repr\"asentiert werden k\"oennen.
