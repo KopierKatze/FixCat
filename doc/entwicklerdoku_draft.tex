@@ -18,24 +18,23 @@
 \newpage
 \section{Einleitung}
 Dieses Dokument ist die Entwicklerdokumentation von pyPsy.
-Es richtet vor allem an Personen doe pyPsy weiterentwickeln wollen.
+Es richtet sich vor allem an Personen die pyPsy weiterentwickeln wollen.
 
-Es enh\"alt eine Beschreibung des Ziels das mit diesem Programm/Projekt erreicht wurde.
-Die Anforderungen an die Software.
-Sowie die darauf aufbauenden getroffenen Entscheidungen bzgl. Architektur und Implementation.
+Es enh\"alt eine Beschreibung des Ziels, das mit diesem Programm/Projekt erreicht wurde, sowie die Anforderungen an die Software.
+Sowie die darauf aufbauenden getroffenen Entscheidungen bezüglich der Architektur und Implementation.
 Darrauf folgt eine \"Ubersicht \"uber die Funktion und Aufgaben der einzelnen Komponenten des Programms.
 
 Abschlie\ss end werden m\"ogliche Erweiterungen und ihre Implementation diskutiert und ein Glossar mit den wichtigsten Begriffen geboten.
 
 \section{Projektziel}
-In der Arbeitsgruppe "Angewandte Kognitionsforschung des Instituts f\"ur Psychologie III der Fakult\"at f\"ur Mathematik und Naturwissenschaften der Technischen Universtit\"at Dresden wird die Aufmerksamkeit des Menschen untersucht.
-Dazu werden unter Anderem Experimente bei denen Probanten einen Eye-Tracker tragen durchgef\"uhrt.
+In der Arbeitsgruppe "`Angewandte Kognitionsforschung"' des Instituts f\"ur Psychologie III der Fakult\"at f\"ur Mathematik und Naturwissenschaften der Technischen Universtit\"at Dresden wird die Aufmerksamkeit des Menschen untersucht.
+Dazu werden unter Anderem Experimente, bei denen Probanten einen Eye-Tracker tragen, durchgef\"uhrt.
 
-Den Eye-Tracker kann man sich als \"ubergrosse, mit mehereren Kameras ausgestattete Brille vorstellen.
+Den Eye-Tracker kann man sich als \"ubergroße, mit mehereren Kameras ausgestattete Brille vorstellen.
 Diese Kameras nehmen zum einem das Blickfeld des Probanden sowie seine Augen auf.
 Aus den Aufnahmen der Augen errechnet das Eye-Tracking-System die Blickrichtung des Probanden und liefert nach dem Versuch ein Rohvideo, dass das Blickfeld des Probanden zeigt, sowie eine Datei mit den bin\"ar gepeicherten Rohblickdaten.
-Diese beiden Dateien k\"onnen mit Hilfe eines Tools des Herstellers des Eye-Tracking-Systems in ein Video mit Overlay und eine ASCII Datei mit genauen Informationen \"uber das Blickverhalten des Probanden umgewandelt werden.
-Das Video mit Overlay zeigt das Blickfeld des Probanden und einen blauen Punkt an der Stelle auf die Proband gerade sieht.
+Diese beiden Dateien k\"onnen mit Hilfe eines Tools des Herstellers des Eye-Tracking-Systems in ein Video mit Overlay und eine ASCII-Datei mit genauen Informationen \"uber das Blickverhalten des Probanden umgewandelt werden.
+Das Video mit Overlay zeigt das Blickfeld des Probanden und einen blauen Punkt an der Stelle, auf die der Proband gerade sieht.
 
 F\"ur die Auswertung der Experimente ist es vor allem interessant, was der Proband wann wahrgenommen hat.
 Um diese Information ohne weitere Hilfsmittel zu erhalten, m\"ussen mindestens das Video mit Overlay und die ASCII Datei mit den Blickdaten gleichzeitg betrachtet werden.
@@ -44,44 +43,94 @@ Ausserdem m\"ussen die Daten erfasst werden, was dazu gef\"uhrt hat, dass die Wi
 Dieser Prozess soll mit Hilfe des zu entwicklenden Programms vereinfacht werden.
 
 \section{Anforderungen}
-Die Anforderungen k\"onnen dem seperatem Anforderungsdokument entnommen werden.
+In diesem Abschnitt werden die zu Beginn des Projektes an pyPsy gestellten Anforderungen erläutert, welche sich in die Kategorien Datenin- und Output, Wiedergabe und Kategorisierung gliedern lassen. 
+Die Pflichtanforderungen wurden in der Version 1.0 alle erfüllt, sowie auch einige optionale Anforderungen. 
+\subsection{Dateninput}
+\subsubsection{Pflicht}
+\begin{description}
+\item[Video laden] Das Programm muss ein vom Nutzer angegebenes Video, das von einer Eyelink II Ausrüstung aufgenommen wurde und von der Eyelink Software ohne Binärzeitbalken und ohne Blickcursor exportiert wurde, laden können.
+\item[Augenbewegungsdaten laden] Das Programm muss eine vom Nutzer angegebene Augenbewegungsdatendatei, die von der Eyelink Software im ASCII-Format exportiert wurde, laden können.
+\item[Programmstatus laden] Das Programm muss einen zuvor gespeicherten Programmstatus wiederherstellen können.
+\end{description}
+\subsubsection{Optional}
+\begin{description}
+\item[Videos mit anderen Codecs laden] Das Programm sollte auch Videos mit anderen Codecs laden. Beispielsweise XviD.
+\item[Rohvideos laden] Das Programm sollte Videos mit Eyelink Binärzeitbalken laden.
+\item[Rohaugenbewegungsdaten laden] Das Programm sollte auch Augenbewegungsdaten, die im Eyelink Binärformat gespeicht sind, laden.
+\end{description}
+\subsection{Datenoutput}
+\subsubsection{Pflicht}
+\begin{description}
+\item[Video mit Blickcursor exportieren] Das Programm muss dem Nutzer die Möglichkeit bieten, das geladene Video mit den geladenen Augenbewegungsdaten, die mit Hilfe eines Blickcursors im jeweiligem Bild angezeigt werden, zu exportieren.
+\item[Kategorisierungen exportieren] Das Programm muss dem Nutzer die Möglichkeit bieten, die von ihm vorgenommenen Kategorisierungen in Form einer CSV-Datei zu exportieren.
+\item[Programmstatus speichern] Das Programm muss dem Nutzer die Möglichkeit bieten, den aktuellen Programmstatus zum späteren Wiederherstellen zu speichern.
+\end{description}
+\subsubsection{Optional}
+\begin{description}
+\item[Videokomprimierung] Das Programm sollte das exportierte Video komprimieren. 
+\end{description}
+\subsection{Wiedergabe}
+\subsubsection{Pflicht}
+\begin{description}
+\item[Frame mit Blickcursor anzeigen] Das Programm zeigt dem Nutzer einen Frame des geladenen Videos zu einem bestimmten Zeitpunkt, mit einem oder zwei Blickcursor, dessen/derren Position aus den geladenen Augenbewegungsdaten gewonnen werden.
+\item[Video abspielen] Das Programm bietet dem Nutzer die Möglichkeit, in regelmäßigen vom Nutzer wählbaren Abständen, das gezeigte Frame durch das im Video darauffolgende zu ersetzen. Der Nutzer kann dieses Verhalten mit den Buttons Play/Pause, Schneller, Langsamer, dem Hotkey Leertaste Play/Pause steuern.
+\item[Nachfolger/Vorgänger anzeigen] Das Programm zeigt auf Anweisung des Nutzers hin das vorhergehende oder nachfolgende Frame an. Der Nutzer kann dieses Verhalten mit den Hotkeys Pfeil Hoch/Pfeil Runter und dem Mausrad steuern.
+\item[Eventbasiertes springen] Das Programm bietet dem Nutzer die Möglichkeit, vom aktuell gezeigten Frame zu einem Frame des Videos, während der nächsten oder vorhergehende Fixation, zu springen. Der Nutzer kann dieses Verhalten mit den Hotkeys Pfeil Rechts/Pfeil Links steuern.
+\item[Zeitbasiertes springen] Der Nutzer kann das Programm mit einem Slider anweißen, das Frame des Videos zu einem bestimmten Zeitpunkt anzuzeigen.
+\end{description}
+\subsubsection{Optional}
+\begin{description}
+\item[Anpassbare Blickcursor] Der Nutzer sollte das Aussehen der Blickcursor anpassen können. 
+\item[Deinterlacing] Das Programm sollte die angezeigten Frames mit einem Deinterlacing Filter verbessern.
+\item[Eventbasierte Blickcursorfarbe] Das Programm sollte den Blickcursor in unterschiedlichen Farben in Abhängigkeit vom aktuellem Event zeichnen.
+\item[Korrektur des Blickcursors] Das Programm bietet dem Nutzer die Möglichkeit, die Position des Blickcursors zeit- oder positionsabhängig zu korrigieren.
+\end{description}
+\subsection{Kategorisierung}
+\subsubsection{Pflicht}
+\begin{description}
+\item[Kategorien festlegen] Das Programm bietet dem Nutzer eine Oberfläche um Kategorien anzulegen. Eine Kategorie besteht aus einem Namen und einem Tastenkürzel.
+\item[Fixation kategorisieren] Der Nutzer kann die zum gerade angezeigten Frame gehörende Fixation durch Drücken des zuvor festgelegten Tastenkürzels zu einer Kategorie zuordnen.
+\item[Automatische Kategorisierung] Wird nach einer Kategorisierung durch den Nutzer ein Frame der darauffolgenden Fixation gezeigt, übernimmt das Programm die vorhergehende Kategorisierung auf die nachfolgende Fixation.
+\item[Statusfenster Kategorisierung] Das Programm informiert den Nutzer über den Status der Kategorisierung mit einer Tabelle am rechtem Rand der Oberfläche. In dieser werden alle Fixation mit Nummern und zugehöriger Kategorie angezeigt.
+\end{description}
 
 \section{Entscheidungen}
 In diesem Abschnitt stellen wir die von uns w\"ahrend der Entwicklung getroffenen Entscheidungen, welche den Entwicklungsprozess und die entstandene Software nachhaltig beeinflusst haben, vor.
 
 \subsection{Programmiersprache}
-Da von Anfang des Projektes an davon gesprochen wurde, dass die Software nach der Erstellung von anderen Personen gepflegt und erweitert werden soll, haben wir uns f\"ur Python als Programmiersprache entschieden.
-WAS ZEICHNET PYTHON ALS PLEGELEICHTE WARTBARE EINFACH ZU UEBERSCHAUENDE SPRACHE AUS?
+Da von Anfang des Projektes an davon gesprochen wurde, dass die Software nach der Erstellung von anderen Personen gepflegt und erweitert werden soll, haben wir uns f\"ur Python als Programmiersprache entschieden. Python zeichnet sich durch eine unkomplizierte und leicht erlernbare Syntax, viele Libraries mit umfangreicher Funktionalität und seine Platformunabhängigkeit aus.
 
 \subsection{Videobibliothek \& GUI-Bibliothek}
 Eine der wichtigsten Komponenten einer Video wiedergebenden Software ist die Videobibliothek.
-Sie muss in diesem Projekt Videos mit DV-Codec lesen, Videos in unterschiedlichen Codecs ausgeben und einzelne Videobilder relativ komplex bearbeiten (Overlay) k\"onnen.
-Au\ss erdem muss sie dass ganze effizient erledigen um eine Wiedergabe in Echtzeit zu erm\"oglichen.
+Sie muss in diesem Projekt Videos mit DV-Codec lesen, Videos in unterschiedlichen Codecs ausgeben und einzelne Videobilder relativ komplex bearbeiten (Overlay zeichnen) k\"onnen.
+Au\ss erdem muss sie diese Operationen effizient erledigen, um eine Wiedergabe in Echtzeit zu erm\"oglichen.
 
 Alleine die Anforderung Videos auch erstellen zu k\"onnen schloss schon einen gro\ss teil der vorhandenen Bibliotheken aus.
-Wegen dem Bearbeiten von Einzelbildern wurde unter anderem auch ein bildweiser Zugriff auf das Video ben\"otigt und auch das Anzeigen des Videos in der GUI musste funktionieren.
-Nach etlichen Stunden testen kristalisierte sich eine L\"osung mit Hilfe von OpenCV als Videobibliothek und wxPython als GUI herraus.
+Wegen dem Bearbeiten von Einzelbildern wurde unter anderem auch ein bildweiser Zugriff auf das Video ben\"otigt, und auch das Anzeigen des Videos in der GUI musste funktionieren.
+Nach etlichen Stunden testen kristallisierte sich eine L\"osung mit Hilfe von OpenCV als Videobibliothek und wxPython als GUI herraus.
 
-OpenCV war Aufgrund der Anforderungen und der Programmiersprache eigentlich Alternativloss.
-Wahrscheinlich auch bei den meisten anderen Programmiersprachen.
-Die Kombination aus Videocodecs und Einzelbildzugriff macht's.
+OpenCV war Aufgrund der Anforderungen und der Programmiersprache alternativlos. 
+Die Kombination aus Videocodecs und Einzelbildzugriff war dabei ausschlaggebend.
 
-F\"ur wxPython fand sich leicht eine M\"oglichkeit zum Anzeigen des Videobilds.
-Das war der Grund f\"ur die Entscheidung f\"ur wxPython.
+F\"ur wxPython fand sich leicht eine M\"oglichkeit zum Anzeigen des Videobilds und das Framework bot einen sehr modularen Aufbau, wodurch sich die GUI relativ frei aufbauen ließ.
 
 \subsection{Architektur}
-Im Laufe der Entwicklung stellte sich herraus, dass die Leistung unserer Computer (\"alterem Baujahrs) nicht ausreichte um die Videos ruckelfrei wiederzugeben.
-Es zeigte sich, dass die beiden w\"ahrend der Wiedergabe gleichzeitig ablaufenden Prozesse 'Bilder bereitstellen' und 'Bilder anzeigen' allein ausreicht performant sind und auch weniger als die H\"alfte der Prozessorleistung nutzen.
+Im Laufe der Entwicklung stellte sich heraus, dass die Leistung unserer Computer (\"alterem Baujahrs) nicht ausreichte um die Videos ruckelfrei wiederzugeben.
+Es zeigte sich, dass die beiden w\"ahrend der Wiedergabe gleichzeitig ablaufenden Prozesse \textit{Bilder bereitstellen} und \textit{Bilder anzeigen} allein ausreichend performant sind und auch weniger als die H\"alfte der Prozessorleistung nutzen.
 Gemeinsam in einzelnen Threads jedoch zeigte sich das Problem.
 
-Die Ursache da\"ur liegt in der Architektur von Python mit dem GIL und den damit verbundenen teurer Kontextwechseln zwischen zwei Threads.
-Wir entschieden uns daher pyPsy als multiprocessing Anwendung zu implementieren.
+Die Ursache da\"ur liegt in der Architektur von Python mit dem GIL ("`Global Interpreter Lock"') und den damit verbundenen - im informatischen Sinne teuren - Kontextwechseln zwischen zwei Threads.
+Wir entschieden uns daher pyPsy als Multiprocessing Anwendung zu implementieren.
 Mit Hilfe der Python Standardbibliothek war dies auch mit relativ wenig Aufwand verbunden.
 
-In pyPsy gibt es einen Backend-Prozess und einen GUI-Prozess die mit Hilfe von IPC und Shared Memory (Video) miteinander kommunizieren.
-Der gr\"o\ss te Teil des multiprocessing Codes findet sich in der start\_pypsy.py Datei.
-
-Der folgende Abschnitt ist in GUI und Backend Komponenten unterteilt.
+In pyPsy gibt es einen Backend-Prozess und einen GUI-Prozess, die mit Hilfe von IPC(Interprozesskommunikation) und Shared Memory (für das Video) miteinander kommunizieren.
+Der gr\"o\ss te Teil des Multiprocessing Codes findet sich in der start\_pypsy.py Datei.
+\\ \\
+Eine weitere Entscheidung bezüglich der Architektur betrifft die Saveable Klasse, die das Abspeichern von pyPsy Projekten mit hilfe eines SaveControllers regelt. Um alle wichtigen Daten in der pyps-Datei ablegen zu können, müssen einige Klassen des Backends deshalb von Saveable erben. Neben dem Controller sind dies auch die Clock, der CategoryContainer, das EyeMovement und der VideoReader. Das bedeutet, dass diese Klassen bei ihrer Initialisierung Saveable Objekte sind, die dem SaveController hinzugefügt werden können. Das Abspeichern der Projektdaten in eine pyps-Datei erfolgt durch den SaveController, der alle Saveable Objekte in der von ihm verwalteten Datenstruktur in eine Datei schreibt. Für Letzteres verwenden wir das Pickle Modul, welches Objekte in Strings umwandelt, die dann in die pyps-Datei geschrieben werden. 
+\\ \\
+Um pyPsy besser anpassen zu können, wird beim Start eine Config-Datei angelegt, die vom Nutzer editiert werden kann. Neben der Quelle der Bilder für die Blickcursor kann auch das Codec für den Videoexport, sowie die Shortcuts für die Steuerung der Wiedergabe geändert werden. Die Config Datei ist im Json Format angelegt, da dieses Format gut lesbar für den Benutzer ist und sich mit Hilfe des Json Moduls für Python sehr gut einlesen lässt. 
+\\ \\
+Der folgende Abschnitt über die Klassen im Einzelnen ist in GUI und Backend Komponenten unterteilt.
 Diese finden sich zur Laufzeit in den entsprechenden Prozessen.
 
 \section{Komponenten}
@@ -93,22 +142,11 @@ Diese Liste ist nicht vollst\"andig.
 Sie betrachtet nur die interessantesten Konzepte.
 
 \subsubsection{MainFrame}
-Der MainFrame ist das Hauptfenster von pyPsy, in dem der Benutzer das Video sehen und steuern kann. Des weiteren werden die bereits vorgenommenen Kategorisierungen auf der rechten Seite in der CategoryList angezeigt. Die Spalte Index bezeichnet entweder den Index des Frames oder - je nach Einstellung des Projekts - der Fixation im Video, während rechts daneben der Name der Kategorie eingetragen wird. 
-Direkt unter dem Bild des Videos ist ein Slider, mit dem der Benutzer Frame genau durch das Video navigieren kann.
-Unterhalb des Bildes vom Video sind Buttons für die Steuerung der Wiedergabe des Videos. Von links nach rechts sind dies
-\begin{itemize}
-\item Frame zurück springen
-\item Play
-\item Pause
-\item Frame nach vorne springen
-\item zum/r nächsten nicht kategorisierten Frame/Fixation springen
-\end{itemize}
-Daneben sind Checkboxen, mit denen der Benutzer festlegen kann, welche Augendaten im Video angezeigt werden sollen. Dabei steht
-\begin{itemize}
-\item L für Daten des linken Auges
-\item R für Daten des rechten Auges
-\item M für die Mittelung der Daten beider Augen
-\end{itemize}
+Der MainFrame ist das Hauptfenster von pyPsy, in dem der Benutzer das Video ansehen und steuern kann. Um während der Videowiedergabe die Steuerflächen im Fenster ohne Performance-Einbußen zu benutzen, muss der MainFrame in einem eigenen Prozess laufen. Die einzelnen Frames des Videos bezieht der MainFrame vom gemeinsamen Speicher der beiden Hauptprozesse und nicht etwa direkt von der bereit gestellten Videodatei. Somit muss der MainFrame über den Proxy, der zwischen Prozessen vermittelt, mit dem Controller (der in einem anderen Prozess läuft) kommunzieren. \\  \\
+Bereits vorgenommene Kategorisierungen werden auf der rechten Seite in der CategoryList angezeigt. Die Spalte "`Index"' bezeichnet entweder den Index des Frames oder - je nach Einstellung des Projekts - der Fixation im Video, während rechts daneben der Name der Kategorie eingetragen wird. 
+Direkt unter dem Bild des Videos ist ein Slider, mit dem der Benutzer Frame-genau durch das Video navigieren kann.
+Unterhalb des Bildes vom Video sind Buttons für die Steuerung der Wiedergabe des Videos. Von links nach rechts sind dies \textbf{Frame zurück springen}, \textbf{Play}, \textbf{Pause}, \textbf{Frame nach vorne springen} und \textbf{zum/r nächsten nicht kategorisierten Frame/Fixation springen}. \\
+Daneben sind Checkboxen, mit denen der Benutzer festlegen kann, welche Augendaten im Video angezeigt werden sollen. Dabei steht \textbf{L} für Daten des linken Auges, \textbf{R} für Daten des rechten Auges und \textbf{M} für die Mittelung der Daten beider Augen. \\
 Rechterhand unter der Liste der Kategorisierungen befindet sich der SpeedSlider, mit dem der Benutzer die Abspielgeschwindigkeit des Videos einstellen kann. 
 In der Status Bar rechts am unteren Ende des Fensters werden alle relevanten Informationen für einen besseren Überblick angezeigt. Der Reihe nach sind diese:
 \begin{itemize}
@@ -123,22 +161,22 @@ In der Status Bar rechts am unteren Ende des Fensters werden alle relevanten Inf
 Die Menüs oben links bieten dem Benutzer folgende Untermenüs:
 Das "`File"' Menü ist unterteilt in "`Open"', "`Save"', "`About"' und "`Quit"'. 
 Im "`Category"' Menü mit den Punkten "`Mange categories"' und "`Export categories"' kann der Benutzer Kategorien anlegen und verwalten. Dies schließt den Import von Kategorien aus anderen pyPsy-Projekten ein.
-Im Menüpunkt für den Export können die vorgenommenen Kategorisierungen als .csv-Datei exportiert werden. 
-Das"`Export"' Menü mit dem Unterpunkt "`Video"' ist für den Videoexport zuständig. Wird dieser Menüpunkt ausgewählt, so muss der Benutzer zunächst den Pfad und den Namen für die resultierende .avi-Datei angeben. Der Fortschritt des Exports wird in einem Fortschrittsfenster angezeigt.
+Im Menüpunkt für den Export können die vorgenommenen Kategorisierungen als csv-Datei exportiert werden. 
+Das "`Export"' Menü mit dem Unterpunkt "`Video"' ist für den Videoexport zuständig. Wird dieser Menüpunkt ausgewählt, so muss der Benutzer zunächst den Pfad und den Namen für die resultierende Videodatei angeben. Der Fortschritt des Exports wird in einem Fortschrittsfenster angezeigt.
 
 
 \subsubsection{CategoryList}
 Auf der rechten Seite des MainFrames werden die bereits vorgenommenen Kategorisierungen angezeigt, sobald der Benutzer diese vornimmt. 
-Da entweder Frames oder Fixationen kategorisiert werden, werden als Index links von den Kategorienamen die Indices der Frames oder Fixationen angezeigt. Ist ein/e Frame/Fixation noch nicht kategorisiert, wird nur ein Strich angezeigt.
+Da entweder Frames oder Fixationen kategorisiert werden, werden als Index links von den Kategorienamen die Indices der Frames oder Fixationen angezeigt. Ist ein/e Frame/Fixation noch nicht kategorisiert, wird nur ein Strich angezeigt. \\
 Um eine Folge von Frames oder Fixationen zu kategorisieren, kann nach Anwendung einer Kategorie auf einen Index diese Kategorie durch drücken der Pfeiltaste nach unten auf die folgenden Indices angewendet werden.
 Falls nötig, können Kategorisierungen gelöscht werden, indem die entsprechenden Indices markiert werden und die Entfernen Taste gedrückt wird. 
 
 \subsection{Backend}
 Die Komponenten in diesem Abschnitt werden im Backend genutzt.
-Das hei\ss t sie stellen die fachliche Funktionalit\"at her.
+Das hei\ss t, sie stellen die fachliche Funktionalit\"at her.
 
 \subsubsection{Controller}
-  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller beziehungsweise der funktionalen Klassen auf den Controller dargestellt.
+  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten, auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller, beziehungsweise der funktionalen Klassen auf den Controller dargestellt(Abbildung \ref{RolleController}).
   \begin{figure}[ht]
     \begin{center}
     \begin{tikzpicture}[auto, node distance=1.2cm]
@@ -180,15 +218,17 @@ Das hei\ss t sie stellen die fachliche Funktionalit\"at her.
       ;
     \end{tikzpicture}
     \end{center}
-  \caption{Verwendete Klassen und Rolle des Controllers}
+  \caption{Rolle des Controllers}
+  \label{RolleController}
   \label{Grobentwurf}
   \end{figure}
   
-  Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um. Da der Controller die einzige Verbindung zwischen GUI und Backend ist, kann er auch als "`Adapter"' - im Sinne des gleichnamigen Software Design Patterns - zwischen den beiden gesehen werden. 
+  Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um. Da der Controller die einzige Verbindung zwischen GUI und Backend ist, kann er auch als "`Adapter"' - im Sinne des gleichnamigen Software Design Patterns - zwischen GUI und Backend gesehen werden. 
 
 \subsubsection{Saveable}
 Um möglichst viele Eigenschaften eines pyPsy Projektes abspeichern zu können, erben die meisten Klassen des Backends von Saveable. Diese Klasse enthält Methoden, die es beispielsweise ermöglichen die verstrichene Zeit des Videos in der pyps-Datei abzulegen. 
 Für eine bessere Verwaltung der Objekte, die abgespeichert werden, gibt es den sogenannten "`SaveController"', der die Liste speicherbarer Objekte verwaltet. 
+Die zu speichernden Daten bietet die jeweilige Klasse dem SaveController über die $getState()$ Methode an
 
 \subsubsection{Clock}
 Diese Klasse ist der programminterne Zeitgeber. 
@@ -202,7 +242,7 @@ Mit dieser Funktion wird biepsielsweise die GUI darüber informiert, dass sie da
 \subsubsection{VideoReader}
 Die VideoReader Klasse ist für den Zugriff auf die Videobilder zuständig.
 
-Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben und anschließend bietet sie framegenauen Zugriff und Informationen zum geladenen Video.
+Der Klasse wird bei der Initialisierung der Ort der Videodatei bekannt gegeben und anschließend bietet sie framegenauen Zugriff und Informationen zum geladenen Video. Darnter fällt zum Beispiel die Länge, Anzahl Frames, die Framrate und das Format.
 
 \subsubsection{VideoWriter}
 Diese Klasse nimmt einzelne Bilder entgegen und speichert sie in einer Videodatei ab.
@@ -222,31 +262,10 @@ Die EyeMovement Klasse bereitet die Augenbewegungsdaten auf und bietet sie ander
 
 Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdatendatei übergeben wurde, parst sie diese Datei und legt die enthaltenen Daten in internen Datenstrukturen an. Nun können andere Komponenten den Zustand der Augen zu einem bestimmten Zeitpunkt kategorisieren. Konkret kann folgendes abgerufen werden: Blickposition, Sakkade, Fixation oder Blinzeln jeweils des linken und rechten Auges und gemittelt für beide Augen.
 
-\section{M\"ogliche Erweiterung}
+\section{M\"ogliche Erweiterungen}
   \begin{description}
-    \item[Deinteralicing] wird von OpenCV nicht als eingebaute Funktionalität unterstützt und ist deshalb bisher noch nicht realisiert. Eine Implementierung dieses Features benötigt einen schnellen Algorithmus, der das Deinterlacing auf jedes Bild anwendet. 
+    \item[Deinteralicing] wird von OpenCV nicht als eingebaute Funktionalität unterstützt und ist deshalb bisher noch nicht realisiert. Eine Implementierung dieses Features benötigt einen effizienten Algorithmus, der das Deinterlacing auf jedes Bild anwendet. 
+    \item[Position des Blickcursors korrigierbar] Bisher kann der Benutzer die Position des Cursors nicht in pyPsy beeinflussen, falls dies nötig ist. Das wäre zum Beispiel nötig, wenn das Eyelink System teilweise fehlerhafte Daten liefert, die manuell korrigiert werden können. Da dieses Eingreifen sehr komplex zu realisieren wäre, wurde dieses Feature bisher nicht implementiert.
   \end{description}
-
-\section{Verwendete Python Module}
-In den folgenden Abschnitten werden verwendete Python Module aufgezählt und es wird kurz erklärt, wofür diese konkret in pyPsy verwendet werden. Dabei werden nur die Module erwähnt, die für die Funktionalität von pyPsy direkt notwendig sind und nicht häufig verwendete Module wie beispielsweise das "`os"' Modul. 
-\subsection{OpenCV für Python}
-Für die Verarbeitung von Videodateien und allen dazugehören Operationen wird OpenCV für Python verwendet, da es sehr viele Möglichkeiten bietet, gut dokumentiert und außerdem performant ist. 
-Im Einzelnen wird OpenCV für das framebasierte Einlesen des Ausgangsvideos, das Zeichnen des Overlays (also der Blickdaten) und das Erzeugen eines neuen Videos mit Overlay verwendet.
-\subsection{Multiprocessing und Threading}
-Diese beiden Module gewährleisten eine bessere Auslastung der Systemressourcen da sie mehrere gleichzeitige Verarbeitungsprozesse erm\"oglichen. In pyPsy sind das Beispielsweise gleichzeitiges Reagieren auf Nutzereingaben (z.B. Kategorisierung) w\"ahrend der Videowiedergabe.
-Im Backend verwenden wir Threading um den internen Zeitgeber weiter zu setzen und gleichzeitig Anfragen der GUI (des Benutzers) abarbeiten zu k\"onnen.
-In der Clock Klasse wird Threading verwendet, um einen nur für die Clock zuständigen Thread zu erzeugen. Dieser Thread bestimmt außerdem die Zeitrechnung der Clock, indem er für ein gewisses Intervall schläft und erst danach weiter "`tickt"'. 
-
-Das Multiprocessing Packet wird in der Startroutine von pyPsy verwendet, um die performante Nebenl\"aufigkeit der Prozesse (GUI und Backend) in pyPsy zu gew\"ahrleisten. Dabei wird der Controller als Adapter zwischen den Model (Backend) und den View (GUI) Klassen verwendet. Das bedeutet, dass die Kommunikation zwischen GUI und Backend nur \"uber die Methoden des Controllers stattfindet. Daf\"ur erh\"alt die GUI einen Proxy des Controllers, welcher die Methodenaufrufe an die echte Controllerinstanz in einem anderem Prozess durch Interprozesskommunikation weiterleitet.
-
-Da die Interprozzeskommunikation vergleichweise langsam ist, werden die sich schnell \"andernden Bilddateien (Bild \& Bildnummer) mit Hilfe eines gemeinsamen Speichers zwischen beiden Prozessen ausgetauscht.
-
-F\"ur die Umsetzung der Interprozesskommunikation und des gemeinsamen Speichers haben wir auf die Standard Python Bibliothek zur\"uckgegriffen. Dieser k\"onnen auch weiter Informationen \"uber das Thema entnommen werden.
-
-\subsection{Json für Python}
-Um die vom Benutzer editierbare Config-Datei auslesen und schreiben zu können, verwendet pyPsy das Json Modul. Dies geschieht in der Config und in der Saveable Klasse. 
-
-\subsection{Pickle}
-Das Picke Modul wird in der Saveable Klasse verwendet, um die vom Benutzer generierten Kategorisierungen gut lesbar in einer csv-Datei abzuspeichern. Das Modul übernimmt dabei einen großen Teil der Arbeit des sogenannten Pretty-Printings, also der Formatierung.
 
 \end{document}
