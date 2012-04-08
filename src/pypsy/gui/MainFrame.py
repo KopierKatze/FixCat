@@ -9,6 +9,7 @@ from pypsy.CategoryContainer import CategoryContainerError
 
 import wx
 import threading # used for video export
+from wx.lib.wordwrap import wordwrap
 
 class MainFrame(wx.Frame):
     """This class handles the main window of pyPsy."""
@@ -542,9 +543,16 @@ class MainFrame(wx.Frame):
 
     def OnAbout(self, e):
         """Shows the about text of pyPsy."""
-        dlg = wx.MessageDialog(self, "PyPsy is a tool for processing eyetracking Data.", "About PyPsy", wx.OK)
-        dlg.ShowModal()
-        dlg.Destroy()
+        info = wx.AboutDialogInfo()
+        info.Name = 'pyPsy'
+        info.Version = '0.9'
+        info.Copyright = 'Copyright???'
+        info.Description = wordwrap('pyPsy is a tool for processing eyetracking data', 400, wx.ClientDC(self))
+        info.WebSite = ('https://github.com/KopierKatze/pypsy', 'GitHub project page')
+        info.Developers = ["Alexandra Weiss", "Franz Gregor"]
+        info.License = wordwrap('License???', 400, wx.ClientDC(self))
+
+        wx.AboutBox(info)
 
     def SaveAsk(self):
         """Called, if the user has made changes to the project and if `OnExit()`
