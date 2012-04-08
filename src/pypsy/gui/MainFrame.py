@@ -70,10 +70,10 @@ class MainFrame(wx.Frame):
                 self.OnSave()
             d.Destroy()
         else:
-            self.statusBar.SetFields(['auto save...'])
+            self.statusBar.SetStatusText('auto save...', 0)
             self.controller.save_project(self.save_file+"_autosave")
             self.autosave_timer.Restart()
-            self.statusBar.SetFields([''])
+            self.statusBar.SetStatusText('', 0)
 
     def InitMenu(self):
         """Draws the menu at the top of the window."""
