@@ -130,7 +130,7 @@ class SaveController(object):
 class SaveControllerError(Exception):
     """Is raised when:
 
-     - You try to add a Saveable with `SaveController.addSaveable()` that has to `Saveable.getState()` method.
+     - You try to add a Saveable with `SaveController.addSaveable()` that has no `Saveable.getState()` method.
      - On failures while loading `SaveController.loadFromFile()` or saving `SaveController.saveToFile()`
     """
     pass
