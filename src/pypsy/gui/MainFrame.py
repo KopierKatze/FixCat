@@ -70,7 +70,7 @@ class MainFrame(wx.Frame):
                 self.OnSave()
             d.Destroy()
         else:
-            self.statusBar.SetStatusText('auto save...', 0)
+            self.statusBar.SetStatusText('auto saveing...', 0)
             self.controller.save_project(self.save_file+"_autosave")
             self.autosave_timer.Restart()
             self.statusBar.SetStatusText('', 0)
@@ -604,6 +604,8 @@ class MainFrame(wx.Frame):
             if not "." in path:
                 path += ".avi"
 
+            self.autosave_timer.Stop()
+
             progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
               style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
 
@@ -613,8 +615,11 @@ class MainFrame(wx.Frame):
             waiting_thread.start()
             while waiting_thread.isAlive():
                 wx.MilliSleep(900)
+                self.loadImage()
                 progress_dialog.Update(self.current_frame.value)
             progress_dialog.Destroy()
+
+            self.autosave_timer.Restart()
             self.loadImage()
 
 
