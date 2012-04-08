@@ -21,7 +21,7 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
         #self.SetIcon(images.get_application_iconIcon())
-        icon = wx.Icon('../../alternative_icon.ico', wx.BITMAP_TYPE_ICO)
+        icon = wx.Icon('../../icon.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
         self.controller = controller
 
