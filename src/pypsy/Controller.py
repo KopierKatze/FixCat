@@ -17,8 +17,8 @@ class Controller(Saveable):
     methods are like proxies, eg. `isClockRunning()` uses the instance of the 
     Clock class to run the corresponding method in Clock. For information about 
     those methods, please see the documentation of the class they are defined in.
-    The images for the `cursors` which indicate the state of each eye are 
-    retreived from the `config` file. 
+    The images for the cursors which indicate the state of each eye are 
+    retreived from the config file. 
     """
     def __init__(self, video_str, current_frame):
         self.video_reader = None
@@ -190,7 +190,7 @@ class Controller(Saveable):
 # -----------  IMAGE PROCESSING ----
     def overlayedFrame(self, frame, left, right, mean):
         """This method produces the overlay of eyemovement data on the current 
-        frame. It uses the `video_reader` to grab the frame and then uses 
+        frame. It uses the video_reader to grab the frame and then uses 
         `_addCursorToImage()` to draw the overlay."""
         # retrieve original image from video file
         image = self.video_reader.frame(frame)
@@ -206,7 +206,7 @@ class Controller(Saveable):
     def _addCursorToImage(self, image, cursor, position):
         """This helper method draws the overlay of the cursor image onto the 
         video image, by using functions of opencv. In order for the overlay to 
-        be drawn correctly, it has to be put in a mask (`cursorMask`)."""
+        be drawn correctly, it has to be put in a mask (cursorMask)."""
         # in case that we don't have information about the position or cursor end now
         if position is None or cursor is None: return
 

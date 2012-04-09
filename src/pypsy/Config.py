@@ -107,9 +107,9 @@ class Config(object):
     def get(self, category, attr):
         """ This method is used by `check()` in order to retreive configuration 
         data from the dictionary. Individual shortcuts (`attr`) are listed within
-        the `keyboard_shortcuts` `category`. 
-        `autosave_minutes` and the codec used for the video export
-        (`video_export_codec`) are stored in the `general` `category`. """
+        the keyboard_shortcuts `category`. 
+        autosave_minutes and the codec used for the video export
+        are stored in the general `category`. """
         if category == 'keyboard_shortcuts':
             value = self.raw[category][attr]
             if hasattr(value, "isdigit"):
@@ -164,7 +164,7 @@ class ConfigError(Exception):
             `default_config_raw`. 
         6. If one of the cursor files could not be opened, eg. because of a 
             reading error thrown by the operating system.
-        7. If the time interval in `autosave_minutes` is less than 0 (or null) 
+        7. If the time interval in autosave_minutes is less than 0 (or null) 
             or not a number at all.
         8. If the codec in the `video_export_codec` field is not a valid FOURCC 
             codec. Please see fourcc.org for information about FOURCC codecs. """

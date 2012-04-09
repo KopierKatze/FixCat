@@ -13,7 +13,7 @@ class VideoWriter(object):
         The `size` of the output file has to be of type cv size.
         The framerate(`fps`) of the new video should be that of the video that is
         currently worked on.
-        In case of an expected error, a `VideoWriterError` will be thrown. """
+        In case of an expected error, a `WriterError` will be thrown. """
         self.width = size[0]
         self.height = size[1]
 
@@ -33,7 +33,7 @@ class VideoWriter(object):
     def addFrame(self, new_frame):
         """Adds a new frame to the end of the video file. Before the frame is
         added, the colors are converted from the color scheme used by opencv to
-        the normal rgb color scheme. `cv.CvtColor` takes care of this.
+        the normal rgb color scheme. cv.CvtColor takes care of this.
         `new_frame` has to be of type IplImage.
 
         This method might fail if the disk is full. This is not checked at the
@@ -50,12 +50,12 @@ class VideoWriter(object):
 
 class WriterError(Exception):
     """This error will be thrown in the following methods.
-        0. A `VideoWriterError` is thrown in `VideoWriter.__init__()` if:
+        0. A `WriterError` is thrown in `VideoWriter.__init__()` if:
             - no `VideoWriter.__init__.filepath` was specified
             - `VideoWriter.__init__.fps` was not specified or is lower than 1
             - the cv size of the output file was not specified or is smaller than 1
 
-        1. A `VideoWriterError` is thrown in `VideoWriter.addFrame()` if:
+        1. A `WriterError` is thrown in `VideoWriter.addFrame()` if:
             - `VideoWriter.addFrame.new_frame` is none
 
     """
