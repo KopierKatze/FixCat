@@ -9,6 +9,7 @@ from pypsy.CategoryContainer import CategoryContainerError
 
 import wx
 import threading # used for video export
+from wx.lib.wordwrap import wordwrap
 
 class MainFrame(wx.Frame):
     """This class handles the main window of pyPsy."""
@@ -20,8 +21,7 @@ class MainFrame(wx.Frame):
         L{StringImage}."""
         wx.Frame.__init__(self, None, title="pyPsy",
             size=(900, 600))
-        #self.SetIcon(images.get_application_iconIcon())
-        icon = wx.Icon('../../alternative_icon.ico', wx.BITMAP_TYPE_ICO)
+        icon = wx.Icon('icon.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
         self.controller = controller
 
@@ -70,10 +70,10 @@ class MainFrame(wx.Frame):
                 self.OnSave()
             d.Destroy()
         else:
-            self.statusBar.SetFields(['auto save...'])
+            self.statusBar.SetStatusText('auto saveing...', 0)
             self.controller.save_project(self.save_file+"_autosave")
             self.autosave_timer.Restart()
-            self.statusBar.SetFields([''])
+            self.statusBar.SetStatusText('', 0)
 
     def InitMenu(self):
         """Draws the menu at the top of the window."""
@@ -543,9 +543,16 @@ class MainFrame(wx.Frame):
 
     def OnAbout(self, e):
         """Shows the about text of pyPsy."""
-        dlg = wx.MessageDialog(self, "PyPsy is a tool for processing eyetracking Data.", "About PyPsy", wx.OK)
-        dlg.ShowModal()
-        dlg.Destroy()
+        info = wx.AboutDialogInfo()
+        info.Name = 'pyPsy'
+        info.Version = '0.9'
+        info.Copyright = 'Copyright???'
+        info.Description = wordwrap('pyPsy is a tool for processing eyetracking data', 400, wx.ClientDC(self))
+        info.WebSite = ('https://github.com/KopierKatze/pypsy', 'GitHub project page')
+        info.Developers = ["Alexandra Weiss", "Franz Gregor"]
+        info.License = wordwrap('License???', 400, wx.ClientDC(self))
+
+        wx.AboutBox(info)
 
     def SaveAsk(self):
         """Called, if the user has made changes to the project and if `OnExit()`
@@ -597,6 +604,8 @@ class MainFrame(wx.Frame):
             if not "." in path:
                 path += ".avi"
 
+            self.autosave_timer.Stop()
+
             progress_dialog = wx.ProgressDialog('Video Export', 'Exporting video...', parent=self, maximum=self.frames_total,
               style=wx.PD_APP_MODAL|wx.PD_REMAINING_TIME|wx.PD_ELAPSED_TIME|wx.PD_SMOOTH)
 
@@ -606,8 +615,11 @@ class MainFrame(wx.Frame):
             waiting_thread.start()
             while waiting_thread.isAlive():
                 wx.MilliSleep(900)
+                self.loadImage()
                 progress_dialog.Update(self.current_frame.value)
             progress_dialog.Destroy()
+
+            self.autosave_timer.Restart()
             self.loadImage()
 
 
