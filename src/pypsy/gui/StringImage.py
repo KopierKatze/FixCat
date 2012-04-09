@@ -91,9 +91,9 @@ class StringImage(wx.Window):
             self.Refresh()
 
     def SetImageSize(self, width, height):
-        """assigne dimensions of the image encoded in `image_string` argument of `SetImage`.
+        """assigne dimensions of the image encoded in image_string argument of SetImage.
 
-        this information is needed to retrieve the image out of the `image_string`."""
+        this information is needed to retrieve the image out of the image_string."""
         self.width = width
         self.height = height
 

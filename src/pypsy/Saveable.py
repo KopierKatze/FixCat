@@ -8,7 +8,7 @@ class Saveable(object):
     which have to save date in order to restore
     the current program state (project).
 
-    The `getState` method has to be overwritten
+    The getState method has to be overwritten
     in the child.
     It should return a pickable standart python
     object (list, dict, str, integer, ...).
@@ -130,7 +130,7 @@ class SaveController(object):
 class SaveControllerError(Exception):
     """Is raised when:
 
-     - You try to add a Saveable with `SaveController.addSaveable()` that has no `Saveable.getState()` method.
-     - On failures while loading `SaveController.loadFromFile()` or saving `SaveController.saveToFile()`
+     - You try to add a Saveable with addSaveable that has no getState method.
+     - On failures while loading loadFromFile or saving saveToFile
     """
     pass

@@ -180,7 +180,7 @@ class MainFrame(wx.Frame):
         self.controllspanel.SetSizer(vbox)
 
     def seek(self, frame):
-        """Helper function for handling the `slider` events."""
+        """Helper function for handling the slider events."""
         self.controller.seek(frame)
         self.loadImage()
 
@@ -245,7 +245,7 @@ class MainFrame(wx.Frame):
     def loadImage(self):
         """Updates the image of the video widget and displays the first
         frame of the video if a new project is started. This method also handles
-        the status of the video, eg. `current time`, beeing displayed in the
+        the status of the video, eg. current time, beeing displayed in the
         lower right corner of the MainFrame."""
         image_str = self.video_str.get_obj().raw[:self.video_str_length]
         self.videoimage.SetImage(image_str)
@@ -272,7 +272,7 @@ class MainFrame(wx.Frame):
         self._loadProjectInfo()
 
     def newProjectPlausible(self):
-        """This method runs the `Controller.plausibleCheck()` of the `controller`
+        """This method runs the plausibleCheck() of the Controller
         in order to check if the video and the eyemovement data match to a certain
         degree or not. If this is not the case, the user will see a dialog window
         asking, if he wants to continue."""
@@ -280,7 +280,7 @@ class MainFrame(wx.Frame):
 
     def getMaxFramesOfEyeMovement(self):
         """Returns the overall number of frames contained in the trial of the
-        eyemovement file by using `Controller.getMaxFramesOfEyeMovement()`."""
+        eyemovement file by using getMaxFramesOfEyeMovement() of the Controller."""
         return self.controller.getMaxFramesOfEyeMovement()
 
     def loadProject(self, filepath, overwrite_video_filepath=None):
@@ -330,7 +330,7 @@ class MainFrame(wx.Frame):
         self.category_list.FillInCategorisations(self.controller.getCategorisations())
 
     def getCategories(self):
-        """Gets the categories from the `controller`."""
+        """Gets the categories from the Controller."""
         return self.controller.getCategories()
 
     def editCategory(self, old_shortcut, new_shortcut, category_name):
@@ -341,12 +341,12 @@ class MainFrame(wx.Frame):
 
     def importCategories(self, filepath):
         """Imports categories from an existing project into the one currently
-        opened, by calling `Controller.importCategories()` in the `controller`."""
+        opened, by calling importCategories() in the Controller."""
         self.needs_save = True
         self.controller.importCategories(filepath)
 
     def controllerIO(self):
-        """This method checks if the `controller` is ready for use. Returns
+        """This method checks if the Controller is ready for use. Returns
         False if it is not."""
         if self.controller is None: return False
         if not self.controller.ready(): return False
@@ -486,21 +486,21 @@ class MainFrame(wx.Frame):
             self.loadImage()
 
     def OnSliderScroll(self, event):
-        """Sets the slider to the new value produced by moving the `slider`."""
+        """Sets the slider to the new value produced by moving the slider."""
         self.loopthrough_categorykey = None
 
         self.seek(self.slider.GetValue())
 
     def OnSpeedSliderScroll(self, event=None):
         """Sets the slider for playback speed control to the new value produced
-        by moving the `speedslider`. This method also handles the update of the status
+        by moving the speedslider. This method also handles the update of the status
         information of the video displayed in the lower right corner."""
         self.speed = self.speedslider.GetValue() * 0.01
         self.controller.setPlaybackSpeed(self.speed)
         self.loadImage()
 
     def OnNextUncategorisedObject(self,event):
-        """Called if the user clicked on the UI button for the `next_uncategorised`
+        """Called if the user clicked on the UI button for the next_uncategorised
         frame or fixation."""
         self.loopthrough_categorykey = None
 
@@ -533,7 +533,7 @@ class MainFrame(wx.Frame):
     def OnCategoryExport(self, event):
         """Guides the user through the process of exporting categories. After 
         the user selected the output file in the dialog, 
-        `Controller.exportCategorisations()` is called and handles the export."""
+        exportCategorisations() of the Controller is called and handles the export."""
         file_dialog = wx.FileDialog(self, "Export CSV", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="CSV file (*.csv)|*.csv")
         if file_dialog.ShowModal() == wx.ID_OK:
             path = file_dialog.GetPath()
@@ -589,7 +589,7 @@ class MainFrame(wx.Frame):
 
     def OnExport(self, event):
         """This method takes care of the export of a video. For better performance,
-        this is handled in a new thread `waiting_thread`. While this thread works,
+        this is handled in a new thread waiting_thread. While this thread works,
         a progress dialog will show up. """
         file_dialog = wx.FileDialog(self, "Export video", style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT, wildcard="AVI file (*.avi)|*.avi")
         if file_dialog.ShowModal() == wx.ID_OK:
