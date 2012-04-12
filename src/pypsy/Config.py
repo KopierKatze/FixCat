@@ -17,7 +17,7 @@ categories_and_attributes = {
   'cursors':
     ['blink_left', 'fixated_left', 'saccade_left', 'blink_right', 'fixated_right', 'saccade_right', 'blink_mean', 'fixated_mean', 'saccade_mean'],
   'general':
-    ['autosave_minutes', 'video_export_codec'],
+    ['autosave_minutes', 'video_export_codec', 'plausible_edf_video_frame_diff_percent'],
 }
 
 class Config(object):
@@ -146,6 +146,11 @@ class Config(object):
                     raise ConfigError('The codec for exporting a video has to be a valid FOURCC codec (eg: "DIVX").')
                 else:
                     return str(self.raw[category][attr])
+            elif attr == 'plausible_edf_video_frame_diff_percent':
+                if not (type(self.raw[category][attr]) == float or type(self.raw[category][attr]) == int):
+                    raise ConfigError('The value for the plausibility check should be a int or float.')
+                else:
+                    return float(self.raw[category][attr])
         return self.raw[category][attr]
 
 class ConfigError(Exception):
@@ -200,6 +205,7 @@ default_config_raw = {
     'autosave_minutes' : 5,
     "__comment": "Please only edit this, if you know which codecs you have installed. The string for the codec is composed of the four letters of the fourcc codec without spaces or other characters. For more information about fourcc please see http://www.fourcc.org/codecs.php",
     'video_export_codec' : 'DIVX',
+    'plausible_edf_video_frame_diff_percent' : 0.8,
   }
 }
 default_config = json.dumps(default_config_raw, indent=4)
