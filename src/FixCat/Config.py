@@ -21,11 +21,11 @@ categories_and_attributes = {
 }
 
 class Config(object):
-    """This class is used for creating a .json config file for pyPsy, if 
+    """This class is used for creating a .json config file for FixCat, if 
     necessary, and it takes care of performing a `check()` if the config 
     file is valid.
     All data is stored in a dictionary. 
-    The config file has to be called config.json in order for pyPsy to 
+    The config file has to be called config.json in order for FixCat to 
     recognize and use it. """
     def __init__(self):
         """Checks if there is already an existing config file. If not, a new 
