@@ -5,6 +5,7 @@ from OpenDialog import OpenDialog
 import images
 
 from FixCat.Config import Config
+from FixCat import License
 from FixCat.CategoryContainer import CategoryContainerError
 
 import wx
@@ -12,14 +13,14 @@ import threading # used for video export
 from wx.lib.wordwrap import wordwrap
 
 class MainFrame(wx.Frame):
-    """This class handles the main window of pyPsy."""
+    """This class handles the main window of FixCat."""
     def __init__(self, video_str, current_frame, controller):
         """In order to manage everythin in the main window, the MainFrame needs
         to know the `controller` that handles everything, as well as the number
         `current_frame` and a string representation of the video image in
         `video_str`. For more information about `video_str`, please see
         L{StringImage}."""
-        wx.Frame.__init__(self, None, title="pyPsy",
+        wx.Frame.__init__(self, None, title="FixCat",
             size=(900, 600))
         icon = wx.Icon('icon.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
@@ -542,15 +543,15 @@ class MainFrame(wx.Frame):
             self.controller.exportCategorisations(path)
 
     def OnAbout(self, e):
-        """Shows the about text of pyPsy."""
+        """Shows the about text of FixCat."""
         info = wx.AboutDialogInfo()
-        info.Name = 'pyPsy'
+        info.Name = 'FixCat'
         info.Version = '0.9'
         info.Copyright = 'GNU GPLv3'
-        info.Description = wordwrap('pyPsy is a tool for processing eyetracking data', 400, wx.ClientDC(self))
-        info.WebSite = ('https://github.com/KopierKatze/pypsy', 'GitHub project page')
+        info.Description = wordwrap('FixCat is a tool for processing eyetracking data', 400, wx.ClientDC(self))
+        info.WebSite = ('https://github.com/KopierKatze/FixCat', 'GitHub project page')
         info.Developers = ["Alexandra Weiss", "Franz Gregor"]
-        info.License = wordwrap('see http://www.gnu.org/licenses/gpl-3.0.txt', 400, wx.ClientDC(self))
+        info.License = wordwrap(License.gpl, 400, wx.ClientDC(self))
 
         wx.AboutBox(info)
 
@@ -564,7 +565,7 @@ class MainFrame(wx.Frame):
                 self.OnSave()
 
     def OnExit(self, e):
-        """Closes pyPsy and shows a dialog if the user wants to save the changes
+        """Closes FixCat and shows a dialog if the user wants to save the changes
         made if necessary."""
         self.SaveAsk()
         self.Destroy()
