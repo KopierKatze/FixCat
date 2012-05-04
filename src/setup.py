@@ -3,7 +3,7 @@ import py2exe
 
 setup(
   console=[{
-    'script':'start_pypsy.py',
+    'script':'fixcat.py',
     'icon_resources':[(1, 'icon.ico')]}],
   zipfile=None, # integrate library into .exe
   options={

@@ -1,7 +1,7 @@
 import wx
 import  wx.lib.intctrl
-from pypsy.VideoReader import ReaderError
-from pypsy.EyeMovement import EyeMovementError
+from FixCat.VideoReader import ReaderError
+from FixCat.EyeMovement import EyeMovementError
 
 class OpenDialog(wx.Dialog):
     def __init__(self, parent, bootstrap_phase=False):

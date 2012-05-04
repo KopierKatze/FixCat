@@ -1,6 +1,6 @@
 import wx
 from EditCategoryDialog import EditCategoryDialog
-from pypsy.Helper import KeyCodeToHumanReadable
+from FixCat.Helper import KeyCodeToHumanReadable
 
 class CategoryDialog(wx.Dialog):
     def __init__(self, parent, id, title='Category overview'):

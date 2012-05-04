@@ -4,8 +4,8 @@ from CategoryList import CategoryList
 from OpenDialog import OpenDialog
 import images
 
-from pypsy.Config import Config
-from pypsy.CategoryContainer import CategoryContainerError
+from FixCat.Config import Config
+from FixCat.CategoryContainer import CategoryContainerError
 
 import wx
 import threading # used for video export

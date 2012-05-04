@@ -80,7 +80,7 @@ class Config(object):
                 raise ConfigError('The following unknown categories were found in the config file: %s.' % to_much)
 
     def check(self):
-        """Evaluate the current raw dictionary whether it is a valid pypsy config
+        """Evaluate the current raw dictionary whether it is a valid FixCat config
         by compary needed data and existing data of the config file. 
         Both amounts are compared in the `_check()` method. """
 
@@ -177,7 +177,7 @@ class ConfigError(Exception):
 
 # default configuration
 default_config_raw = {
-'__comment':"This is the pypsy configuration. It is writen in JSON Format. So be shure to write valid JSON. (http://www.json.org/)",
+'__comment':"This is the FixCat configuration. It is writen in JSON Format. So be shure to write valid JSON. (http://www.json.org/)",
 'keyboard_shortcuts':{
     '__comment': 'You could use the ascii code of a key or the wxPython key name without WXK_ prefix (see http://wxpython.org/docs/api/wx.KeyEvent-class.html).',
     'play/pause': "space",

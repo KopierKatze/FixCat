@@ -1,4 +1,4 @@
-"""This module contains the images used in pypsy.
+"""This module contains the images used in FixCat.
 
 They are encoded in this module so we don't have
 to ship dedicated imaged files.

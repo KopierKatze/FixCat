@@ -1,7 +1,7 @@
 import wx
 
-from pypsy.Helper import KeyCodeToHumanReadable
-from pypsy.CategoryContainer import CategoryContainerError
+from FixCat.Helper import KeyCodeToHumanReadable
+from FixCat.CategoryContainer import CategoryContainerError
 
 class EditCategoryDialog(wx.Dialog):
     def __init__(self, parent, editCategoryFunction, category_name='', category_shortcut=None):
