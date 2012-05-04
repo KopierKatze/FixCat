@@ -5,7 +5,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows, positioning}
 \usepackage{pgf-umlcd}
-\title{Entwicklerdokumentation pyPsy}
+\title{Entwicklerdokumentation FixCat}
 \author{Franz Gregor und Alexandra Weiss}
 \date{\today}
 \makeindex
@@ -17,8 +17,8 @@
 \tableofcontents
 \newpage
 \section{Einleitung}
-Dieses Dokument ist die Entwicklerdokumentation von pyPsy.
-Es richtet sich vor allem an Personen die pyPsy weiterentwickeln wollen.
+Dieses Dokument ist die Entwicklerdokumentation von FixCat.
+Es richtet sich vor allem an Personen die FixCat weiterentwickeln wollen.
 
 Es enh\"alt eine Beschreibung des Ziels, das mit diesem Programm/Projekt erreicht wurde, sowie die Anforderungen an die Software.
 Sowie die darauf aufbauenden getroffenen Entscheidungen bezüglich der Architektur und Implementation.
@@ -43,7 +43,7 @@ Ausserdem m\"ussen die Daten erfasst werden, was dazu gef\"uhrt hat, dass die Wi
 Dieser Prozess soll mit Hilfe des zu entwicklenden Programms vereinfacht werden.
 
 \section{Anforderungen}
-In diesem Abschnitt werden die zu Beginn des Projektes an pyPsy gestellten Anforderungen erläutert, welche sich in die Kategorien Datenin- und Output, Wiedergabe und Kategorisierung gliedern lassen. 
+In diesem Abschnitt werden die zu Beginn des Projektes an FixCat gestellten Anforderungen erläutert, welche sich in die Kategorien Datenin- und Output, Wiedergabe und Kategorisierung gliedern lassen. 
 Die Pflichtanforderungen wurden in der Version 1.0 alle erfüllt, sowie auch einige optionale Anforderungen. 
 \subsection{Dateninput}
 \subsubsection{Pflicht}
@@ -120,21 +120,21 @@ Es zeigte sich, dass die beiden w\"ahrend der Wiedergabe gleichzeitig ablaufende
 Gemeinsam in einzelnen Threads jedoch zeigte sich das Problem.
 
 Die Ursache da\"ur liegt in der Architektur von Python mit dem GIL ("`Global Interpreter Lock"') und den damit verbundenen - im informatischen Sinne teuren - Kontextwechseln zwischen zwei Threads.
-Wir entschieden uns daher pyPsy als Multiprocessing Anwendung zu implementieren.
+Wir entschieden uns daher FixCat als Multiprocessing Anwendung zu implementieren.
 Mit Hilfe der Python Standardbibliothek war dies auch mit relativ wenig Aufwand verbunden.
 
-In pyPsy gibt es einen Backend-Prozess und einen GUI-Prozess, die mit Hilfe von IPC(Interprozesskommunikation) und Shared Memory (für das Video) miteinander kommunizieren.
+In FixCat gibt es einen Backend-Prozess und einen GUI-Prozess, die mit Hilfe von IPC(Interprozesskommunikation) und Shared Memory (für das Video) miteinander kommunizieren.
 Der gr\"o\ss te Teil des Multiprocessing Codes findet sich in der FixCat.py Datei.
 \\ \\
-Eine weitere Entscheidung bezüglich der Architektur betrifft die Saveable Klasse, die das Abspeichern von pyPsy Projekten mit hilfe eines SaveControllers regelt. Um alle wichtigen Daten in der pyps-Datei ablegen zu können, müssen einige Klassen des Backends deshalb von Saveable erben. Neben dem Controller sind dies auch die Clock, der CategoryContainer, das EyeMovement und der VideoReader. Das bedeutet, dass diese Klassen bei ihrer Initialisierung Saveable Objekte sind, die dem SaveController hinzugefügt werden können. Das Abspeichern der Projektdaten in eine pyps-Datei erfolgt durch den SaveController, der alle Saveable Objekte in der von ihm verwalteten Datenstruktur in eine Datei schreibt. Für Letzteres verwenden wir das Pickle Modul, welches Objekte in Strings umwandelt, die dann in die pyps-Datei geschrieben werden. 
+Eine weitere Entscheidung bezüglich der Architektur betrifft die Saveable Klasse, die das Abspeichern von FixCat Projekten mit hilfe eines SaveControllers regelt. Um alle wichtigen Daten in der pyps-Datei ablegen zu können, müssen einige Klassen des Backends deshalb von Saveable erben. Neben dem Controller sind dies auch die Clock, der CategoryContainer, das EyeMovement und der VideoReader. Das bedeutet, dass diese Klassen bei ihrer Initialisierung Saveable Objekte sind, die dem SaveController hinzugefügt werden können. Das Abspeichern der Projektdaten in eine pyps-Datei erfolgt durch den SaveController, der alle Saveable Objekte in der von ihm verwalteten Datenstruktur in eine Datei schreibt. Für Letzteres verwenden wir das Pickle Modul, welches Objekte in Strings umwandelt, die dann in die pyps-Datei geschrieben werden. 
 \\ \\
-Um pyPsy besser anpassen zu können, wird beim Start eine Config-Datei angelegt, die vom Nutzer editiert werden kann. Neben der Quelle der Bilder für die Blickcursor kann auch das Codec für den Videoexport, sowie die Shortcuts für die Steuerung der Wiedergabe geändert werden. Die Config Datei ist im Json Format angelegt, da dieses Format gut lesbar für den Benutzer ist und sich mit Hilfe des Json Moduls für Python sehr gut einlesen lässt. 
+Um FixCat besser anpassen zu können, wird beim Start eine Config-Datei angelegt, die vom Nutzer editiert werden kann. Neben der Quelle der Bilder für die Blickcursor kann auch das Codec für den Videoexport, sowie die Shortcuts für die Steuerung der Wiedergabe geändert werden. Die Config Datei ist im Json Format angelegt, da dieses Format gut lesbar für den Benutzer ist und sich mit Hilfe des Json Moduls für Python sehr gut einlesen lässt. 
 \\ \\
 Der folgende Abschnitt über die Klassen im Einzelnen ist in GUI und Backend Komponenten unterteilt.
 Diese finden sich zur Laufzeit in den entsprechenden Prozessen.
 
 \section{Komponenten}
-In diesem Abschnitt werden die wichtigsten Komponenten von pyPsy und deren Interaktion beschrieben.
+In diesem Abschnitt werden die wichtigsten Komponenten von FixCat und deren Interaktion beschrieben.
 
 \subsection{GUI}
 Die folgenden Komponenten stellen die GUI oder ihre Elemente bereit und werden im GUI-Prozess ausgef\"uhrt.
@@ -142,7 +142,7 @@ Diese Liste ist nicht vollst\"andig.
 Sie betrachtet nur die interessantesten Konzepte.
 
 \subsubsection{MainFrame}
-Der MainFrame ist das Hauptfenster von pyPsy, in dem der Benutzer das Video ansehen und steuern kann. Um während der Videowiedergabe die Steuerflächen im Fenster ohne Performance-Einbußen zu benutzen, muss der MainFrame in einem eigenen Prozess laufen. Die einzelnen Frames des Videos bezieht der MainFrame vom gemeinsamen Speicher der beiden Hauptprozesse und nicht etwa direkt von der bereit gestellten Videodatei. Somit muss der MainFrame über den Proxy, der zwischen Prozessen vermittelt, mit dem Controller (der in einem anderen Prozess läuft) kommunzieren. \\  \\
+Der MainFrame ist das Hauptfenster von FixCat, in dem der Benutzer das Video ansehen und steuern kann. Um während der Videowiedergabe die Steuerflächen im Fenster ohne Performance-Einbußen zu benutzen, muss der MainFrame in einem eigenen Prozess laufen. Die einzelnen Frames des Videos bezieht der MainFrame vom gemeinsamen Speicher der beiden Hauptprozesse und nicht etwa direkt von der bereit gestellten Videodatei. Somit muss der MainFrame über den Proxy, der zwischen Prozessen vermittelt, mit dem Controller (der in einem anderen Prozess läuft) kommunzieren. \\  \\
 Bereits vorgenommene Kategorisierungen werden auf der rechten Seite in der CategoryList angezeigt. Die Spalte "`Index"' bezeichnet entweder den Index des Frames oder - je nach Einstellung des Projekts - der Fixation im Video, während rechts daneben der Name der Kategorie eingetragen wird. 
 Direkt unter dem Bild des Videos ist ein Slider, mit dem der Benutzer Frame-genau durch das Video navigieren kann.
 Unterhalb des Bildes vom Video sind Buttons für die Steuerung der Wiedergabe des Videos. Von links nach rechts sind dies \textbf{Frame zurück springen}, \textbf{Play}, \textbf{Pause}, \textbf{Frame nach vorne springen} und \textbf{zum/r nächsten nicht kategorisierten Frame/Fixation springen}. \\
@@ -160,7 +160,7 @@ In der Status Bar rechts am unteren Ende des Fensters werden alle relevanten Inf
 \end{itemize}
 Die Menüs oben links bieten dem Benutzer folgende Untermenüs:
 Das "`File"' Menü ist unterteilt in "`Open"', "`Save"', "`About"' und "`Quit"'. 
-Im "`Category"' Menü mit den Punkten "`Mange categories"' und "`Export categories"' kann der Benutzer Kategorien anlegen und verwalten. Dies schließt den Import von Kategorien aus anderen pyPsy-Projekten ein.
+Im "`Category"' Menü mit den Punkten "`Mange categories"' und "`Export categories"' kann der Benutzer Kategorien anlegen und verwalten. Dies schließt den Import von Kategorien aus anderen FixCat-Projekten ein.
 Im Menüpunkt für den Export können die vorgenommenen Kategorisierungen als csv-Datei exportiert werden. 
 Das "`Export"' Menü mit dem Unterpunkt "`Video"' ist für den Videoexport zuständig. Wird dieser Menüpunkt ausgewählt, so muss der Benutzer zunächst den Pfad und den Namen für die resultierende Videodatei angeben. Der Fortschritt des Exports wird in einem Fortschrittsfenster angezeigt.
 
@@ -176,7 +176,7 @@ Die Komponenten in diesem Abschnitt werden im Backend genutzt.
 Das hei\ss t, sie stellen die fachliche Funktionalit\"at her.
 
 \subsubsection{Controller}
-  Der Controller spielt eine sehr zentrale Rolle in pyPsy, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten, auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller, beziehungsweise der funktionalen Klassen auf den Controller dargestellt(Abbildung \ref{RolleController}).
+  Der Controller spielt eine sehr zentrale Rolle in FixCat, da er die Schnittstelle zwischen GUI und den funktionalen Klassen bildet. Im Sinne des Design Patterns "`Model-View-Controller"' bedeutet dies, dass Klassen, die die GUI verwalten, auf beispielsweise die Clock nur über den Controller zugreifen können. Im Folgenden ist der Zugriff der GUI-Klassen auf den Controller, beziehungsweise der funktionalen Klassen auf den Controller dargestellt(Abbildung \ref{RolleController}).
   \begin{figure}[ht]
     \begin{center}
     \begin{tikzpicture}[auto, node distance=1.2cm]
@@ -226,7 +226,7 @@ Das hei\ss t, sie stellen die fachliche Funktionalit\"at her.
   Die Besonderheit dieser Model-View-Controller Architektur ist, dass es nur einen zentrallen Controller gibt. Auf der rechten Seite sind die Models angeordnet, in der Mitte der Controller und auf der linken Seite die Views. Im folgendem wird kurz auf die Aufgaben der einzelnen Models eingegangen. Die Views bieten dem Nutzer jeweils die Interaktionsmöglichkeit an und der Controller setzt diese auf die Models um. Da der Controller die einzige Verbindung zwischen GUI und Backend ist, kann er auch als "`Adapter"' - im Sinne des gleichnamigen Software Design Patterns - zwischen GUI und Backend gesehen werden. 
 
 \subsubsection{Saveable}
-Um möglichst viele Eigenschaften eines pyPsy Projektes abspeichern zu können, erben die meisten Klassen des Backends von Saveable. Diese Klasse enthält Methoden, die es beispielsweise ermöglichen die verstrichene Zeit des Videos in der pyps-Datei abzulegen. 
+Um möglichst viele Eigenschaften eines FixCat Projektes abspeichern zu können, erben die meisten Klassen des Backends von Saveable. Diese Klasse enthält Methoden, die es beispielsweise ermöglichen die verstrichene Zeit des Videos in der pyps-Datei abzulegen. 
 Für eine bessere Verwaltung der Objekte, die abgespeichert werden, gibt es den sogenannten "`SaveController"', der die Liste speicherbarer Objekte verwaltet. 
 Die zu speichernden Daten bietet die jeweilige Klasse dem SaveController über die $getState()$ Methode an
 
@@ -265,7 +265,7 @@ Nachdem der Klasse bei der Initialisierung der Pfad zu einer Augenbewegungsdaten
 \section{M\"ogliche Erweiterungen}
   \begin{description}
     \item[Deinterlacing] wird von OpenCV nicht als eingebaute Funktionalität unterstützt und ist deshalb bisher noch nicht realisiert. Eine Implementierung dieses Features benötigt einen effizienten Algorithmus, der das Deinterlacing auf jedes Bild anwendet. 
-    \item[Position des Blickcursors korrigierbar] Bisher kann der Benutzer die Position des Cursors nicht in pyPsy beeinflussen, falls dies nötig ist. Das wäre zum Beispiel nötig, wenn das Eyelink System teilweise fehlerhafte Daten liefert, die manuell korrigiert werden können. Da dieses Eingreifen sehr komplex zu realisieren wäre, wurde dieses Feature bisher nicht implementiert.
+    \item[Position des Blickcursors korrigierbar] Bisher kann der Benutzer die Position des Cursors nicht in FixCat beeinflussen, falls dies nötig ist. Das wäre zum Beispiel nötig, wenn das Eyelink System teilweise fehlerhafte Daten liefert, die manuell korrigiert werden können. Da dieses Eingreifen sehr komplex zu realisieren wäre, wurde dieses Feature bisher nicht implementiert.
   \end{description}
 
 \end{document}
