@@ -5,10 +5,10 @@ from multiprocessing.managers import SyncManager
 
 import wx
 
-from pypsy.Controller import Controller
-from pypsy.gui.MainFrame import MainFrame
+from FixCat.Controller import Controller
+from FixCat.gui.MainFrame import MainFrame
 
-from pypsy import Config
+from FixCat import Config
 
 
 myController = None
