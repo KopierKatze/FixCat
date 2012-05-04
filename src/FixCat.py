@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-Copyright 2012 Alexandra Weiß, Franz Gregor
+Copyright 2012 Alexandra Weiss, Franz Gregor
 
 This file is part of FixCat.
 
