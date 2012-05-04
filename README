@@ -43,5 +43,5 @@ change into src directory and execute
   or maybe you can omit the 'python' part
 
 a dist directory exists after the programm has terminated
-copy the cursors directory, the icon.ico file and all the opencv_*.dlls next to the created start_pypsy.exe into the dist directory
+copy the cursors directory, the icon.ico file and all the opencv_*.dlls next to the created FixCat.exe into the dist directory
 you can now distrubute the dist directory and start the application by executing FixCat.exe
