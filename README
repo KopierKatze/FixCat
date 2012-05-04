@@ -26,7 +26,7 @@ Linux:
 Same procedure as in windows but using your package manager will make things easy.
 
 Ubuntu (should be the same in other Debian flavored distros):
-  sudo apt-get install python python-wxversion python-opencv
+  sudo apt-get install python python-wxgtk2.8 python-opencv
 
 BUILD DISTRIBUTION
 ==================
@@ -44,4 +44,4 @@ change into src directory and execute
 
 a dist directory exists after the programm has terminated
 copy the cursors directory, the icon.ico file and all the opencv_*.dlls next to the created start_pypsy.exe into the dist directory
-you can now distrubute the dist directory and start the application by executing start_pypsy.exe
+you can now distrubute the dist directory and start the application by executing FixCat.exe
