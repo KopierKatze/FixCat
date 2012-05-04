@@ -124,7 +124,7 @@ Wir entschieden uns daher pyPsy als Multiprocessing Anwendung zu implementieren.
 Mit Hilfe der Python Standardbibliothek war dies auch mit relativ wenig Aufwand verbunden.
 
 In pyPsy gibt es einen Backend-Prozess und einen GUI-Prozess, die mit Hilfe von IPC(Interprozesskommunikation) und Shared Memory (für das Video) miteinander kommunizieren.
-Der gr\"o\ss te Teil des Multiprocessing Codes findet sich in der start\_pypsy.py Datei.
+Der gr\"o\ss te Teil des Multiprocessing Codes findet sich in der FixCat.py Datei.
 \\ \\
 Eine weitere Entscheidung bezüglich der Architektur betrifft die Saveable Klasse, die das Abspeichern von pyPsy Projekten mit hilfe eines SaveControllers regelt. Um alle wichtigen Daten in der pyps-Datei ablegen zu können, müssen einige Klassen des Backends deshalb von Saveable erben. Neben dem Controller sind dies auch die Clock, der CategoryContainer, das EyeMovement und der VideoReader. Das bedeutet, dass diese Klassen bei ihrer Initialisierung Saveable Objekte sind, die dem SaveController hinzugefügt werden können. Das Abspeichern der Projektdaten in eine pyps-Datei erfolgt durch den SaveController, der alle Saveable Objekte in der von ihm verwalteten Datenstruktur in eine Datei schreibt. Für Letzteres verwenden wir das Pickle Modul, welches Objekte in Strings umwandelt, die dann in die pyps-Datei geschrieben werden. 
 \\ \\
